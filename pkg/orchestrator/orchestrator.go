@@ -28,6 +28,7 @@ type Config struct {
 	OutputIndividualDir string  // Directory for individual slide videos (Udemy)
 	TransitionDuration  float64 // Duration of transitions between slides in seconds
 	ScreenDevice        string  // Screen capture device (macOS, auto-detected if empty)
+	AudioManifest       string  // Path to audio manifest file (from 'marp2video tts')
 }
 
 // Orchestrator coordinates the entire video generation process
