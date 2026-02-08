@@ -198,17 +198,76 @@ The pause directives are automatically removed from the spoken text.
 
 ## How It Works
 
-The conversion process follows these steps:
+### Pipeline Overview
 
-1. **Parse Markdown** - Extract slides and voiceover comments from Marp file
-2. **Generate Audio** - Convert voiceover text to speech using ElevenLabs API
-3. **Render HTML** - Use Marp CLI to convert markdown to HTML presentation
-4. **Launch Browser** - Open presentation in a controlled browser window using Rod
-5. **Record Slides** - For each slide:
-   - Navigate to the slide
-   - Play the generated audio
-   - Record screen + audio using ffmpeg
-6. **Combine Videos** - Concatenate all slide recordings into final video
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  INPUT: presentation.md (Marp markdown with <!-- voiceover comments -->) │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  STEP 1: Parse Markdown                                                 │
+│  • Extract slides from Marp file                                        │
+│  • Extract voiceover text from HTML comments                            │
+│  • Parse [PAUSE:ms] timing directives                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  STEP 2: Generate Audio (ElevenLabs TTS)                                │
+│  • Send voiceover text to ElevenLabs API                                │
+│  • Receive MP3 audio files (one per slide)                              │
+│  • Output: workdir/audio/slide_000.mp3, slide_001.mp3, ...              │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  STEP 3: Render HTML (Marp CLI)                                         │
+│  • Execute: marp presentation.md -o presentation.html --html            │
+│  • Creates navigable HTML presentation with all slides                  │
+│  • Output: workdir/html/presentation.html                               │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  STEP 4: Record Slides (Browser + ffmpeg)                               │
+│  • Launch headless browser via Rod (Chromium)                           │
+│  • Load HTML presentation                                               │
+│  • For each slide:                                                      │
+│    ├─ Navigate to slide (keyboard: Home + Arrow keys)                   │
+│    ├─ Start screen recording with audio overlay                         │
+│    ├─ Record for: audio duration + pause directives                     │
+│    └─ Save: workdir/video/slide_000.mp4, slide_001.mp4, ...             │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  STEP 5: Combine Videos (ffmpeg)                                        │
+│  • Concatenate all slide videos in sequence                             │
+│  • Optional: Apply crossfade transitions (--transition flag)            │
+│  • Output: presentation.mp4                                             │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  STEP 6: Export Individual Videos (Optional)                            │
+│  • Copy individual slide videos to output directory                     │
+│  • For Udemy courses: --output-individual ./lectures/                   │
+│  • Output: lectures/slide_000.mp4, slide_001.mp4, ...                   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Step Details
+
+| Step | Component | Tool | Input | Output |
+|------|-----------|------|-------|--------|
+| 1 | Parser | Go | `slides.md` | Slides + voiceovers |
+| 2 | TTS | ElevenLabs API | Voiceover text | `slide_*.mp3` |
+| 3 | Renderer | Marp CLI | `slides.md` | `presentation.html` |
+| 4 | Recorder | Rod + ffmpeg | HTML + MP3 | `slide_*.mp4` |
+| 5 | Combiner | ffmpeg | `slide_*.mp4` | `output.mp4` |
+| 6 | Exporter | Go | `slide_*.mp4` | Individual files |
 
 ## Architecture
 
@@ -291,9 +350,34 @@ Individual slide videos (`--output-individual`) are designed for Udemy courses:
 - Combining related slides into single lectures
 - Using more detailed voiceover scripts
 
-## Example
+## Examples
+
+The `examples/` directory contains self-contained examples, each in its own subdirectory:
+
+```
+examples/
+├── intro/                    # Introduction to marp2video
+│   ├── presentation.md       # Marp markdown source
+│   ├── transcript.txt        # Human-readable voiceover transcript
+│   └── output.mp4            # Generated video (after running)
+└── README.md
+```
+
+### Running an Example
+
+```bash
+# Generate the intro video
+marp2video \
+  --input examples/intro/presentation.md \
+  --output examples/intro/output.mp4
+```
+
+The `intro` example is a self-documenting presentation that explains what marp2video does - using marp2video itself.
+
+### Full Example
 
 See `example_presentation.md` for a complete example with:
+
 - Custom Marp theme
 - Voiceover comments on each slide
 - Pause directives for timing
