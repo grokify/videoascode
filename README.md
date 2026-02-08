@@ -2,12 +2,14 @@
 
 Convert Marp presentations with voiceovers to video files.
 
-This tool takes a Marp markdown presentation with voiceover text in HTML comments, generates speech using ElevenLabs TTS, and creates a synchronized video recording of the presentation.
+This tool takes a Marp markdown presentation with voiceover text (inline comments or JSON transcript), generates speech using ElevenLabs TTS, and creates a synchronized video recording of the presentation.
 
 ## Features
 
 - ✅ **Parse Marp presentations** with voiceover in HTML comments
+- ✅ **JSON transcript support** for multi-language voiceovers
 - ✅ **Text-to-speech** using ElevenLabs API (Adam voice by default)
+- ✅ **Multi-language** support with per-slide voice configuration
 - ✅ **Browser automation** with Rod to display slides
 - ✅ **Screen recording** with synchronized audio using ffmpeg
 - ✅ **Cross-platform** support (macOS, Linux, Windows)
@@ -15,6 +17,7 @@ This tool takes a Marp markdown presentation with voiceover text in HTML comment
 - ✅ **Full orchestration** - entire process automated in Go
 - ✅ **YouTube-ready** combined video output with optional transitions
 - ✅ **Udemy-ready** individual slide videos for course lectures
+- ✅ **Decoupled workflow** - generate audio and video separately
 
 ## Installation
 
@@ -56,100 +59,127 @@ go build -o bin/marp2video ./cmd/marp2video
 
 ## Usage
 
-### Basic Usage
+marp2video provides two subcommands for flexible workflows:
+
+- `marp2video video` - Full pipeline or video generation with pre-generated audio
+- `marp2video tts` - Generate audio from JSON transcript
+
+### Quick Start (Full Pipeline)
 
 ```bash
 export ELEVENLABS_API_KEY="your-api-key-here"
 
-./bin/marp2video \
-  --input example_presentation.md \
-  --output presentation.mp4
+# Using inline voiceover comments
+marp2video video --input slides.md --output video.mp4
 ```
 
-### Command-Line Options
+### Two-Step Workflow (Recommended for Multi-Language)
+
+```bash
+# Step 1: Generate audio from transcript
+marp2video tts --transcript transcript.json --output audio/ --lang en-US
+
+# Step 2: Generate video with pre-generated audio
+marp2video video --input slides.md --manifest audio/manifest.json --output video.mp4
+```
+
+### Command: `marp2video tts`
+
+Generate audio files from a JSON transcript.
 
 ```
---input string
-    Input Marp markdown file (required)
+marp2video tts [flags]
 
---output string
-    Output video file (default: "output.mp4")
+Flags:
+  -t, --transcript string   Transcript JSON file (required)
+  -o, --output string       Output directory for audio files (default "audio")
+  -l, --lang string         Language/locale code (e.g., en-US, es-ES)
+  -k, --api-key string      ElevenLabs API key (or use ELEVENLABS_API_KEY env var)
+```
 
---output-individual string
-    Directory to save individual slide videos (for Udemy)
-    Each slide will be saved as slide_000.mp4, slide_001.mp4, etc.
+**Output:**
 
---transition float
-    Transition duration between slides in seconds (default: 0 = no transitions)
-    Uses crossfade effect for both video and audio
+- `audio/slide_000.mp3`, `slide_001.mp3`, ... (one per slide)
+- `audio/manifest.json` (timing information for video recording)
 
---api-key string
-    ElevenLabs API key (or use ELEVENLABS_API_KEY env var)
+**Example:**
 
---voice string
-    ElevenLabs voice ID (default: "pNInz6obpgDQGcFmaJgB" - Adam voice)
+```bash
+# Generate audio for Spanish
+marp2video tts --transcript transcript.json --output audio_es/ --lang es-ES
+```
 
---width int
-    Video width in pixels (default: 1920)
+### Command: `marp2video video`
 
---height int
-    Video height in pixels (default: 1080)
+Generate video from Marp presentation.
 
---fps int
-    Video frame rate (default: 30)
+```
+marp2video video [flags]
 
---workdir string
-    Working directory for temporary files (default: system temp dir)
-
---screen-device string
-    Screen capture device for macOS (auto-detected if empty)
-    Use "ffmpeg -f avfoundation -list_devices true -i ''" to list devices
-
---check
-    Check dependencies without running
-
---version
-    Show version information
+Flags:
+  -i, --input string              Input Marp markdown file (required)
+  -o, --output string             Output video file (default "output.mp4")
+  -m, --manifest string           Audio manifest file (from 'marp2video tts')
+  -k, --api-key string            ElevenLabs API key (or use ELEVENLABS_API_KEY env var)
+  -v, --voice string              ElevenLabs voice ID (default: Adam)
+      --width int                 Video width (default 1920)
+      --height int                Video height (default 1080)
+      --fps int                   Frame rate (default 30)
+      --transition float          Transition duration in seconds
+      --output-individual string  Directory for individual slide videos
+      --workdir string            Working directory for temp files
+      --screen-device string      Screen capture device (macOS)
+      --check                     Check dependencies and exit
 ```
 
 ### Examples
 
-**Generate combined video for YouTube:**
+**Full pipeline with inline voiceovers:**
+
 ```bash
-./bin/marp2video \
+marp2video video \
   --input presentation.md \
   --output youtube_video.mp4 \
   --transition 0.5
 ```
 
-**Generate individual videos for Udemy:**
+**Multi-language workflow:**
+
 ```bash
-./bin/marp2video \
+# Generate audio for each language
+marp2video tts --transcript transcript.json --output audio_en/ --lang en-US
+marp2video tts --transcript transcript.json --output audio_es/ --lang es-ES
+
+# Generate videos
+marp2video video --input slides.md --manifest audio_en/manifest.json --output video_en.mp4
+marp2video video --input slides.md --manifest audio_es/manifest.json --output video_es.mp4
+```
+
+**Generate individual videos for Udemy:**
+
+```bash
+marp2video video \
   --input presentation.md \
   --output combined.mp4 \
   --output-individual ./udemy_videos/
 ```
 
-**Generate both with transitions:**
-```bash
-./bin/marp2video \
-  --input presentation.md \
-  --output youtube_video.mp4 \
-  --output-individual ./udemy_videos/ \
-  --transition 0.5
-```
-
 ### Check Dependencies
 
 ```bash
-./bin/marp2video --check
+marp2video video --check
 ```
 
 This will verify that all required tools (ffmpeg, marp) are installed.
 
-## Presentation Format
+## Voiceover Formats
 
-### Voiceover Comments
+marp2video supports two voiceover formats:
+
+1. **Inline HTML comments** - Simple, single-language
+2. **JSON transcript** - Multi-language, advanced TTS control
+
+### Option 1: Inline Voiceover Comments
 
 Add voiceover text in HTML comments before or after slide content:
 
@@ -180,7 +210,7 @@ Voiceover for slide 2...
 More content
 ```
 
-### Pause Directives
+#### Pause Directives
 
 Use `[PAUSE:milliseconds]` to add pauses in the voiceover:
 
@@ -196,29 +226,128 @@ Third sentence after a 2-second pause.
 
 The pause directives are automatically removed from the spoken text.
 
+### Option 2: JSON Transcript
+
+For multi-language support and advanced TTS configuration, use a JSON transcript file:
+
+```json
+{
+  "version": "1.0",
+  "metadata": {
+    "title": "My Presentation",
+    "defaultLanguage": "en-US",
+    "defaultVoice": {
+      "provider": "elevenlabs",
+      "voiceId": "pNInz6obpgDQGcFmaJgB",
+      "voiceName": "Adam",
+      "model": "eleven_multilingual_v2",
+      "stability": 0.5,
+      "similarityBoost": 0.75
+    },
+    "defaultVenue": "youtube"
+  },
+  "slides": [
+    {
+      "index": 0,
+      "title": "Title Slide",
+      "transcripts": {
+        "en-US": {
+          "segments": [
+            { "text": "Welcome to the presentation.", "pause": 500 },
+            { "text": "Let's get started." }
+          ]
+        },
+        "es-ES": {
+          "voice": {
+            "voiceId": "onwK4e9ZLuTAKqWW03F9",
+            "voiceName": "Daniel"
+          },
+          "segments": [
+            { "text": "Bienvenido a la presentación.", "pause": 500 },
+            { "text": "Comencemos." }
+          ]
+        }
+      }
+    }
+  ]
+}
+```
+
+#### Transcript Features
+
+| Feature | Description |
+|---------|-------------|
+| **Multi-language** | Per-slide transcripts for each locale (en-US, es-ES, etc.) |
+| **Voice override** | Different voice per language or segment |
+| **Pause control** | Pause after each segment (milliseconds) |
+| **Venue presets** | Optimized settings for YouTube, Udemy, Coursera |
+| **TTS parameters** | Stability, similarity boost, style exaggeration |
+
+#### Audio Manifest
+
+When using `marp2video tts`, a manifest is generated with timing info:
+
+```json
+{
+  "version": "1.0",
+  "language": "en-US",
+  "generatedAt": "2024-01-01T12:00:00Z",
+  "slides": [
+    {
+      "index": 0,
+      "audioFile": "slide_000.mp3",
+      "audioDurationMs": 5200,
+      "pauseDurationMs": 500,
+      "totalDurationMs": 5700
+    }
+  ]
+}
+```
+
+This manifest is used by `marp2video video --manifest` for precise slide timing.
+
 ## How It Works
 
 ### Pipeline Overview
 
+marp2video supports two workflows:
+
+**Workflow A: Full Pipeline (inline voiceovers)**
+```
+presentation.md → Parse → TTS → Render → Record → Combine → video.mp4
+```
+
+**Workflow B: Two-Step (JSON transcript)**
+```
+Step 1: transcript.json → marp2video tts → audio/*.mp3 + manifest.json
+Step 2: presentation.md + manifest.json → marp2video video → video.mp4
+```
+
+### Detailed Pipeline
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  INPUT: presentation.md (Marp markdown with <!-- voiceover comments -->) │
+│  INPUT OPTIONS                                                          │
+│  ┌─────────────────────────┐    ┌─────────────────────────────────────┐ │
+│  │ A: presentation.md      │ OR │ B: transcript.json (multi-language) │ │
+│  │    (inline voiceovers)  │    │    + presentation.md                │ │
+│  └─────────────────────────┘    └─────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  STEP 1: Parse Markdown                                                 │
-│  • Extract slides from Marp file                                        │
-│  • Extract voiceover text from HTML comments                            │
-│  • Parse [PAUSE:ms] timing directives                                   │
+│  STEP 1: Parse / Load Transcript                                        │
+│  • A: Extract voiceover from HTML comments + parse [PAUSE:ms]           │
+│  • B: Load transcript.json, select language, resolve voice config       │
 └─────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  STEP 2: Generate Audio (ElevenLabs TTS)                                │
 │  • Send voiceover text to ElevenLabs API                                │
-│  • Receive MP3 audio files (one per slide)                              │
-│  • Output: workdir/audio/slide_000.mp3, slide_001.mp3, ...              │
+│  • Apply voice settings (stability, similarity, style)                  │
+│  • Output: audio/slide_000.mp3, slide_001.mp3, ...                      │
+│  • Output: audio/manifest.json (timing for video recording)             │
 └─────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -226,7 +355,6 @@ The pause directives are automatically removed from the spoken text.
 │  STEP 3: Render HTML (Marp CLI)                                         │
 │  • Execute: marp presentation.md -o presentation.html --html            │
 │  • Creates navigable HTML presentation with all slides                  │
-│  • Output: workdir/html/presentation.html                               │
 └─────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -235,10 +363,9 @@ The pause directives are automatically removed from the spoken text.
 │  • Launch headless browser via Rod (Chromium)                           │
 │  • Load HTML presentation                                               │
 │  • For each slide:                                                      │
-│    ├─ Navigate to slide (keyboard: Home + Arrow keys)                   │
-│    ├─ Start screen recording with audio overlay                         │
-│    ├─ Record for: audio duration + pause directives                     │
-│    └─ Save: workdir/video/slide_000.mp4, slide_001.mp4, ...             │
+│    ├─ Navigate to slide                                                 │
+│    ├─ Record for: audioDurationMs + pauseDurationMs (from manifest)     │
+│    └─ Save: video/slide_000.mp4, slide_001.mp4, ...                     │
 └─────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -246,7 +373,7 @@ The pause directives are automatically removed from the spoken text.
 │  STEP 5: Combine Videos (ffmpeg)                                        │
 │  • Concatenate all slide videos in sequence                             │
 │  • Optional: Apply crossfade transitions (--transition flag)            │
-│  • Output: presentation.mp4                                             │
+│  • Output: video.mp4                                                    │
 └─────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -254,7 +381,6 @@ The pause directives are automatically removed from the spoken text.
 │  STEP 6: Export Individual Videos (Optional)                            │
 │  • Copy individual slide videos to output directory                     │
 │  • For Udemy courses: --output-individual ./lectures/                   │
-│  • Output: lectures/slide_000.mp4, slide_001.mp4, ...                   │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -273,14 +399,25 @@ The pause directives are automatically removed from the spoken text.
 
 ```
 marp2video/
-├── cmd/marp2video/          # CLI entry point
+├── cmd/marp2video/          # CLI (Cobra-based)
+│   ├── main.go              # Entry point
+│   ├── root.go              # Root command
+│   ├── tts.go               # TTS subcommand
+│   └── video.go             # Video subcommand
 ├── pkg/
 │   ├── parser/              # Marp markdown parser
-│   ├── tts/                 # ElevenLabs text-to-speech
+│   ├── transcript/          # JSON transcript types
+│   ├── tts/                 # ElevenLabs TTS + manifest
 │   ├── renderer/            # Marp HTML renderer & browser control
 │   ├── audio/               # Audio utilities
 │   ├── video/               # Video recording & combination
 │   └── orchestrator/        # Main workflow coordinator
+├── examples/                # Example presentations
+│   └── intro/               # Self-documenting example
+│       ├── presentation.md
+│       ├── transcript.json
+│       └── README.md
+└── docs/                    # MkDocs documentation
 ```
 
 ## Platform-Specific Recording
@@ -352,36 +489,66 @@ Individual slide videos (`--output-individual`) are designed for Udemy courses:
 
 ## Examples
 
-The `examples/` directory contains self-contained examples, each in its own subdirectory:
+The `examples/` directory contains self-contained examples:
 
 ```
 examples/
 ├── intro/                    # Introduction to marp2video
-│   ├── presentation.md       # Marp markdown source
-│   ├── transcript.txt        # Human-readable voiceover transcript
-│   └── output.mp4            # Generated video (after running)
+│   ├── presentation.md       # Marp markdown source (13 slides)
+│   ├── transcript.json       # Multi-language transcript (en-US, en-GB, es-ES)
+│   ├── README.md             # Detailed usage instructions
+│   └── audio/                # Generated audio (after running tts)
+│       ├── manifest.json
+│       └── slide_*.mp3
 └── README.md
 ```
 
-### Running an Example
+### Running the Intro Example
+
+**Option A: Full pipeline (inline voiceovers)**
 
 ```bash
-# Generate the intro video
-marp2video \
+marp2video video \
   --input examples/intro/presentation.md \
   --output examples/intro/output.mp4
 ```
 
+**Option B: Two-step with transcript (multi-language)**
+
+```bash
+# Generate audio for English
+marp2video tts \
+  --transcript examples/intro/transcript.json \
+  --output examples/intro/audio/ \
+  --lang en-US
+
+# Generate video
+marp2video video \
+  --input examples/intro/presentation.md \
+  --manifest examples/intro/audio/manifest.json \
+  --output examples/intro/output.mp4
+
+# Generate Spanish version
+marp2video tts \
+  --transcript examples/intro/transcript.json \
+  --output examples/intro/audio_es/ \
+  --lang es-ES
+
+marp2video video \
+  --input examples/intro/presentation.md \
+  --manifest examples/intro/audio_es/manifest.json \
+  --output examples/intro/output_es.mp4
+```
+
 The `intro` example is a self-documenting presentation that explains what marp2video does - using marp2video itself.
 
-### Full Example
+### Additional Example
 
 See `example_presentation.md` for a complete example with:
 
 - Custom Marp theme
 - Voiceover comments on each slide
 - Pause directives for timing
-- 30+ slides demonstrating various features
 
 ## Troubleshooting
 
@@ -432,12 +599,16 @@ MIT License - see LICENSE file for details
 
 ## Roadmap
 
-- [ ] Add support for custom voice settings (speed, stability, etc.)
-- [x] Implement video transitions between slides
+- [x] Custom voice settings (stability, similarity, style)
+- [x] Video transitions between slides
 - [x] Individual slide video export (for Udemy)
+- [x] JSON transcript for multi-language support
+- [x] Decoupled TTS workflow (separate audio generation)
+- [x] Audio manifest with timing information
 - [ ] Add progress bar during conversion
 - [ ] Support for background music
 - [ ] Batch processing of multiple presentations
 - [ ] Web UI for easier configuration
 - [ ] Export to different video formats
 - [ ] Add subtitle/caption generation
+- [ ] Avatar integration (HeyGen, Synthesia)
