@@ -1,0 +1,284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/grokify/marp2video/transcript.schema.json",
+  "title": "Marp2Video Transcript",
+  "description": "Schema for marp2video presentation transcripts with multi-language and TTS provider support",
+  "type": "object",
+  "required": ["version", "metadata", "slides"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "slides": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Slide"
+      }
+    }
+  },
+  "$defs": {
+    "Metadata": {
+      "type": "object",
+      "required": ["title", "defaultLanguage", "defaultVoice"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Presentation title"
+        },
+        "description": {
+          "type": "string",
+          "description": "Presentation description"
+        },
+        "defaultLanguage": {
+          "type": "string",
+          "description": "BCP-47 language code (e.g., 'en-US', 'en-GB', 'fr-CA', 'zh-Hans')",
+          "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,4})?(-[A-Z]{2})?$"
+        },
+        "defaultVoice": {
+          "$ref": "#/$defs/VoiceConfig"
+        },
+        "defaultVenue": {
+          "type": "string",
+          "enum": ["youtube", "udemy", "coursera", "edx", "instagram", "tiktok", "general"],
+          "description": "Target platform for voice optimization"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "custom": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "VoiceConfig": {
+      "type": "object",
+      "required": ["voiceId"],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": ["elevenlabs", "deepgram", "google", "azure", "amazon"],
+          "description": "TTS provider"
+        },
+        "voiceId": {
+          "type": "string",
+          "description": "Provider-specific voice ID"
+        },
+        "voiceName": {
+          "type": "string",
+          "description": "Human-readable voice name"
+        },
+        "model": {
+          "type": "string",
+          "description": "Provider-specific model ID"
+        },
+        "outputFormat": {
+          "type": "string",
+          "enum": ["mp3", "wav", "pcm", "opus", "aac"],
+          "default": "mp3"
+        },
+        "sampleRate": {
+          "type": "integer",
+          "enum": [8000, 16000, 22050, 24000, 44100, 48000]
+        },
+        "speed": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 4.0,
+          "default": 1.0
+        },
+        "pitch": {
+          "type": "number",
+          "minimum": -1.0,
+          "maximum": 1.0,
+          "default": 0.0
+        },
+        "stability": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Voice consistency (ElevenLabs)"
+        },
+        "similarityBoost": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Voice similarity enhancement (ElevenLabs)"
+        },
+        "style": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Style exaggeration (ElevenLabs)"
+        }
+      }
+    },
+    "Slide": {
+      "type": "object",
+      "required": ["index", "transcripts"],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "title": {
+          "type": "string",
+          "description": "Slide title for reference"
+        },
+        "transcripts": {
+          "type": "object",
+          "description": "Language code to content mapping",
+          "additionalProperties": {
+            "$ref": "#/$defs/LanguageContent"
+          }
+        },
+        "avatar": {
+          "$ref": "#/$defs/AvatarConfig"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Internal notes (not spoken)"
+        }
+      }
+    },
+    "LanguageContent": {
+      "type": "object",
+      "required": ["segments"],
+      "properties": {
+        "voice": {
+          "$ref": "#/$defs/VoiceConfig",
+          "description": "Override default voice for this language"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Segment"
+          }
+        },
+        "timing": {
+          "$ref": "#/$defs/TimingInfo"
+        }
+      }
+    },
+    "Segment": {
+      "type": "object",
+      "required": ["text"],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Text to speak"
+        },
+        "pause": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Pause after segment in milliseconds"
+        },
+        "emphasis": {
+          "type": "string",
+          "enum": ["none", "moderate", "strong"]
+        },
+        "rate": {
+          "type": "string",
+          "enum": ["x-slow", "slow", "medium", "fast", "x-fast"]
+        },
+        "pitch": {
+          "type": "string",
+          "description": "Pitch adjustment (low, medium, high, +Xst, -Xst)"
+        },
+        "voice": {
+          "$ref": "#/$defs/VoiceConfig",
+          "description": "Override voice for this segment"
+        },
+        "ssml": {
+          "$ref": "#/$defs/SSMLHints"
+        }
+      }
+    },
+    "SSMLHints": {
+      "type": "object",
+      "properties": {
+        "breaks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Break durations (e.g., '400ms', '1s')"
+        },
+        "emphasis": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Words to emphasize"
+        },
+        "prosody": {
+          "type": "string"
+        },
+        "sayAs": {
+          "type": "string",
+          "enum": ["date", "time", "telephone", "cardinal", "ordinal", "characters", "spell-out"]
+        },
+        "phoneme": {
+          "type": "string",
+          "description": "IPA pronunciation"
+        },
+        "subAlias": {
+          "type": "string",
+          "description": "Substitution text"
+        }
+      }
+    },
+    "TimingInfo": {
+      "type": "object",
+      "properties": {
+        "audioDuration": {
+          "type": "integer",
+          "description": "Audio duration in milliseconds"
+        },
+        "pauseDuration": {
+          "type": "integer",
+          "description": "Total pause duration in milliseconds"
+        },
+        "totalDuration": {
+          "type": "integer",
+          "description": "Total slide duration in milliseconds"
+        }
+      }
+    },
+    "AvatarConfig": {
+      "type": "object",
+      "required": ["provider", "avatarId"],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": ["heygen", "synthesia", "d-id", "colossyan"],
+          "description": "Avatar provider"
+        },
+        "avatarId": {
+          "type": "string",
+          "description": "Provider-specific avatar ID"
+        },
+        "position": {
+          "type": "string",
+          "enum": ["bottom-right", "bottom-left", "top-right", "top-left", "full", "pip"],
+          "default": "bottom-right"
+        },
+        "size": {
+          "type": "string",
+          "enum": ["small", "medium", "large"],
+          "default": "medium"
+        },
+        "style": {
+          "type": "string",
+          "description": "Visual style (casual, professional, etc.)"
+        },
+        "custom": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    }
+  }
+}
