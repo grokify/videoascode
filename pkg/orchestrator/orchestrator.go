@@ -3,6 +3,7 @@ package orchestrator
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/grokify/marp2video/pkg/renderer"
 	"github.com/grokify/marp2video/pkg/tts"
 	"github.com/grokify/marp2video/pkg/video"
+	"github.com/grokify/mogo/fmt/progress"
 	"github.com/grokify/mogo/log/slogutil"
 )
 
@@ -25,15 +27,17 @@ type Config struct {
 	Width               int
 	Height              int
 	FrameRate           int
-	OutputIndividualDir string  // Directory for individual slide videos (Udemy)
-	TransitionDuration  float64 // Duration of transitions between slides in seconds
-	ScreenDevice        string  // Screen capture device (macOS, auto-detected if empty)
-	AudioManifest       string  // Path to audio manifest file (from 'marp2video tts')
+	OutputIndividualDir string    // Directory for individual slide videos (Udemy)
+	TransitionDuration  float64   // Duration of transitions between slides in seconds
+	ScreenDevice        string    // Screen capture device (macOS, auto-detected if empty)
+	AudioManifest       string    // Path to audio manifest file (from 'marp2video tts')
+	ProgressWriter      io.Writer // Writer for progress output (nil to disable)
 }
 
 // Orchestrator coordinates the entire video generation process
 type Orchestrator struct {
-	config Config
+	config   Config
+	progress *progress.MultiStageRenderer
 }
 
 // NewOrchestrator creates a new orchestrator
@@ -52,7 +56,39 @@ func NewOrchestrator(config Config) *Orchestrator {
 		config.WorkDir = filepath.Join(os.TempDir(), "marp2video")
 	}
 
-	return &Orchestrator{config: config}
+	o := &Orchestrator{config: config}
+
+	// Initialize progress renderer if writer is provided
+	if config.ProgressWriter != nil {
+		o.progress = progress.NewMultiStageRenderer(config.ProgressWriter).
+			WithBarWidth(20).
+			WithDescWidth(30)
+	}
+
+	return o
+}
+
+// totalStages returns the number of stages (5 or 6 if exporting individual videos)
+func (o *Orchestrator) totalStages() int {
+	if o.config.OutputIndividualDir != "" {
+		return 6
+	}
+	return 5
+}
+
+// updateProgress updates the progress display if enabled
+func (o *Orchestrator) updateProgress(stage int, desc string, current, total int, done bool) {
+	if o.progress == nil {
+		return
+	}
+	o.progress.Update(progress.StageInfo{
+		Stage:       stage,
+		TotalStages: o.totalStages(),
+		Description: desc,
+		Current:     current,
+		Total:       total,
+		Done:        done,
+	})
 }
 
 // Process orchestrates the entire conversion process
@@ -72,6 +108,7 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 	}
 
 	// Step 1: Parse Marp markdown
+	o.updateProgress(1, "Parsing Marp markdown", 0, 0, false)
 	logger.Info("Step 1: Parsing Marp markdown...")
 	content, err := os.ReadFile(o.config.InputFile)
 	if err != nil {
@@ -83,6 +120,7 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 		return fmt.Errorf("failed to parse Marp file: %w", err)
 	}
 	logger.Info("Found slides", "count", len(presentation.Slides))
+	o.updateProgress(1, "Parsing Marp markdown", 0, 0, true)
 
 	// Step 2: Generate audio for each slide
 	logger.Info("Step 2: Generating audio with ElevenLabs...")
@@ -95,8 +133,11 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 	audioPlayer := audio.NewPlayer()
 	audioFiles := make([]string, len(presentation.Slides))
 	slideDurations := make([]time.Duration, len(presentation.Slides))
+	numSlides := len(presentation.Slides)
 
 	for i, slide := range presentation.Slides {
+		o.updateProgress(2, "Generating audio", i+1, numSlides, false)
+
 		if slide.Voiceover == "" {
 			logger.Info("Slide: No voiceover, skipping audio generation", "slide", i)
 			continue
@@ -122,8 +163,10 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 
 		logger.Info("Slide: Audio generated", "slide", i, "duration", totalDuration.Seconds())
 	}
+	o.updateProgress(2, "Generating audio", numSlides, numSlides, true)
 
 	// Step 3: Render Marp to HTML
+	o.updateProgress(3, "Rendering HTML", 0, 0, false)
 	logger.Info("Step 3: Rendering Marp to HTML...")
 	marpRenderer := renderer.NewMarpRenderer()
 	if err := marpRenderer.CheckMarpCLI(); err != nil {
@@ -135,8 +178,10 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 		return fmt.Errorf("failed to render HTML: %w", err)
 	}
 	logger.Info("HTML presentation created", "path", htmlPath)
+	o.updateProgress(3, "Rendering HTML", 0, 0, true)
 
 	// Step 4: Open browser and record each slide
+	o.updateProgress(4, "Recording slides", 0, numSlides, false)
 	logger.Info("Step 4: Recording slides...")
 	browserCtrl, err := renderer.NewBrowserController(o.config.Width, o.config.Height)
 	if err != nil {
@@ -163,6 +208,8 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 	videoFiles := make([]string, 0, len(presentation.Slides))
 
 	for i := range presentation.Slides {
+		o.updateProgress(4, "Recording slides", i+1, numSlides, false)
+
 		if audioFiles[i] == "" {
 			logger.Info("Slide: Skipping (no audio)", "slide", i)
 			continue
@@ -187,15 +234,39 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 		videoFiles = append(videoFiles, videoPath)
 		logger.Info("Slide: Recorded", "slide", i, "path", videoPath)
 	}
+	o.updateProgress(4, "Recording slides", numSlides, numSlides, true)
 
-	// Step 5: Save individual videos if requested (for Udemy)
+	// Step 5: Combine all videos (for YouTube)
+	combineStage := 5
+	o.updateProgress(combineStage, "Combining videos", 0, 0, false)
+	logger.Info("Step 5: Combining videos...")
+	combiner := video.NewCombiner(videoDir)
+
+	var combineErr error
+	if o.config.TransitionDuration > 0 {
+		combineErr = combiner.CombineVideosWithTransitions(ctx, videoFiles, o.config.OutputFile, o.config.TransitionDuration)
+	} else {
+		combineErr = combiner.CombineVideos(ctx, videoFiles, o.config.OutputFile)
+	}
+	if combineErr != nil {
+		return fmt.Errorf("failed to combine videos: %w", combineErr)
+	}
+	o.updateProgress(combineStage, "Combining videos", 0, 0, true)
+
+	// Step 6: Save individual videos if requested (for Udemy)
 	if o.config.OutputIndividualDir != "" {
-		logger.Info("Step 5a: Saving individual slide videos...")
+		exportStage := 6
+		numVideos := len(videoFiles)
+		o.updateProgress(exportStage, "Exporting individual videos", 0, numVideos, false)
+		logger.Info("Step 6: Saving individual slide videos...")
+
 		if err := os.MkdirAll(o.config.OutputIndividualDir, 0755); err != nil {
 			return fmt.Errorf("failed to create individual output directory: %w", err)
 		}
 
 		for i, videoPath := range videoFiles {
+			o.updateProgress(exportStage, "Exporting individual videos", i+1, numVideos, false)
+
 			// Find the slide index from the video filename
 			baseName := filepath.Base(videoPath)
 			destPath := filepath.Join(o.config.OutputIndividualDir, baseName)
@@ -210,20 +281,7 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 			}
 			logger.Info("Saved individual video", "path", destPath)
 		}
-	}
-
-	// Step 6: Combine all videos (for YouTube)
-	logger.Info("Step 6: Combining videos...")
-	combiner := video.NewCombiner(videoDir)
-
-	var combineErr error
-	if o.config.TransitionDuration > 0 {
-		combineErr = combiner.CombineVideosWithTransitions(ctx, videoFiles, o.config.OutputFile, o.config.TransitionDuration)
-	} else {
-		combineErr = combiner.CombineVideos(ctx, videoFiles, o.config.OutputFile)
-	}
-	if combineErr != nil {
-		return fmt.Errorf("failed to combine videos: %w", combineErr)
+		o.updateProgress(exportStage, "Exporting individual videos", numVideos, numVideos, true)
 	}
 
 	logger.Info("Video generation complete", "output", o.config.OutputFile)

@@ -108,7 +108,7 @@ func runVideo(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("dependency check failed: %w", err)
 	}
 
-	// Create orchestrator config
+	// Create orchestrator config with progress output
 	config := orchestrator.Config{
 		InputFile:           videoInputFile,
 		OutputFile:          videoOutputFile,
@@ -122,6 +122,7 @@ func runVideo(cmd *cobra.Command, args []string) error {
 		TransitionDuration:  videoTransitionDuration,
 		ScreenDevice:        videoScreenDevice,
 		AudioManifest:       videoManifest,
+		ProgressWriter:      os.Stdout,
 	}
 
 	// Create and run orchestrator

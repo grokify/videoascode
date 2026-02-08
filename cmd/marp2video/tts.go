@@ -8,6 +8,7 @@ import (
 
 	"github.com/grokify/marp2video/pkg/transcript"
 	"github.com/grokify/marp2video/pkg/tts"
+	"github.com/grokify/mogo/fmt/progress"
 	"github.com/spf13/cobra"
 )
 
@@ -93,10 +94,19 @@ func runTTS(cmd *cobra.Command, args []string) error {
 	fmt.Printf("  Output:     %s\n", ttsOutputDir)
 	fmt.Printf("  Slides:     %d\n\n", len(t.Slides))
 
-	// Create generator
+	// Create progress renderer
+	renderer := progress.NewSingleStageRenderer(os.Stdout).WithBarWidth(30)
+
+	// Progress callback
+	progressFn := func(current, total int, name string) {
+		renderer.Update(current, total, name)
+	}
+
+	// Create generator with progress callback
 	generator, err := tts.NewTranscriptGenerator(tts.TranscriptGeneratorConfig{
-		APIKey:    apiKey,
-		OutputDir: ttsOutputDir,
+		APIKey:       apiKey,
+		OutputDir:    ttsOutputDir,
+		ProgressFunc: progressFn,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create TTS generator: %w", err)
@@ -104,6 +114,10 @@ func runTTS(cmd *cobra.Command, args []string) error {
 
 	// Generate audio
 	manifest, err := generator.GenerateFromTranscript(ctx, t, language)
+
+	// Clear progress line
+	renderer.Done("")
+
 	if err != nil {
 		return fmt.Errorf("failed to generate audio: %w", err)
 	}

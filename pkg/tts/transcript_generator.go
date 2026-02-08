@@ -12,10 +12,14 @@ import (
 	"github.com/grokify/mogo/log/slogutil"
 )
 
+// ProgressFunc is called during generation with current progress
+type ProgressFunc func(current, total int, slideName string)
+
 // TranscriptGeneratorConfig holds configuration for transcript-based TTS generation
 type TranscriptGeneratorConfig struct {
-	APIKey    string
-	OutputDir string
+	APIKey       string
+	OutputDir    string
+	ProgressFunc ProgressFunc // Optional callback for progress updates
 }
 
 // TranscriptGenerator generates audio from transcript files
@@ -49,9 +53,15 @@ func (g *TranscriptGenerator) GenerateFromTranscript(ctx context.Context, t *tra
 
 	// Create manifest
 	manifest := NewManifest(language)
+	numSlides := len(t.Slides)
 
 	// Process each slide
-	for _, slide := range t.Slides {
+	for i, slide := range t.Slides {
+		// Report progress
+		if g.config.ProgressFunc != nil {
+			g.config.ProgressFunc(i+1, numSlides, slide.Title)
+		}
+
 		// Get transcript for this language
 		content, err := t.GetSlideTranscript(slide.Index, language)
 		if err != nil {
