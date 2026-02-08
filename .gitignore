@@ -37,3 +37,6 @@ Thumbs.db
 
 # Working directory
 /workdir/
+
+# MkDocs build output
+/site/
