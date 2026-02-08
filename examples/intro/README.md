@@ -9,147 +9,105 @@ A self-documenting presentation that introduces marp2video.
 | `presentation.md` | Marp markdown source (13 slides) |
 | `transcript.json` | Multi-language voiceover transcript |
 | `audio/` | Generated audio files (after Step 1) |
+| `audio/manifest.json` | Audio timing manifest (after Step 1) |
 | `output.mp4` | Final video (after full pipeline) |
 
 ## Step 1: Generate Audio from Transcript
 
-Convert the transcript segments to audio using OmniVoice TTS providers.
+Use the `marp2video tts` command to generate audio files from the transcript.
 
-### Using ElevenLabs (via OmniVoice)
+### Using CLI (Recommended)
+
+```bash
+# Set API key
+export ELEVENLABS_API_KEY="your-api-key"
+
+# Generate audio for default language (en-US)
+marp2video tts --transcript transcript.json --output audio/
+
+# Generate audio for specific language
+marp2video tts --transcript transcript.json --output audio/ --lang es-ES
+
+# Generate audio for British English
+marp2video tts --transcript transcript.json --output audio/ --lang en-GB
+```
+
+This generates:
+
+- `audio/slide_000.mp3`, `slide_001.mp3`, ... (one per slide)
+- `audio/manifest.json` (timing information for video recorder)
+
+### Manifest Output
+
+The manifest.json contains timing data for use by the video recorder:
+
+```json
+{
+  "version": "1.0",
+  "language": "en-US",
+  "generatedAt": "2024-01-01T12:00:00Z",
+  "slides": [
+    {
+      "index": 0,
+      "title": "Title Slide",
+      "audioFile": "slide_000.mp3",
+      "audioDurationMs": 5200,
+      "pauseDurationMs": 500,
+      "totalDurationMs": 5700
+    }
+  ]
+}
+```
+
+### Using Go Library (Programmatic)
 
 ```go
 package main
 
 import (
     "context"
-    "encoding/json"
-    "fmt"
-    "os"
-    "path/filepath"
-
-    "github.com/agentplexus/go-elevenlabs/omnivoice/tts"
-    omnitts "github.com/agentplexus/omnivoice/tts"
+    "github.com/grokify/marp2video/pkg/transcript"
+    "github.com/grokify/marp2video/pkg/tts"
 )
 
 func main() {
     ctx := context.Background()
 
-    // Initialize ElevenLabs provider
-    provider, err := tts.New(tts.WithAPIKey(os.Getenv("ELEVENLABS_API_KEY")))
-    if err != nil {
-        panic(err)
-    }
-
     // Load transcript
-    data, _ := os.ReadFile("transcript.json")
-    var transcript Transcript
-    json.Unmarshal(data, &transcript)
+    t, _ := transcript.LoadFromFile("transcript.json")
 
-    // Process each slide for the target language
-    lang := "en-US" // or "en-GB", "es-ES"
-    for _, slide := range transcript.Slides {
-        content, ok := slide.Transcripts[lang]
-        if !ok {
-            continue
-        }
+    // Create generator
+    generator, _ := tts.NewTranscriptGenerator(tts.TranscriptGeneratorConfig{
+        APIKey:    os.Getenv("ELEVENLABS_API_KEY"),
+        OutputDir: "audio",
+    })
 
-        // Combine segments into full text
-        var text string
-        for _, seg := range content.Segments {
-            text += seg.Text + " "
-        }
+    // Generate audio and get manifest
+    manifest, _ := generator.GenerateFromTranscript(ctx, t, "en-US")
 
-        // Determine voice config
-        voiceID := transcript.Metadata.DefaultVoice.VoiceID
-        if content.Voice != nil && content.Voice.VoiceID != "" {
-            voiceID = content.Voice.VoiceID
-        }
-
-        // Synthesize audio
-        config := omnitts.SynthesisConfig{
-            VoiceID:         voiceID,
-            Model:           "eleven_multilingual_v2",
-            OutputFormat:    "mp3",
-            SampleRate:      44100,
-            Stability:       0.5,
-            SimilarityBoost: 0.75,
-        }
-
-        result, err := provider.Synthesize(ctx, text, config)
-        if err != nil {
-            panic(err)
-        }
-
-        // Save audio file
-        outPath := filepath.Join("audio", fmt.Sprintf("slide_%03d.mp3", slide.Index))
-        os.MkdirAll("audio", 0755)
-        os.WriteFile(outPath, result.Audio, 0644)
-
-        fmt.Printf("Generated %s (%d bytes)\n", outPath, len(result.Audio))
-    }
+    // Save manifest
+    manifest.SaveToFile("audio/manifest.json")
 }
-
-// Transcript types (simplified)
-type Transcript struct {
-    Metadata struct {
-        DefaultVoice struct {
-            VoiceID string `json:"voiceId"`
-        } `json:"defaultVoice"`
-    } `json:"metadata"`
-    Slides []struct {
-        Index       int                        `json:"index"`
-        Transcripts map[string]LanguageContent `json:"transcripts"`
-    } `json:"slides"`
-}
-
-type LanguageContent struct {
-    Voice    *VoiceConfig `json:"voice"`
-    Segments []Segment    `json:"segments"`
-}
-
-type VoiceConfig struct {
-    VoiceID string `json:"voiceId"`
-}
-
-type Segment struct {
-    Text  string `json:"text"`
-    Pause int    `json:"pause"`
-}
-```
-
-### Using OmniVoice Client with Fallback
-
-```go
-// Create client with multiple providers (when available)
-client := omnitts.NewClient(
-    elevenLabsProvider,
-    // deepgramProvider,  // Future: Deepgram TTS
-    // openaiProvider,    // Future: OpenAI TTS
-)
-
-// Synthesize with automatic fallback
-result, err := client.Synthesize(ctx, text, config)
 ```
 
 ## Step 2: Generate Video
 
-Once audio files are generated, use marp2video to create the video.
+Use the `marp2video video` command with the audio manifest.
 
-### Using Inline Voiceovers
+### Using Pre-generated Audio (Recommended)
 
 ```bash
-marp2video \
+marp2video video \
   --input presentation.md \
+  --manifest audio/manifest.json \
   --output output.mp4
 ```
 
-### Using Pre-generated Audio
+### Using Inline Voiceovers (Full Pipeline)
 
 ```bash
-# Audio files in audio/ directory will be used automatically
-marp2video \
+marp2video video \
   --input presentation.md \
-  --audio-dir audio/ \
   --output output.mp4
 ```
 
