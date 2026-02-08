@@ -48,6 +48,28 @@
             { "text": "Bienvenido a marp2video, una herramienta de línea de comandos que transforma tus presentaciones Marp en videos profesionales con voces generadas por IA.", "pause": 500 },
             { "text": "En esta presentación, exploraremos lo que marp2video puede hacer y cómo usarlo." }
           ]
+        },
+        "zh-Hans": {
+          "voice": {
+            "provider": "elevenlabs",
+            "voiceId": "pNInz6obpgDQGcFmaJgB",
+            "voiceName": "Adam"
+          },
+          "segments": [
+            { "text": "欢迎使用 marp2video，这是一个命令行工具，可以将您的 Marp 演示文稿转换为带有 AI 生成配音的专业视频。", "pause": 500 },
+            { "text": "在本演示中，我们将探索 marp2video 的功能以及如何使用它。" }
+          ]
+        },
+        "fr-FR": {
+          "voice": {
+            "provider": "elevenlabs",
+            "voiceId": "pNInz6obpgDQGcFmaJgB",
+            "voiceName": "Adam"
+          },
+          "segments": [
+            { "text": "Bienvenue dans marp2video, un outil en ligne de commande qui transforme vos présentations Marp en vidéos professionnelles avec des voix off générées par l'IA.", "pause": 500 },
+            { "text": "Dans cette présentation, nous allons explorer ce que marp2video peut faire et comment l'utiliser." }
+          ]
         }
       }
     },
@@ -65,6 +87,18 @@
           "segments": [
             { "text": "Marp2video combina el poder de las presentaciones Marp con la tecnología de texto a voz de ElevenLabs para crear videos pulidos automáticamente.", "pause": 300 },
             { "text": "Maneja el pipeline completo: renderizar tus diapositivas, generar voz a partir de tu guión, grabar cada diapositiva y combinar todo en un video final." }
+          ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "Marp2video 将 Marp 演示文稿的强大功能与 ElevenLabs 文字转语音技术相结合，自动创建精美的视频。", "pause": 300 },
+            { "text": "它处理完整的流程：渲染您的幻灯片、从脚本生成语音、录制每张幻灯片，并将所有内容合并成最终视频。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "Marp2video combine la puissance des présentations Marp avec la technologie de synthèse vocale d'ElevenLabs pour créer automatiquement des vidéos soignées.", "pause": 300 },
+            { "text": "Il gère le pipeline complet : rendu de vos diapositives, génération de la voix à partir de votre script, enregistrement de chaque diapositive et combinaison du tout en une vidéo finale." }
           ]
         }
       }
@@ -85,6 +119,20 @@
             { "text": "Crear tutoriales en video o contenido de cursos tradicionalmente requiere un esfuerzo significativo.", "pause": 300 },
             { "text": "Necesitas grabar audio, capturar tu pantalla y luego pasar horas editando todo junto.", "pause": 500 },
             { "text": "Marp2video elimina este trabajo manual al automatizar todo el proceso." }
+          ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "传统上，创建视频教程或课程内容需要付出大量努力。", "pause": 300 },
+            { "text": "您需要录制音频、捕获屏幕，然后花费数小时将所有内容编辑在一起。", "pause": 500 },
+            { "text": "Marp2video 通过自动化整个过程消除了这些手动工作。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "La création de tutoriels vidéo ou de contenu de cours nécessite traditionnellement un effort considérable.", "pause": 300 },
+            { "text": "Vous devez enregistrer l'audio, capturer votre écran, puis passer des heures à tout éditer ensemble.", "pause": 500 },
+            { "text": "Marp2video élimine ce travail manuel en automatisant l'ensemble du processus." }
           ]
         }
       }
@@ -108,6 +156,22 @@
             { "text": "Marp2video envía el texto a ElevenLabs para generar voz con sonido natural.", "pause": 300 },
             { "text": "Luego usa ffmpeg para grabar cada diapositiva sincronizada con el audio, y combina todo en tu video final." }
           ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "这是工作流程。", "pause": 300 },
+            { "text": "您用 Marp markdown 编写演示文稿，将配音脚本添加为 HTML 注释。", "pause": 300 },
+            { "text": "Marp2video 将文本发送到 ElevenLabs 生成自然的语音。", "pause": 300 },
+            { "text": "然后它使用 ffmpeg 录制每张与音频同步的幻灯片，并将所有内容合并成最终视频。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "Voici le flux de travail.", "pause": 300 },
+            { "text": "Vous rédigez votre présentation en Marp markdown, en ajoutant des scripts de voix off comme commentaires HTML.", "pause": 300 },
+            { "text": "Marp2video envoie le texte à ElevenLabs pour générer une voix au son naturel.", "pause": 300 },
+            { "text": "Ensuite, il utilise ffmpeg pour enregistrer chaque diapositive synchronisée avec l'audio, et combine le tout dans votre vidéo finale." }
+          ]
         }
       }
     },
@@ -127,6 +191,20 @@
             { "text": "Escribir locuciones es simple.", "pause": 300 },
             { "text": "Solo añade comentarios HTML a tus diapositivas con el texto que quieres que se hable.", "pause": 300 },
             { "text": "La herramienta extrae estos comentarios y los convierte en voz usando IA." }
+          ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "编写配音很简单。", "pause": 300 },
+            { "text": "只需在幻灯片中添加包含您想要朗读的文本的 HTML 注释。", "pause": 300 },
+            { "text": "该工具会提取这些注释并使用 AI 将其转换为语音。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "Écrire des voix off est simple.", "pause": 300 },
+            { "text": "Ajoutez simplement des commentaires HTML à vos diapositives contenant le texte que vous souhaitez prononcer.", "pause": 300 },
+            { "text": "L'outil extrait ces commentaires et les convertit en voix à l'aide de l'IA." }
           ]
         }
       }
@@ -148,6 +226,20 @@
             { "text": "Usa la directiva de pausa con la duración en milisegundos.", "pause": 300 },
             { "text": "Esto ayuda a crear pausas naturales en la narración." }
           ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "您可以在配音中添加停顿以获得更好的节奏。", "pause": 500 },
+            { "text": "使用停顿指令并以毫秒为单位设置持续时间。", "pause": 300 },
+            { "text": "这有助于在叙述中创建自然的停顿。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "Vous pouvez ajouter des pauses à votre voix off pour un meilleur rythme.", "pause": 500 },
+            { "text": "Utilisez la directive de pause avec la durée en millisecondes.", "pause": 300 },
+            { "text": "Cela aide à créer des pauses naturelles dans la narration." }
+          ]
         }
       }
     },
@@ -166,6 +258,18 @@
             { "text": "Para instalar marp2video, usa el comando install de Go.", "pause": 300 },
             { "text": "También necesitarás el CLI de Marp de npm, ffmpeg para el procesamiento de video, y una clave API de ElevenLabs para la funcionalidad de texto a voz." }
           ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "要安装 marp2video，请使用 Go 的 install 命令。", "pause": 300 },
+            { "text": "您还需要从 npm 安装 Marp CLI、用于视频处理的 ffmpeg，以及用于文字转语音功能的 ElevenLabs API 密钥。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "Pour installer marp2video, utilisez la commande install de Go.", "pause": 300 },
+            { "text": "Vous aurez également besoin de Marp CLI depuis npm, de ffmpeg pour le traitement vidéo, et d'une clé API ElevenLabs pour la fonctionnalité de synthèse vocale." }
+          ]
         }
       }
     },
@@ -183,6 +287,18 @@
           "segments": [
             { "text": "Usar marp2video es sencillo.", "pause": 300 },
             { "text": "Configura tu clave API de ElevenLabs como variable de entorno, luego ejecuta el comando con tu archivo markdown de entrada y la ruta de salida deseada." }
+          ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "使用 marp2video 很简单。", "pause": 300 },
+            { "text": "将您的 ElevenLabs API 密钥设置为环境变量，然后使用输入的 markdown 文件和所需的输出路径运行命令。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "L'utilisation de marp2video est simple.", "pause": 300 },
+            { "text": "Définissez votre clé API ElevenLabs comme variable d'environnement, puis exécutez la commande avec votre fichier markdown d'entrée et le chemin de sortie souhaité." }
           ]
         }
       }
@@ -204,6 +320,20 @@
             { "text": "Genera un video combinado para YouTube, o exporta videos individuales de diapositivas para plataformas como Udemy.", "pause": 300 },
             { "text": "También puedes añadir transiciones suaves de fundido entre diapositivas." }
           ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "Marp2video 支持多种输出选项。", "pause": 300 },
+            { "text": "生成用于 YouTube 的单个组合视频，或为 Udemy 等平台导出单独的幻灯片视频。", "pause": 300 },
+            { "text": "您还可以在幻灯片之间添加平滑的淡入淡出过渡效果。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "Marp2video prend en charge plusieurs options de sortie.", "pause": 300 },
+            { "text": "Générez une seule vidéo combinée pour YouTube, ou exportez des vidéos individuelles de diapositives pour des plateformes comme Udemy.", "pause": 300 },
+            { "text": "Vous pouvez également ajouter des transitions en fondu enchaîné entre les diapositives." }
+          ]
         }
       }
     },
@@ -222,6 +352,18 @@
             { "text": "La herramienta ofrece varias opciones de personalización.", "pause": 300 },
             { "text": "Elige diferentes voces, ajusta la resolución del video, configura la tasa de fotogramas y las transiciones entre diapositivas." }
           ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "该工具提供多种自定义选项。", "pause": 300 },
+            { "text": "选择不同的语音、调整视频分辨率、设置帧率并配置幻灯片之间的过渡效果。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "L'outil offre plusieurs options de personnalisation.", "pause": 300 },
+            { "text": "Choisissez différentes voix, ajustez la résolution vidéo, définissez le taux de rafraîchissement et configurez les effets de transition entre les diapositives." }
+          ]
         }
       }
     },
@@ -239,6 +381,18 @@
           "segments": [
             { "text": "Marp2video es perfecto para crear contenido de cursos en línea, tutoriales de YouTube, demostraciones de productos, materiales de capacitación y documentación animada.", "pause": 500 },
             { "text": "Cualquier escenario donde necesites convertir diapositivas en contenido de video." }
+          ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "Marp2video 非常适合创建在线课程内容、YouTube 教程、产品演示、培训材料和动画文档。", "pause": 500 },
+            { "text": "任何需要将幻灯片转换为视频内容的场景。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "Marp2video est parfait pour créer du contenu de cours en ligne, des tutoriels YouTube, des démonstrations de produits, des supports de formation et de la documentation animée.", "pause": 500 },
+            { "text": "Tout scénario où vous devez transformer des diapositives en contenu vidéo." }
           ]
         }
       }
@@ -259,6 +413,20 @@
             { "text": "Aquí hay algo meta.", "pause": 300 },
             { "text": "Esta misma presentación fue convertida a video usando marp2video.", "pause": 500 },
             { "text": "Es un ejemplo autocontenido y autodocumentado de lo que la herramienta puede hacer." }
+          ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "这里有一些有趣的事情。", "pause": 300 },
+            { "text": "这个演示文稿本身就是使用 marp2video 转换成视频的。", "pause": 500 },
+            { "text": "这是一个自包含、自文档化的示例，展示了该工具的功能。" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "Voici quelque chose de méta.", "pause": 300 },
+            { "text": "Cette présentation elle-même a été convertie en vidéo à l'aide de marp2video.", "pause": 500 },
+            { "text": "C'est un exemple autonome et auto-documenté de ce que l'outil peut faire." }
           ]
         }
       }
@@ -281,6 +449,22 @@
             { "text": "Instala los prerrequisitos, escribe tu presentación con comentarios de locución, ejecuta la herramienta, y tendrás un video profesional listo para compartir.", "pause": 500 },
             { "text": "Visita el repositorio en GitHub para más ejemplos y documentación.", "pause": 300 },
             { "text": "¡Gracias por ver!" }
+          ]
+        },
+        "zh-Hans": {
+          "segments": [
+            { "text": "开始使用很简单。", "pause": 300 },
+            { "text": "安装必备软件，编写带有配音注释的演示文稿，运行工具，您就会获得一个可以分享的专业视频。", "pause": 500 },
+            { "text": "访问 GitHub 上的仓库获取更多示例和文档。", "pause": 300 },
+            { "text": "感谢观看！" }
+          ]
+        },
+        "fr-FR": {
+          "segments": [
+            { "text": "Commencer est facile.", "pause": 300 },
+            { "text": "Installez les prérequis, rédigez votre présentation avec des commentaires de voix off, exécutez l'outil, et vous aurez une vidéo professionnelle prête à partager.", "pause": 500 },
+            { "text": "Consultez le dépôt sur GitHub pour plus d'exemples et de documentation.", "pause": 300 },
+            { "text": "Merci d'avoir regardé !" }
           ]
         }
       }
