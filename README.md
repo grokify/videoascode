@@ -605,7 +605,7 @@ MIT License - see LICENSE file for details
 - [x] JSON transcript for multi-language support
 - [x] Decoupled TTS workflow (separate audio generation)
 - [x] Audio manifest with timing information
-- [ ] Add progress bar during conversion
+- [x] Progress bar during conversion
 - [ ] Support for background music
 - [ ] Batch processing of multiple presentations
 - [ ] Web UI for easier configuration
