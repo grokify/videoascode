@@ -23,7 +23,7 @@ func NewCombiner(outputDir string) *Combiner {
 
 // CombineVideos concatenates multiple video files into one
 func (c *Combiner) CombineVideos(ctx context.Context, videoPaths []string, outputPath string) error {
-	logger := slogutil.LoggerFromContext(ctx, nil)
+	logger := slogutil.LoggerFromContext(ctx, slogutil.Null())
 
 	if len(videoPaths) == 0 {
 		return fmt.Errorf("no video files to combine")
@@ -66,7 +66,7 @@ func (c *Combiner) CombineVideos(ctx context.Context, videoPaths []string, outpu
 
 // CombineVideosWithTransitions concatenates videos with crossfade transitions
 func (c *Combiner) CombineVideosWithTransitions(ctx context.Context, videoPaths []string, outputPath string, transitionDuration float64) error {
-	logger := slogutil.LoggerFromContext(ctx, nil)
+	logger := slogutil.LoggerFromContext(ctx, slogutil.Null())
 
 	if len(videoPaths) == 0 {
 		return fmt.Errorf("no video files to combine")

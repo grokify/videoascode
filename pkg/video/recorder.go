@@ -9,8 +9,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-
-	"github.com/grokify/mogo/log/slogutil"
 )
 
 // RecorderConfig holds video recording configuration
@@ -46,16 +44,20 @@ func detectMacOSScreenDevice() string {
 	output, _ := cmd.CombinedOutput()
 
 	// Parse output to find "Capture screen X" device
+	// Format: "[AVFoundation indev @ 0x...] [1] Capture screen 0"
 	lines := strings.Split(string(output), "\n")
 	for _, line := range lines {
-		// Look for lines like "[4] Capture screen 0"
 		if strings.Contains(line, "Capture screen") {
-			// Extract the device number in brackets
-			start := strings.Index(line, "[")
-			end := strings.Index(line, "]")
-			if start != -1 && end > start {
-				deviceNum := line[start+1 : end]
-				return deviceNum + ":none"
+			// Find the device number - look for "] [N]" pattern
+			// The first ] closes the address, the second [...] contains the device number
+			idx := strings.Index(line, "] [")
+			if idx != -1 {
+				rest := line[idx+3:] // Skip "] ["
+				end := strings.Index(rest, "]")
+				if end != -1 {
+					deviceNum := rest[:end]
+					return deviceNum + ":none"
+				}
 			}
 		}
 	}
@@ -65,7 +67,7 @@ func detectMacOSScreenDevice() string {
 
 // RecordSlide records a single slide with audio playback
 func (r *Recorder) RecordSlide(ctx context.Context, slideIndex int, audioPath string, duration time.Duration) (string, error) {
-	logger := slogutil.LoggerFromContext(ctx, nil)
+	_ = ctx // reserved for future use
 
 	// Ensure output directory exists
 	if err := os.MkdirAll(r.config.OutputDir, 0755); err != nil {
@@ -75,44 +77,27 @@ func (r *Recorder) RecordSlide(ctx context.Context, slideIndex int, audioPath st
 	outputPath := filepath.Join(r.config.OutputDir, fmt.Sprintf("slide_%03d.mp4", slideIndex))
 
 	// Build ffmpeg command based on platform
+	// The -t flag tells ffmpeg to stop after the specified duration
 	cmd, err := r.buildRecordCommand(outputPath, audioPath, duration)
 	if err != nil {
 		return "", err
 	}
 
-	// Start recording
+	// Print to stderr for immediate visibility
+	fmt.Fprintf(os.Stderr, "\n[DEBUG] Starting recording: slide=%d duration=%.1fs audio=%s\n", slideIndex, duration.Seconds(), audioPath)
+
+	// Run ffmpeg and wait for completion
 	if err := cmd.Start(); err != nil {
-		return "", fmt.Errorf("failed to start recording: %w", err)
+		return "", fmt.Errorf("failed to start ffmpeg: %w", err)
+	}
+	fmt.Fprintf(os.Stderr, "[DEBUG] ffmpeg started, waiting for completion...\n")
+
+	err = cmd.Wait()
+	if err != nil {
+		return "", fmt.Errorf("recording failed: %w", err)
 	}
 
-	// Wait for duration or context cancellation
-	done := make(chan error, 1)
-	go func() {
-		done <- cmd.Wait()
-	}()
-
-	select {
-	case <-time.After(duration):
-		// Stop recording gracefully by sending interrupt to ffmpeg
-		if cmd.Process != nil {
-			if err := cmd.Process.Signal(os.Interrupt); err != nil {
-				logger.Warn("failed to send interrupt signal", "error", err)
-			}
-		}
-		<-done // Wait for process to finish
-	case <-ctx.Done():
-		if cmd.Process != nil {
-			if err := cmd.Process.Kill(); err != nil {
-				logger.Warn("failed to kill process", "error", err)
-			}
-		}
-		return "", ctx.Err()
-	case err := <-done:
-		if err != nil {
-			return "", fmt.Errorf("recording failed: %w", err)
-		}
-	}
-
+	fmt.Fprintf(os.Stderr, "[DEBUG] Recording complete: %s\n", outputPath)
 	return outputPath, nil
 }
 
@@ -132,6 +117,14 @@ func (r *Recorder) buildRecordCommand(outputPath, audioPath string, duration tim
 	}
 
 	cmd := exec.Command("ffmpeg", args...)
+	// Discard stdout/stderr to prevent blocking, unless debugging
+	if os.Getenv("MARP2VIDEO_DEBUG") != "" {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	} else {
+		cmd.Stdout = nil
+		cmd.Stderr = nil
+	}
 	return cmd, nil
 }
 
