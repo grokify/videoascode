@@ -30,7 +30,7 @@ func (r *MarpRenderer) RenderToHTML(inputPath, outputDir string) (string, error)
 	outputPath := filepath.Join(outputDir, "presentation.html")
 
 	// Run marp CLI
-	cmd := exec.Command(r.marpCLIPath,
+	cmd := exec.Command(r.marpCLIPath, // #nosec G204 -- marpCLIPath is fixed, paths are user-provided intentionally
 		inputPath,
 		"-o", outputPath,
 		"--html",
@@ -56,7 +56,7 @@ func (r *MarpRenderer) RenderToImages(inputPath, outputDir string) ([]string, er
 	outputPath := filepath.Join(outputDir, "slide.png")
 
 	// Run marp CLI with --images png
-	cmd := exec.Command(r.marpCLIPath,
+	cmd := exec.Command(r.marpCLIPath, // #nosec G204 -- marpCLIPath is fixed, paths are user-provided intentionally
 		inputPath,
 		"-o", outputPath,
 		"--images", "png",
@@ -87,7 +87,7 @@ func (r *MarpRenderer) RenderToImages(inputPath, outputDir string) ([]string, er
 
 // CheckMarpCLI verifies that Marp CLI is installed
 func (r *MarpRenderer) CheckMarpCLI() error {
-	cmd := exec.Command(r.marpCLIPath, "--version")
+	cmd := exec.Command(r.marpCLIPath, "--version") // #nosec G204 -- marpCLIPath is fixed to "marp"
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("marp CLI not found. Install with: npm install -g @marp-team/marp-cli")
 	}

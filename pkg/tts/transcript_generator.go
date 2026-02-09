@@ -3,6 +3,7 @@ package tts
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -238,7 +239,7 @@ func (g *TranscriptGenerator) generateSlideAudio(ctx context.Context, text, outp
 		return 0, fmt.Errorf("failed to read audio: %w", err)
 	}
 
-	if err := os.WriteFile(outputPath, audioData, 0644); err != nil {
+	if err := os.WriteFile(outputPath, audioData, 0600); err != nil {
 		return 0, fmt.Errorf("failed to write audio file: %w", err)
 	}
 
@@ -261,7 +262,10 @@ func readAllAndClose(rc interface{ Read([]byte) (int, error) }) ([]byte, error) 
 			data = append(data, buf[:n]...)
 		}
 		if err != nil {
-			break
+			if err == io.EOF {
+				break
+			}
+			return data, err
 		}
 	}
 	return data, nil
