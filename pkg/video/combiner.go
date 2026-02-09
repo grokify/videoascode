@@ -37,7 +37,7 @@ func (c *Combiner) CombineVideos(ctx context.Context, videoPaths []string, outpu
 		fileList.WriteString(fmt.Sprintf("file '%s'\n", path))
 	}
 
-	if err := os.WriteFile(concatFilePath, []byte(fileList.String()), 0644); err != nil {
+	if err := os.WriteFile(concatFilePath, []byte(fileList.String()), 0600); err != nil {
 		return fmt.Errorf("failed to create concat file list: %w", err)
 	}
 	defer func() {
@@ -202,5 +202,5 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(dst, data, 0644)
+	return os.WriteFile(dst, data, 0600)
 }

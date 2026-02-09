@@ -84,7 +84,7 @@ func (g *Generator) GenerateAudio(ctx context.Context, text string, slideIndex i
 	}
 
 	// Write audio to file
-	if err := os.WriteFile(outputPath, audioData, 0644); err != nil {
+	if err := os.WriteFile(outputPath, audioData, 0600); err != nil {
 		return nil, fmt.Errorf("failed to write audio file: %w", err)
 	}
 

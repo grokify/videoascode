@@ -40,7 +40,7 @@ func TestCombineVideosWithTransitions_SingleVideo(t *testing.T) {
 
 	// Create a fake source video file
 	srcPath := filepath.Join(tmpDir, "source.mp4")
-	if err := os.WriteFile(srcPath, []byte("fake video content"), 0644); err != nil {
+	if err := os.WriteFile(srcPath, []byte("fake video content"), 0600); err != nil {
 		t.Fatalf("Failed to create source file: %v", err)
 	}
 
@@ -69,7 +69,7 @@ func TestCopyFile(t *testing.T) {
 	// Create source file
 	srcPath := filepath.Join(tmpDir, "source.txt")
 	content := []byte("test content")
-	if err := os.WriteFile(srcPath, content, 0644); err != nil {
+	if err := os.WriteFile(srcPath, content, 0600); err != nil {
 		t.Fatalf("Failed to create source file: %v", err)
 	}
 

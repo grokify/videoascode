@@ -145,7 +145,7 @@ func TestLoadManifest_InvalidJSON(t *testing.T) {
 
 	// Write invalid JSON
 	invalidPath := filepath.Join(tmpDir, "invalid.json")
-	if err := os.WriteFile(invalidPath, []byte("not json"), 0644); err != nil {
+	if err := os.WriteFile(invalidPath, []byte("not json"), 0600); err != nil {
 		t.Fatalf("failed to write file: %v", err)
 	}
 

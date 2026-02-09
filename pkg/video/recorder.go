@@ -147,10 +147,10 @@ func (r *Recorder) buildMacOSCommand(outputPath, audioPath string, duration time
 		"-map", "1:a", // Map audio from audio file
 		"-vcodec", "libx264",
 		"-preset", "medium", // Better quality for uploads
-		"-crf", "23",        // Constant rate factor (18-28 is good, lower = better)
+		"-crf", "23", // Constant rate factor (18-28 is good, lower = better)
 		"-pix_fmt", "yuv420p",
-		"-acodec", "aac",    // AAC audio for compatibility
-		"-b:a", "192k",      // Audio bitrate
+		"-acodec", "aac", // AAC audio for compatibility
+		"-b:a", "192k", // Audio bitrate
 		"-y",
 		outputPath,
 	}

@@ -17,11 +17,11 @@ type Transcript struct {
 type Metadata struct {
 	Title           string            `json:"title"`
 	Description     string            `json:"description,omitempty"`
-	DefaultLanguage string            `json:"defaultLanguage"`          // BCP-47 code (e.g., "en-US", "en-GB", "fr-CA", "zh-Hans")
-	DefaultVoice    VoiceConfig       `json:"defaultVoice"`             // Default voice settings
-	DefaultVenue    string            `json:"defaultVenue,omitempty"`   // udemy, youtube, coursera, etc.
-	Tags            []string          `json:"tags,omitempty"`           // For organization/filtering
-	Custom          map[string]string `json:"custom,omitempty"`         // User-defined metadata
+	DefaultLanguage string            `json:"defaultLanguage"`        // BCP-47 code (e.g., "en-US", "en-GB", "fr-CA", "zh-Hans")
+	DefaultVoice    VoiceConfig       `json:"defaultVoice"`           // Default voice settings
+	DefaultVenue    string            `json:"defaultVenue,omitempty"` // udemy, youtube, coursera, etc.
+	Tags            []string          `json:"tags,omitempty"`         // For organization/filtering
+	Custom          map[string]string `json:"custom,omitempty"`       // User-defined metadata
 }
 
 // VoiceConfig specifies TTS voice settings (compatible with OmniVoice SynthesisConfig)
@@ -42,16 +42,16 @@ type VoiceConfig struct {
 // Slide represents a single slide's transcript data
 type Slide struct {
 	Index       int                        `json:"index"`
-	Title       string                     `json:"title,omitempty"`       // Optional slide title for reference
-	Transcripts map[string]LanguageContent `json:"transcripts"`           // Keyed by language code
-	Avatar      *AvatarConfig              `json:"avatar,omitempty"`      // Optional avatar/speaker config
-	Notes       string                     `json:"notes,omitempty"`       // Internal notes (not spoken)
+	Title       string                     `json:"title,omitempty"`  // Optional slide title for reference
+	Transcripts map[string]LanguageContent `json:"transcripts"`      // Keyed by language code
+	Avatar      *AvatarConfig              `json:"avatar,omitempty"` // Optional avatar/speaker config
+	Notes       string                     `json:"notes,omitempty"`  // Internal notes (not spoken)
 }
 
 // LanguageContent contains the transcript for one language
 type LanguageContent struct {
-	Voice    *VoiceConfig `json:"voice,omitempty"` // Override default voice for this language
-	Segments []Segment    `json:"segments"`        // Text segments with timing/effects
+	Voice    *VoiceConfig `json:"voice,omitempty"`  // Override default voice for this language
+	Segments []Segment    `json:"segments"`         // Text segments with timing/effects
 	Timing   *TimingInfo  `json:"timing,omitempty"` // Populated after TTS generation
 }
 
@@ -68,12 +68,12 @@ type Segment struct {
 
 // SSMLHints provides SSML-compatible markup hints
 type SSMLHints struct {
-	Breaks     []string `json:"breaks,omitempty"`     // e.g., ["400ms", "1s"]
-	Emphasis   []string `json:"emphasis,omitempty"`   // Words to emphasize
-	Prosody    string   `json:"prosody,omitempty"`    // Custom prosody settings
-	SayAs      string   `json:"sayAs,omitempty"`      // date, time, telephone, etc.
-	Phoneme    string   `json:"phoneme,omitempty"`    // IPA pronunciation
-	SubAlias   string   `json:"subAlias,omitempty"`   // Substitution text
+	Breaks   []string `json:"breaks,omitempty"`   // e.g., ["400ms", "1s"]
+	Emphasis []string `json:"emphasis,omitempty"` // Words to emphasize
+	Prosody  string   `json:"prosody,omitempty"`  // Custom prosody settings
+	SayAs    string   `json:"sayAs,omitempty"`    // date, time, telephone, etc.
+	Phoneme  string   `json:"phoneme,omitempty"`  // IPA pronunciation
+	SubAlias string   `json:"subAlias,omitempty"` // Substitution text
 }
 
 // TimingInfo contains timing data (populated after TTS generation)
@@ -85,12 +85,12 @@ type TimingInfo struct {
 
 // AvatarConfig specifies virtual avatar/speaker settings
 type AvatarConfig struct {
-	Provider  string            `json:"provider"`            // heygen, synthesia, d-id, etc.
-	AvatarID  string            `json:"avatarId"`            // Provider-specific avatar ID
-	Position  string            `json:"position,omitempty"`  // bottom-right, bottom-left, full, pip
-	Size      string            `json:"size,omitempty"`      // small, medium, large
-	Style     string            `json:"style,omitempty"`     // casual, professional, etc.
-	Custom    map[string]string `json:"custom,omitempty"`    // Provider-specific settings
+	Provider string            `json:"provider"`           // heygen, synthesia, d-id, etc.
+	AvatarID string            `json:"avatarId"`           // Provider-specific avatar ID
+	Position string            `json:"position,omitempty"` // bottom-right, bottom-left, full, pip
+	Size     string            `json:"size,omitempty"`     // small, medium, large
+	Style    string            `json:"style,omitempty"`    // casual, professional, etc.
+	Custom   map[string]string `json:"custom,omitempty"`   // Provider-specific settings
 }
 
 // LoadFromFile loads a transcript from a JSON file
@@ -115,7 +115,7 @@ func (t *Transcript) SaveToFile(path string) error {
 		return fmt.Errorf("failed to marshal transcript: %w", err)
 	}
 
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	if err := os.WriteFile(path, data, 0600); err != nil {
 		return fmt.Errorf("failed to write transcript file: %w", err)
 	}
 

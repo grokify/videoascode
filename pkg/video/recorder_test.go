@@ -7,9 +7,9 @@ import (
 
 func TestNewRecorder(t *testing.T) {
 	tests := []struct {
-		name           string
-		config         RecorderConfig
-		wantFrameRate  int
+		name          string
+		config        RecorderConfig
+		wantFrameRate int
 	}{
 		{
 			name:          "default frame rate",
@@ -46,12 +46,12 @@ func TestBuildMacOSCommand(t *testing.T) {
 
 	// Check essential arguments are present
 	expectedArgs := map[string]string{
-		"-f":               "avfoundation",
-		"-framerate":       "30",
-		"-i":               "2:none", // First -i is screen device
-		"-t":               "5.00",
-		"-vcodec":          "libx264",
-		"-acodec":          "aac",
+		"-f":         "avfoundation",
+		"-framerate": "30",
+		"-i":         "2:none", // First -i is screen device
+		"-t":         "5.00",
+		"-vcodec":    "libx264",
+		"-acodec":    "aac",
 	}
 
 	argMap := make(map[string]string)

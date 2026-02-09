@@ -9,10 +9,10 @@ import (
 
 // Slide represents a single slide with content and voiceover
 type Slide struct {
-	Index        int
-	Content      string
-	Voiceover    string
-	PauseDurations []int // milliseconds
+	Index              int
+	Content            string
+	Voiceover          string
+	PauseDurations     []int // milliseconds
 	TotalPauseDuration int
 }
 
