@@ -1,5 +1,6 @@
 # Binaries
 bin/
+marp2video
 *.exe
 *.exe~
 *.dll
@@ -37,6 +38,10 @@ Thumbs.db
 
 # Working directory
 /workdir/
+**/workdir/
+
+# Generated output
+**/output/
 
 # MkDocs build output
 /site/
