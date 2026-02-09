@@ -19,6 +19,7 @@ type ProgressFunc func(current, total int, slideName string)
 type TranscriptGeneratorConfig struct {
 	APIKey       string
 	OutputDir    string
+	Force        bool         // If true, regenerate audio even if files exist
 	ProgressFunc ProgressFunc // Optional callback for progress updates
 }
 
@@ -44,14 +45,18 @@ func NewTranscriptGenerator(config TranscriptGeneratorConfig) (*TranscriptGenera
 // GenerateFromTranscript generates audio files for all slides in a transcript
 // Returns a manifest with timing information for use by the video recorder
 func (g *TranscriptGenerator) GenerateFromTranscript(ctx context.Context, t *transcript.Transcript, language string) (*Manifest, error) {
-	logger := slogutil.LoggerFromContext(ctx, nil)
+	logger := slogutil.LoggerFromContext(ctx, slogutil.Null())
 
 	// Create output directory
 	if err := os.MkdirAll(g.config.OutputDir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create output directory: %w", err)
 	}
 
-	// Create manifest
+	// Try to load existing manifest for resuming interrupted runs
+	manifestPath := filepath.Join(g.config.OutputDir, "manifest.json")
+	existingManifest, _ := LoadManifest(manifestPath) // Ignore error, may not exist
+
+	// Create new manifest (will be populated with existing + new entries)
 	manifest := NewManifest(language)
 	numSlides := len(t.Slides)
 
@@ -79,11 +84,22 @@ func (g *TranscriptGenerator) GenerateFromTranscript(ctx context.Context, t *tra
 			continue
 		}
 
+		// Check if audio file already exists
+		audioPath := filepath.Join(g.config.OutputDir, fmt.Sprintf("slide_%03d.mp3", slide.Index))
+
+		// Skip if file exists and we're not forcing regeneration
+		if !g.config.Force {
+			if existingEntry, err := g.getExistingSlideAudio(audioPath, existingManifest, slide.Index); err == nil {
+				logger.Info("skipping existing audio",
+					"slide", slide.Index,
+					"file", audioPath)
+				manifest.AddSlide(*existingEntry)
+				continue
+			}
+		}
+
 		// Determine voice configuration
 		voiceConfig := g.resolveVoiceConfig(t.Metadata.DefaultVoice, content.Voice)
-
-		// Generate audio
-		audioPath := filepath.Join(g.config.OutputDir, fmt.Sprintf("slide_%03d.mp3", slide.Index))
 
 		logger.Info("generating audio",
 			"slide", slide.Index,
@@ -99,14 +115,20 @@ func (g *TranscriptGenerator) GenerateFromTranscript(ctx context.Context, t *tra
 		pauseDuration := content.GetTotalPauseDuration()
 
 		// Add to manifest
-		manifest.AddSlide(SlideAudio{
+		slideAudio := SlideAudio{
 			Index:         slide.Index,
 			Title:         slide.Title,
 			AudioFile:     filepath.Base(audioPath),
 			AudioDuration: int(audioDuration.Milliseconds()),
 			PauseDuration: pauseDuration,
 			TotalDuration: int(audioDuration.Milliseconds()) + pauseDuration,
-		})
+		}
+		manifest.AddSlide(slideAudio)
+
+		// Save manifest after each slide (for resume support)
+		if err := manifest.SaveToFile(manifestPath); err != nil {
+			logger.Warn("failed to save manifest", "error", err)
+		}
 
 		logger.Info("generated audio",
 			"slide", slide.Index,
@@ -115,6 +137,34 @@ func (g *TranscriptGenerator) GenerateFromTranscript(ctx context.Context, t *tra
 	}
 
 	return manifest, nil
+}
+
+// getExistingSlideAudio checks if audio file exists and returns manifest entry if available
+func (g *TranscriptGenerator) getExistingSlideAudio(audioPath string, existingManifest *Manifest, slideIndex int) (*SlideAudio, error) {
+	// Check if file exists
+	if _, err := os.Stat(audioPath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("audio file does not exist")
+	}
+
+	// Try to get duration from existing manifest
+	if existingManifest != nil {
+		if entry, err := existingManifest.GetSlide(slideIndex); err == nil {
+			return entry, nil
+		}
+	}
+
+	// File exists but no manifest entry - get duration from file
+	duration, err := getAudioDuration(audioPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get audio duration: %w", err)
+	}
+
+	return &SlideAudio{
+		Index:         slideIndex,
+		AudioFile:     filepath.Base(audioPath),
+		AudioDuration: int(duration.Milliseconds()),
+		TotalDuration: int(duration.Milliseconds()),
+	}, nil
 }
 
 // resolveVoiceConfig merges default voice with language-specific override
