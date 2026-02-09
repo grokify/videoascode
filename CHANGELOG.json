@@ -1,0 +1,54 @@
+{
+  "irVersion": "1.0",
+  "project": "marp2video",
+  "repository": "https://github.com/grokify/marp2video",
+  "versioning": "semver",
+  "commitConvention": "conventional",
+  "maintainers": ["grokify", "johncwang@gmail.com"],
+  "releases": [
+    {
+      "version": "v0.1.0",
+      "date": "2026-02-09",
+      "highlights": [
+        { "description": "Convert Marp presentations to narrated videos with AI-generated voiceovers" },
+        { "description": "Multi-language transcript support with ElevenLabs TTS integration" },
+        { "description": "Image-based video generation for reliable, high-quality output" }
+      ],
+      "added": [
+        { "description": "CLI tool with `tts` and `video` subcommands", "commit": "789cc47" },
+        { "description": "Marp markdown parser with voiceover comment extraction (`<!-- voiceover: ... -->`)", "commit": "789cc47" },
+        { "description": "Pause directive support (`<!-- pause: 500 -->`) for timing control", "commit": "789cc47" },
+        { "description": "ElevenLabs TTS integration for audio generation", "commit": "789cc47" },
+        { "description": "Multi-language transcript package with JSON schema", "commit": "517e554" },
+        { "description": "Support for BCP-47 locale codes (en-US, es-ES, zh-Hans, fr-FR, etc.)", "commit": "3cd26aa" },
+        { "description": "`tts` subcommand for generating audio from transcript.json files", "commit": "c351853" },
+        { "description": "TTS resume support with `--force` flag to skip existing audio files", "commit": "48776f3" },
+        { "description": "Audio manifest for tracking generated files and durations", "commit": "c351853" },
+        { "description": "Image-based video generation using Marp PNG export", "commit": "d8b963c" },
+        { "description": "Video combining with optional crossfade transitions", "commit": "789cc47" },
+        { "description": "Individual slide video export for platforms like Udemy", "commit": "789cc47" },
+        { "description": "Progress bar during conversion with multi-stage tracking", "commit": "60e3d46" },
+        { "description": "`--verbose` flag for debug logging", "commit": "30c69a1" },
+        { "description": "Cross-platform support: macOS, Linux, Windows", "commit": "789cc47" },
+        { "description": "Self-documenting intro example with 13 slides", "commit": "c88bf10" },
+        { "description": "Simplified Chinese and French translations for intro example", "commit": "0d40cc1" }
+      ],
+      "fixed": [
+        { "description": "Nil pointer dereference with slog logger", "commit": "a593129" },
+        { "description": "Browser timeout issues during recording", "commit": "a593129" },
+        { "description": "Screen device auto-detection on macOS", "commit": "a593129" }
+      ],
+      "documentation": [
+        { "description": "Comprehensive README with installation, usage, and troubleshooting", "commit": "f84f250" },
+        { "description": "MkDocs documentation site", "commit": "325ae0d" },
+        { "description": "macOS screen recording permissions guide", "commit": "08b22c3" },
+        { "description": "Example presentation with OmniVoice TTS workflow", "commit": "981fd68" }
+      ],
+      "dependencies": [
+        { "description": "`github.com/go-rod/rod` for browser automation", "commit": "789cc47" },
+        { "description": "`github.com/spf13/cobra` for CLI framework", "commit": "789cc47" },
+        { "description": "`github.com/grokify/mogo` for utilities and progress bars", "commit": "789cc47" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+# Release Notes: v0.1.0
+
+**Release Date:** 2026-02-09
+
+## Overview
+
+marp2video v0.1.0 is the initial release of the Marp-to-Video conversion tool. It enables you to transform Marp markdown presentations into narrated videos with AI-generated voiceovers using ElevenLabs TTS.
+
+## Highlights
+
+- **Marp to Video Conversion** - Convert Marp presentations to MP4 videos with synchronized audio narration
+- **Multi-language Support** - Generate voiceovers in multiple languages using JSON transcript files with BCP-47 locale codes
+- **Image-based Video Generation** - Reliable video creation using Marp's PNG export (no screen recording required)
+
+## Key Features
+
+### CLI Commands
+
+- `marp2video tts` - Generate audio files from transcript.json
+- `marp2video video` - Create video from Marp presentation with audio
+
+### Voiceover Integration
+
+- Embed voiceovers directly in Marp markdown using `<!-- voiceover: ... -->` comments
+- Control timing with pause directives: `<!-- pause: 500 -->`
+- Support for ElevenLabs TTS with configurable voice selection
+
+### Transcript System
+
+- JSON-based transcript format for multi-language content
+- Supports languages: en-US, es-ES, zh-Hans, fr-FR, and more
+- Resume interrupted TTS generation with `--force` flag
+
+### Video Output
+
+- Combined video for YouTube/Vimeo upload
+- Individual slide videos for Udemy courses (`--output-individual`)
+- Optional crossfade transitions between slides
+
+## Installation
+
+```bash
+go install github.com/grokify/marp2video/cmd/marp2video@v0.1.0
+```
+
+### Prerequisites
+
+- [Marp CLI](https://github.com/marp-team/marp-cli): `npm install -g @marp-team/marp-cli`
+- [ffmpeg](https://ffmpeg.org/): Required for video processing
+- [ElevenLabs API key](https://elevenlabs.io/): For TTS generation
+
+## Quick Start
+
+1. Create a Marp presentation with voiceover comments
+2. Generate audio: `marp2video tts -i presentation.md -o audio/`
+3. Create video: `marp2video video -i presentation.md -m audio/manifest.json -o output.mp4`
+
+See the [README](README.md) for detailed usage instructions.
+
+## Platform Support
+
+- **macOS** (Apple Silicon and Intel)
+- **Linux** (amd64, arm64)
+- **Windows** (amd64)
+
+## What's Next
+
+- GoReleaser for pre-built binaries
+- Homebrew tap distribution
+- Additional TTS provider support
+- Custom CSS theme support for Marp rendering
+
+## Links
+
+- [GitHub Repository](https://github.com/grokify/marp2video)
+- [Full Changelog](CHANGELOG.md)
+- [Documentation](https://grokify.github.io/marp2video/)
