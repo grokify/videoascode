@@ -87,7 +87,7 @@ Marp2video eliminates this manual work by automating the entire process.
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Marp MD   │ ──▶ │  ElevenLabs │ ──▶ │   ffmpeg    │
+│   Marp MD   │ ──> │  ElevenLabs │ ──> │   ffmpeg    │
 │  + Comments │     │     TTS     │     │  Recording  │
 └─────────────┘     └─────────────┘     └─────────────┘
                                                │
