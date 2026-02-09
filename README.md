@@ -6,18 +6,18 @@ This tool takes a Marp markdown presentation with voiceover text (inline comment
 
 ## Features
 
-- ✅ **Parse Marp presentations** with voiceover in HTML comments
-- ✅ **JSON transcript support** for multi-language voiceovers
-- ✅ **Text-to-speech** using ElevenLabs API (Adam voice by default)
-- ✅ **Multi-language** support with per-slide voice configuration
-- ✅ **Browser automation** with Rod to display slides
-- ✅ **Screen recording** with synchronized audio using ffmpeg
-- ✅ **Cross-platform** support (macOS, Linux, Windows)
-- ✅ **Pause directives** like `[PAUSE:1000]` for timing control
-- ✅ **Full orchestration** - entire process automated in Go
-- ✅ **YouTube-ready** combined video output with optional transitions
-- ✅ **Udemy-ready** individual slide videos for course lectures
-- ✅ **Decoupled workflow** - generate audio and video separately
+- 📝 **Parse Marp presentations** with voiceover in HTML comments
+- 🌐 **JSON transcript support** for multi-language voiceovers
+- 🎙️ **Text-to-speech** using ElevenLabs API (Adam voice by default)
+- 🗣️ **Multi-language** support with per-slide voice configuration
+- 🖼️ **Image-based rendering** using Marp PNG export for reliable output
+- 🎬 **Video generation** with synchronized audio using ffmpeg
+- 💻 **Cross-platform** support (macOS, Linux, Windows)
+- ⏱️ **Pause directives** like `[PAUSE:1000]` for timing control
+- ⚙️ **Full orchestration** - entire process automated in Go
+- ▶️ **YouTube-ready** combined video output with optional transitions
+- 🎓 **Udemy-ready** individual slide videos for course lectures
+- 🔄 **Decoupled workflow** - generate audio and video separately
 
 ## Installation
 
