@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -128,7 +127,7 @@ func runVideo(cmd *cobra.Command, args []string) error {
 	// Create and run orchestrator
 	orch := orchestrator.NewOrchestrator(config)
 
-	ctx := context.Background()
+	ctx := newContext()
 	if err := orch.Process(ctx); err != nil {
 		return err
 	}

@@ -1,13 +1,18 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log/slog"
 	"os"
 
+	"github.com/grokify/mogo/log/slogutil"
 	"github.com/spf13/cobra"
 )
 
 const version = "0.2.0"
+
+var verbose bool
 
 var rootCmd = &cobra.Command{
 	Use:   "marp2video",
@@ -33,6 +38,17 @@ Examples:
 
 func init() {
 	rootCmd.SetVersionTemplate("marp2video version {{.Version}}\n")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "V", false, "Enable verbose logging")
+}
+
+// newContext returns a context with a logger if verbose mode is enabled
+func newContext() context.Context {
+	ctx := context.Background()
+	if verbose {
+		logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+		ctx = slogutil.ContextWithLogger(ctx, logger)
+	}
+	return ctx
 }
 
 func Execute() {
