@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 
 	"github.com/grokify/marp2video/pkg/audio"
@@ -93,7 +94,7 @@ func (o *Orchestrator) updateProgress(stage int, desc string, current, total int
 
 // Process orchestrates the entire conversion process
 func (o *Orchestrator) Process(ctx context.Context) error {
-	logger := slogutil.LoggerFromContext(ctx, nil)
+	logger := slogutil.LoggerFromContext(ctx, slogutil.Null())
 	logger.Info("Starting Marp to Video conversion...")
 
 	// Create working directories
@@ -104,6 +105,13 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 	for _, dir := range []string{audioDir, videoDir, htmlDir} {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return fmt.Errorf("failed to create directory %s: %w", dir, err)
+		}
+	}
+
+	// Create output directory if needed
+	if outputDir := filepath.Dir(o.config.OutputFile); outputDir != "" && outputDir != "." {
+		if err := os.MkdirAll(outputDir, 0755); err != nil {
+			return fmt.Errorf("failed to create output directory %s: %w", outputDir, err)
 		}
 	}
 
@@ -122,48 +130,78 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 	logger.Info("Found slides", "count", len(presentation.Slides))
 	o.updateProgress(1, "Parsing Marp markdown", 0, 0, true)
 
-	// Step 2: Generate audio for each slide
-	logger.Info("Step 2: Generating audio with ElevenLabs...")
-	ttsGen := tts.NewGenerator(tts.Config{
-		APIKey:    o.config.ElevenLabsAPIKey,
-		VoiceID:   o.config.VoiceID,
-		OutputDir: audioDir,
-	})
-
-	audioPlayer := audio.NewPlayer()
-	audioFiles := make([]string, len(presentation.Slides))
-	slideDurations := make([]time.Duration, len(presentation.Slides))
+	// Step 2: Get audio for each slide (from manifest or generate)
 	numSlides := len(presentation.Slides)
+	audioFiles := make([]string, numSlides)
+	slideDurations := make([]time.Duration, numSlides)
 
-	for i, slide := range presentation.Slides {
-		o.updateProgress(2, "Generating audio", i+1, numSlides, false)
+	if o.config.AudioManifest != "" {
+		// Use pre-generated audio from manifest
+		logger.Info("Step 2: Loading audio from manifest...", "manifest", o.config.AudioManifest)
+		o.updateProgress(2, "Loading audio manifest", 0, 0, false)
 
-		if slide.Voiceover == "" {
-			logger.Info("Slide: No voiceover, skipping audio generation", "slide", i)
-			continue
-		}
-
-		logger.Info("Slide: Generating audio...", "slide", i)
-		audioResult, err := ttsGen.GenerateAudio(ctx, slide.Voiceover, i)
+		manifest, err := tts.LoadManifest(o.config.AudioManifest)
 		if err != nil {
-			return fmt.Errorf("failed to generate audio for slide %d: %w", i, err)
+			return fmt.Errorf("failed to load audio manifest: %w", err)
 		}
 
-		audioFiles[i] = audioResult.FilePath
+		manifestDir := filepath.Dir(o.config.AudioManifest)
+		for i := 0; i < numSlides; i++ {
+			o.updateProgress(2, "Loading audio manifest", i+1, numSlides, false)
 
-		// Get actual audio duration using ffprobe
-		duration, err := audioPlayer.GetDuration(audioResult.FilePath)
-		if err != nil {
-			return fmt.Errorf("failed to get audio duration for slide %d: %w", i, err)
+			slideAudio, err := manifest.GetSlide(i)
+			if err != nil {
+				logger.Warn("No audio in manifest for slide", "slide", i)
+				continue
+			}
+
+			audioFiles[i] = filepath.Join(manifestDir, slideAudio.AudioFile)
+			slideDurations[i] = time.Duration(slideAudio.TotalDuration) * time.Millisecond
+
+			logger.Info("Slide: Using pre-generated audio", "slide", i, "duration", slideDurations[i].Seconds())
 		}
+		o.updateProgress(2, "Loading audio manifest", numSlides, numSlides, true)
+	} else {
+		// Generate audio with ElevenLabs
+		logger.Info("Step 2: Generating audio with ElevenLabs...")
+		ttsGen := tts.NewGenerator(tts.Config{
+			APIKey:    o.config.ElevenLabsAPIKey,
+			VoiceID:   o.config.VoiceID,
+			OutputDir: audioDir,
+		})
 
-		// Add pause durations
-		totalDuration := duration + time.Duration(slide.TotalPauseDuration)*time.Millisecond
-		slideDurations[i] = totalDuration
+		audioPlayer := audio.NewPlayer()
 
-		logger.Info("Slide: Audio generated", "slide", i, "duration", totalDuration.Seconds())
+		for i, slide := range presentation.Slides {
+			o.updateProgress(2, "Generating audio", i+1, numSlides, false)
+
+			if slide.Voiceover == "" {
+				logger.Info("Slide: No voiceover, skipping audio generation", "slide", i)
+				continue
+			}
+
+			logger.Info("Slide: Generating audio...", "slide", i)
+			audioResult, err := ttsGen.GenerateAudio(ctx, slide.Voiceover, i)
+			if err != nil {
+				return fmt.Errorf("failed to generate audio for slide %d: %w", i, err)
+			}
+
+			audioFiles[i] = audioResult.FilePath
+
+			// Get actual audio duration using ffprobe
+			duration, err := audioPlayer.GetDuration(audioResult.FilePath)
+			if err != nil {
+				return fmt.Errorf("failed to get audio duration for slide %d: %w", i, err)
+			}
+
+			// Add pause durations
+			totalDuration := duration + time.Duration(slide.TotalPauseDuration)*time.Millisecond
+			slideDurations[i] = totalDuration
+
+			logger.Info("Slide: Audio generated", "slide", i, "duration", totalDuration.Seconds())
+		}
+		o.updateProgress(2, "Generating audio", numSlides, numSlides, true)
 	}
-	o.updateProgress(2, "Generating audio", numSlides, numSlides, true)
 
 	// Step 3: Render Marp to HTML
 	o.updateProgress(3, "Rendering HTML", 0, 0, false)
@@ -177,64 +215,62 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to render HTML: %w", err)
 	}
+	_ = htmlPath // HTML created for reference; using images for video
 	logger.Info("HTML presentation created", "path", htmlPath)
 	o.updateProgress(3, "Rendering HTML", 0, 0, true)
 
-	// Step 4: Open browser and record each slide
-	o.updateProgress(4, "Recording slides", 0, numSlides, false)
-	logger.Info("Step 4: Recording slides...")
-	browserCtrl, err := renderer.NewBrowserController(o.config.Width, o.config.Height)
+	// Step 4: Render slides to images and create videos
+	o.updateProgress(4, "Creating slide videos", 0, numSlides, false)
+	logger.Info("Step 4: Rendering slides to images...")
+
+	// Render Marp to PNG images (one per slide)
+	imagesDir := filepath.Join(o.config.WorkDir, "images")
+	imagePaths, err := marpRenderer.RenderToImages(o.config.InputFile, imagesDir)
 	if err != nil {
-		return fmt.Errorf("failed to create browser controller: %w", err)
+		return fmt.Errorf("failed to render images: %w", err)
 	}
-	defer func() {
-		if err := browserCtrl.Close(); err != nil {
-			logger.Warn("failed to close browser", "error", err)
-		}
-	}()
+	logger.Info("Generated slide images", "count", len(imagePaths))
 
-	if err := browserCtrl.LoadPresentation(htmlPath); err != nil {
-		return fmt.Errorf("failed to load presentation: %w", err)
-	}
+	// Sort image paths to ensure correct order
+	sort.Strings(imagePaths)
 
-	recorder := video.NewRecorder(video.RecorderConfig{
-		OutputDir:    videoDir,
-		Width:        o.config.Width,
-		Height:       o.config.Height,
-		FrameRate:    o.config.FrameRate,
-		ScreenDevice: o.config.ScreenDevice,
+	// Create video converter
+	converter := video.NewImageVideoConverter(video.ImageVideoConfig{
+		OutputDir: videoDir,
+		Width:     o.config.Width,
+		Height:    o.config.Height,
+		FrameRate: o.config.FrameRate,
 	})
 
 	videoFiles := make([]string, 0, len(presentation.Slides))
 
+	// Create video for each slide with audio
 	for i := range presentation.Slides {
-		o.updateProgress(4, "Recording slides", i+1, numSlides, false)
+		o.updateProgress(4, "Creating slide videos", i+1, numSlides, false)
 
 		if audioFiles[i] == "" {
 			logger.Info("Slide: Skipping (no audio)", "slide", i)
 			continue
 		}
 
-		logger.Info("Slide: Recording...", "slide", i)
-
-		// Navigate to slide
-		if err := browserCtrl.NavigateToSlide(i); err != nil {
-			return fmt.Errorf("failed to navigate to slide %d: %w", i, err)
+		// Find corresponding image (marp generates slide.001.png, slide.002.png, etc.)
+		if i >= len(imagePaths) {
+			return fmt.Errorf("no image found for slide %d", i)
 		}
+		imagePath := imagePaths[i]
 
-		// Wait a moment for slide to settle
-		time.Sleep(500 * time.Millisecond)
+		logger.Info("Creating video for slide", "slide", i, "image", imagePath, "audio", audioFiles[i])
 
-		// Record slide with audio
-		videoPath, err := recorder.RecordSlide(ctx, i, audioFiles[i], slideDurations[i])
+		// Create video from image + audio
+		videoPath, err := converter.CreateSlideVideoWithSize(ctx, i, imagePath, audioFiles[i], slideDurations[i], o.config.Width, o.config.Height)
 		if err != nil {
-			return fmt.Errorf("failed to record slide %d: %w", i, err)
+			return fmt.Errorf("failed to create video for slide %d: %w", i, err)
 		}
 
 		videoFiles = append(videoFiles, videoPath)
-		logger.Info("Slide: Recorded", "slide", i, "path", videoPath)
+		logger.Info("Slide: Video created", "slide", i, "path", videoPath)
 	}
-	o.updateProgress(4, "Recording slides", numSlides, numSlides, true)
+	o.updateProgress(4, "Creating slide videos", numSlides, numSlides, true)
 
 	// Step 5: Combine all videos (for YouTube)
 	combineStage := 5
