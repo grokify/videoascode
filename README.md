@@ -1,5 +1,12 @@
 # marp2video
 
+[![Build Status][build-status-svg]][build-status-url]
+[![Lint Status][lint-status-svg]][lint-status-url]
+[![Go Report Card][goreport-svg]][goreport-url]
+[![Docs][docs-godoc-svg]][docs-godoc-url]
+[![Visualization][viz-svg]][viz-url]
+[![License][license-svg]][license-url]
+
 Convert Marp presentations with voiceovers to video files.
 
 This tool takes a Marp markdown presentation with voiceover text (inline comments or JSON transcript), generates speech using ElevenLabs TTS, and creates a synchronized video recording of the presentation.
@@ -645,3 +652,18 @@ MIT License - see LICENSE file for details
 - [ ] Export to different video formats
 - [ ] Add subtitle/caption generation
 - [ ] Avatar integration (HeyGen, Synthesia)
+
+ [build-status-svg]: https://github.com/grokify/marp2video/actions/workflows/ci.yaml/badge.svg?branch=main
+ [build-status-url]: https://github.com/grokify/marp2video/actions/workflows/ci.yaml
+ [lint-status-svg]: https://github.com/grokify/marp2video/actions/workflows/lint.yaml/badge.svg?branch=main
+ [lint-status-url]: https://github.com/grokify/marp2video/actions/workflows/lint.yaml
+ [goreport-svg]: https://goreportcard.com/badge/github.com/grokify/marp2video
+ [goreport-url]: https://goreportcard.com/report/github.com/grokify/marp2video
+ [docs-godoc-svg]: https://pkg.go.dev/badge/github.com/grokify/marp2video
+ [docs-godoc-url]: https://pkg.go.dev/github.com/grokify/marp2video
+ [viz-svg]: https://img.shields.io/badge/visualizaton-Go-blue.svg
+ [viz-url]: https://mango-dune-07a8b7110.1.azurestaticapps.net/?repo=grokify%2Fmarp2video
+ [loc-svg]: https://tokei.rs/b1/github/grokify/marp2video
+ [repo-url]: https://github.com/grokify/marp2video
+ [license-svg]: https://img.shields.io/badge/license-MIT-blue.svg
+ [license-url]: https://github.com/grokify/marp2video/blob/master/LICENSE
