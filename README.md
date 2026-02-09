@@ -429,14 +429,27 @@ Fully compatible with Apple Silicon Macs. Uses `avfoundation` for screen capture
 ffmpeg -f avfoundation -i "<device>:none" ...
 ```
 
-**Screen device auto-detection**: The tool automatically detects the correct screen capture device. On Macs with external displays or connected iPhones, the device number varies. To list available devices:
+#### Required Permissions
+
+**Screen Recording permission is required.** Before running marp2video, grant permission to your terminal app:
+
+1. Open **System Settings** (or System Preferences on older macOS)
+2. Navigate to **Privacy & Security > Screen Recording**
+3. Enable your terminal application (Terminal, iTerm2, VS Code, etc.)
+4. Restart the terminal after granting permission
+
+Without this permission, ffmpeg will fail with "Could not find video device" or similar errors.
+
+#### Screen Device Auto-Detection
+
+The tool automatically detects the correct screen capture device. On Macs with external displays or connected iPhones, the device number varies. To list available devices:
 ```bash
 ffmpeg -f avfoundation -list_devices true -i ""
 ```
 
 You can manually specify the device if needed:
 ```bash
-./bin/marp2video --input slides.md --output video.mp4 --screen-device "4:none"
+marp2video video --input slides.md --output video.mp4 --screen-device "4:none"
 ```
 
 ### Linux
@@ -563,10 +576,30 @@ Install Marp CLI: `npm install -g @marp-team/marp-cli`
 - Check your ElevenLabs account has sufficient credits
 - Ensure you have access to the voice ID you specified
 
-### Recording issues
-- Ensure the browser window is visible during recording
-- On macOS, you may need to grant screen recording permissions
-- Try reducing video resolution if performance is poor
+### Recording issues on macOS
+
+**"recording failed: exit status 1" or ffmpeg errors:**
+
+1. **Grant Screen Recording permission** (most common issue):
+   - Go to **System Settings > Privacy & Security > Screen Recording**
+   - Enable your terminal app (Terminal, iTerm2, VS Code, etc.)
+   - **Restart your terminal** after granting permission
+
+2. **Verify ffmpeg can access the screen:**
+   ```bash
+   ffmpeg -f avfoundation -list_devices true -i ""
+   ```
+   You should see "Capture screen 0" or similar in the output.
+
+3. **Use verbose mode to see ffmpeg errors:**
+   ```bash
+   marp2video video --input slides.md --output video.mp4 --verbose
+   ```
+
+4. **Other tips:**
+   - Ensure the browser window is visible during recording
+   - Try reducing video resolution if performance is poor
+   - Manually specify screen device with `--screen-device "1:none"`
 
 ## Development
 
