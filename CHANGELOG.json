@@ -7,6 +7,49 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.2.0",
+      "date": "2026-02-14",
+      "highlights": [
+        { "description": "Automatic subtitle generation with STT (Speech-to-Text) support" },
+        { "description": "OmniVoice integration for unified TTS/STT provider abstraction" },
+        { "description": "Dictionary-based case correction for proper noun capitalization in subtitles" }
+      ],
+      "added": [
+        { "description": "Subtitle generator with STT support for automatic caption generation", "commit": "159f95e" },
+        { "description": "`subtitle` CLI command for generating subtitles from audio", "commit": "83c726d" },
+        { "description": "`stt` CLI command for speech-to-text transcription", "commit": "83c726d" },
+        { "description": "Subtitle embedding support (soft subtitles) via ffmpeg", "commit": "452f30a" },
+        { "description": "Subtitle burning support (hard-coded subtitles) via ffmpeg", "commit": "452f30a" },
+        { "description": "Dictionary-based case correction with built-in tech terms", "commit": "7b9f193" },
+        { "description": "Custom dictionary support via JSON files", "commit": "7b9f193" },
+        { "description": "OmniVoice TTS provider wrapper for unified interface", "commit": "6aebc4c" },
+        { "description": "OmniVoice STT provider wrapper for unified interface", "commit": "6aebc4c" },
+        { "description": "TTS provider override and provider-specific settings clearing", "commit": "629de16" },
+        { "description": "Path sanitization for safe ffmpeg subprocess execution", "commit": "35aef8d" }
+      ],
+      "changed": [
+        { "description": "Refactored orchestrator and audio player for OmniVoice integration", "commit": "d975709" }
+      ],
+      "tests": [
+        { "description": "Added subtitle alignment tests", "commit": "5b95ad3" }
+      ],
+      "documentation": [
+        { "description": "Added subtitle generation features to README", "commit": "11c384b" },
+        { "description": "Added subtitle guide and dual-language TRD", "commit": "dd29c85" }
+      ],
+      "dependencies": [
+        { "description": "Bump `github.com/grokify/mogo` to v0.73.2 for `SanitizePath` support", "commit": "35aef8d" },
+        { "description": "Add `github.com/agentplexus/omnivoice` for unified TTS/STT abstraction", "commit": "7c1b9cd" },
+        { "description": "Add `github.com/agentplexus/omnivoice-deepgram` for Deepgram STT", "commit": "7c1b9cd" }
+      ],
+      "chore": [
+        { "description": "Update Go versions in CI", "commit": "171ab0b" },
+        { "description": "Update module dependencies", "commit": "004176a" },
+        { "description": "Fix lint errors and apply gofmt", "commit": "785d2e4" },
+        { "description": "Add intro example audio files", "commit": "309916d" }
+      ]
+    },
+    {
       "version": "v0.1.0",
       "date": "2026-02-09",
       "highlights": [
