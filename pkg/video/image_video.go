@@ -67,15 +67,19 @@ func (c *ImageVideoConverter) CreateSlideVideo(ctx context.Context, slideIndex i
 
 	cmd := exec.Command("ffmpeg", args...)
 
-	// Show debug output if enabled
+	// Show debug output if enabled - use Run() instead of CombinedOutput()
+	// since we're redirecting stdout/stderr directly
 	if os.Getenv("MARP2VIDEO_DEBUG") != "" {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
-	}
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", fmt.Errorf("ffmpeg failed: %w\nOutput: %s", err, string(output))
+		if err := cmd.Run(); err != nil {
+			return "", fmt.Errorf("ffmpeg failed: %w", err)
+		}
+	} else {
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return "", fmt.Errorf("ffmpeg failed: %w\nOutput: %s", err, string(output))
+		}
 	}
 
 	return outputPath, nil
@@ -121,14 +125,19 @@ func (c *ImageVideoConverter) CreateSlideVideoWithSize(ctx context.Context, slid
 
 	cmd := exec.Command("ffmpeg", args...)
 
+	// Show debug output if enabled - use Run() instead of CombinedOutput()
+	// since we're redirecting stdout/stderr directly
 	if os.Getenv("MARP2VIDEO_DEBUG") != "" {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
-	}
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", fmt.Errorf("ffmpeg failed: %w\nOutput: %s", err, string(output))
+		if err := cmd.Run(); err != nil {
+			return "", fmt.Errorf("ffmpeg failed: %w", err)
+		}
+	} else {
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return "", fmt.Errorf("ffmpeg failed: %w\nOutput: %s", err, string(output))
+		}
 	}
 
 	return outputPath, nil

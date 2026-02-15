@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 
 	"github.com/grokify/mogo/log/slogutil"
@@ -22,40 +21,50 @@ func NewCombiner(outputDir string) *Combiner {
 }
 
 // CombineVideos concatenates multiple video files into one
+// Uses filter_complex concat to properly handle mixed audio formats (different sample rates)
 func (c *Combiner) CombineVideos(ctx context.Context, videoPaths []string, outputPath string) error {
-	logger := slogutil.LoggerFromContext(ctx, slogutil.Null())
+	_ = slogutil.LoggerFromContext(ctx, slogutil.Null())
 
 	if len(videoPaths) == 0 {
 		return fmt.Errorf("no video files to combine")
 	}
 
-	// Create a temporary file list for ffmpeg concat
-	concatFilePath := filepath.Join(c.outputDir, "concat_list.txt")
-	var fileList strings.Builder
+	if len(videoPaths) == 1 {
+		return copyFile(videoPaths[0], outputPath)
+	}
 
+	// Build ffmpeg command with filter_complex concat
+	// This properly handles mixed audio formats by re-encoding
+	args := []string{}
+
+	// Add all input files
 	for _, path := range videoPaths {
-		fileList.WriteString(fmt.Sprintf("file '%s'\n", path))
+		args = append(args, "-i", path)
 	}
 
-	if err := os.WriteFile(concatFilePath, []byte(fileList.String()), 0600); err != nil {
-		return fmt.Errorf("failed to create concat file list: %w", err)
+	// Build the concat filter
+	// [0:v][0:a][1:v][1:a]...[n:v][n:a]concat=n=N:v=1:a=1[outv][outa]
+	var filterParts strings.Builder
+	for i := range videoPaths {
+		filterParts.WriteString(fmt.Sprintf("[%d:v][%d:a]", i, i))
 	}
-	defer func() {
-		if err := os.Remove(concatFilePath); err != nil {
-			logger.Warn("failed to remove temp file", "path", concatFilePath, "error", err)
-		}
-	}()
+	filterParts.WriteString(fmt.Sprintf("concat=n=%d:v=1:a=1[outv][outa]", len(videoPaths)))
 
-	// Run ffmpeg concat
-	cmd := exec.Command("ffmpeg",
-		"-f", "concat",
-		"-safe", "0",
-		"-i", concatFilePath,
-		"-c", "copy",
+	args = append(args,
+		"-filter_complex", filterParts.String(),
+		"-map", "[outv]",
+		"-map", "[outa]",
+		"-c:v", "libx264",
+		"-preset", "fast",
+		"-crf", "23",
+		"-c:a", "aac",
+		"-b:a", "192k",
+		"-ar", "44100",
 		"-y",
 		outputPath,
 	)
 
+	cmd := exec.Command("ffmpeg", args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("ffmpeg concat failed: %w\nOutput: %s", err, string(output))
