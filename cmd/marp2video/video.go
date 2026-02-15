@@ -52,6 +52,8 @@ var (
 	videoScreenDevice       string
 	videoManifest           string
 	videoCheckDeps          bool
+	videoSubtitles          string
+	videoSubtitlesLang      string
 )
 
 func init() {
@@ -68,6 +70,8 @@ func init() {
 	videoCmd.Flags().StringVar(&videoScreenDevice, "screen-device", "", "Screen capture device (macOS only)")
 	videoCmd.Flags().StringVarP(&videoManifest, "manifest", "m", "", "Audio manifest file (from 'marp2video tts')")
 	videoCmd.Flags().BoolVar(&videoCheckDeps, "check", false, "Check dependencies and exit")
+	videoCmd.Flags().StringVar(&videoSubtitles, "subtitles", "", "Subtitle file to embed (SRT or VTT)")
+	videoCmd.Flags().StringVar(&videoSubtitlesLang, "subtitles-lang", "", "Subtitle language code, e.g., en-US (auto-detected from filename if not specified)")
 
 	if err := videoCmd.MarkFlagRequired("input"); err != nil {
 		panic(err)
@@ -130,6 +134,47 @@ func runVideo(cmd *cobra.Command, args []string) error {
 	ctx := newContext()
 	if err := orch.Process(ctx); err != nil {
 		return err
+	}
+
+	// Embed subtitles if provided
+	if videoSubtitles != "" {
+		if _, err := os.Stat(videoSubtitles); os.IsNotExist(err) {
+			return fmt.Errorf("subtitle file does not exist: %s", videoSubtitles)
+		}
+
+		// Determine language code
+		lang := videoSubtitlesLang
+		if lang == "" {
+			// Auto-detect from filename (e.g., "en-US.srt" -> "en-US")
+			lang = video.DetectLanguageFromSubtitlePath(videoSubtitles)
+		}
+		if lang == "" {
+			lang = "en-US" // Default fallback
+		}
+
+		// Convert BCP-47 to ISO 639-2 for ffmpeg
+		isoLang := video.BCP47ToISO639(lang)
+
+		fmt.Printf("\nEmbedding subtitles from: %s\n", videoSubtitles)
+		fmt.Printf("  Language: %s (%s)\n", lang, isoLang)
+
+		// Create temp output file
+		tempOutput := videoOutputFile + ".with-subs.mp4"
+
+		// Run ffmpeg to embed subtitles
+		if err := video.EmbedSubtitles(videoOutputFile, videoSubtitles, isoLang, tempOutput); err != nil {
+			return fmt.Errorf("failed to embed subtitles: %w", err)
+		}
+
+		// Replace original with subtitled version
+		if err := os.Remove(videoOutputFile); err != nil {
+			return fmt.Errorf("failed to remove original video: %w", err)
+		}
+		if err := os.Rename(tempOutput, videoOutputFile); err != nil {
+			return fmt.Errorf("failed to rename subtitled video: %w", err)
+		}
+
+		fmt.Printf("✓ Subtitles embedded\n")
 	}
 
 	fmt.Printf("\n✓ Success! Video saved to: %s\n", videoOutputFile)
