@@ -7,6 +7,32 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.2.1",
+      "date": "2026-02-15",
+      "highlights": [
+        { "description": "Mixed audio sample rate support for multi-provider TTS workflows" }
+      ],
+      "fixed": [
+        { "description": "Video concatenation now handles mixed audio sample rates from different TTS providers (e.g., ElevenLabs at 44100 Hz, Deepgram at 22050 Hz) using filter_complex concat instead of demuxer concat", "commit": "68d5976" },
+        { "description": "Debug mode (`MARP2VIDEO_DEBUG=1`) no longer causes 'Stdout already set' error", "commit": "68d5976" }
+      ],
+      "tests": [
+        { "description": "`TestCombineVideos_SingleVideo` for single video passthrough", "commit": "fa5fe3f" },
+        { "description": "`TestCombineVideos_FilterComplexConcat` documenting concat approach", "commit": "fa5fe3f" },
+        { "description": "`TestMixedAudioSampleRates_Documentation` explaining sample rate handling", "commit": "fa5fe3f" },
+        { "description": "`TestNewImageVideoConverter` and `TestDebugModeEnvironmentVariable` for image video converter", "commit": "fa5fe3f" }
+      ],
+      "documentation": [
+        { "description": "Added `--subtitles` and `--subtitles-lang` flags to video command in README", "commit": "0f49569" },
+        { "description": "Updated complete workflow guide with subtitle embedding instructions", "commit": "859df01" },
+        { "description": "Added troubleshooting guide with common issues and solutions", "commit": "fa5fe3f" },
+        { "description": "Updated architecture docs with mixed audio sample rate handling details", "commit": "fa5fe3f" }
+      ],
+      "dependencies": [
+        { "description": "Upgrade `github.com/agentplexus/omnivoice` to v0.4.2 for subtitle line count fix", "commit": "c852036" }
+      ]
+    },
+    {
       "version": "v0.2.0",
       "date": "2026-02-14",
       "highlights": [
