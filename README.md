@@ -9,13 +9,18 @@
 
 Convert Marp presentations with voiceovers to video files.
 
-This tool takes a Marp markdown presentation with voiceover text (inline comments or JSON transcript), generates speech using ElevenLabs TTS, and creates a synchronized video recording of the presentation.
+This tool takes a Marp markdown presentation with voiceover text (inline comments or JSON transcript), generates speech using text-to-speech (TTS), and creates a synchronized video recording of the presentation with optional subtitles.
+
+**Powered by [OmniVoice](https://github.com/agentplexus/omnivoice)** - a unified interface for TTS/STT providers. Tested with:
+
+- **[ElevenLabs](https://elevenlabs.io/)** - High-quality AI voice generation (TTS)
+- **[Deepgram](https://deepgram.com/)** - Fast, accurate speech-to-text (STT) for subtitles
 
 ## Features
 
 - 📝 **Parse Marp presentations** with voiceover in HTML comments
 - 🌐 **JSON transcript support** for multi-language voiceovers
-- 🎙️ **Text-to-speech** using ElevenLabs API (Adam voice by default)
+- 🎙️ **Text-to-speech** via OmniVoice (ElevenLabs, with more providers coming)
 - 🗣️ **Multi-language** support with per-slide voice configuration
 - 🖼️ **Image-based rendering** using Marp PNG export for reliable output
 - 🎬 **Video generation** with synchronized audio using ffmpeg
@@ -25,7 +30,7 @@ This tool takes a Marp markdown presentation with voiceover text (inline comment
 - ▶️ **YouTube-ready** combined video output with optional transitions
 - 🎓 **Udemy-ready** individual slide videos for course lectures
 - 🔄 **Decoupled workflow** - generate audio and video separately
-- 📜 **Subtitle generation** - SRT/VTT from audio using Deepgram STT
+- 📜 **Subtitle generation** - SRT/VTT from audio via OmniVoice (Deepgram STT)
 
 ## Installation
 
@@ -53,9 +58,13 @@ This tool takes a Marp markdown presentation with voiceover text (inline comment
    npm install -g @marp-team/marp-cli
    ```
 
-4. **ElevenLabs API Key**
+4. **ElevenLabs API Key** (for TTS)
    - Sign up at [ElevenLabs](https://elevenlabs.io/)
    - Get your API key from the dashboard
+
+5. **Deepgram API Key** (for subtitle generation)
+   - Sign up at [Deepgram](https://deepgram.com/)
+   - Get your API key from the console
 
 ### Build from Source
 
@@ -75,7 +84,9 @@ marp2video provides two subcommands for flexible workflows:
 ### Quick Start (Full Pipeline)
 
 ```bash
-export ELEVENLABS_API_KEY="your-api-key-here"
+# Set API keys
+export ELEVENLABS_API_KEY="your-elevenlabs-key"  # For TTS
+export DEEPGRAM_API_KEY="your-deepgram-key"      # For subtitles (optional)
 
 # Using inline voiceover comments
 marp2video video --input slides.md --output video.mp4
@@ -417,8 +428,8 @@ Step 2: presentation.md + manifest.json → marp2video video → video/{lang}.mp
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  STEP 2: Generate Audio (ElevenLabs TTS)                                │
-│  • Send voiceover text to ElevenLabs API                                │
+│  STEP 2: Generate Audio (OmniVoice TTS)                                 │
+│  • Send voiceover text to TTS provider (ElevenLabs)                     │
 │  • Apply voice settings (stability, similarity, style)                  │
 │  • Output: audio/{lang}/slide_000.mp3, slide_001.mp3, ...               │
 │  • Output: audio/{lang}/manifest.json (timing for video recording)      │
@@ -463,7 +474,7 @@ Step 2: presentation.md + manifest.json → marp2video video → video/{lang}.mp
 | Step | Component | Tool | Input | Output |
 |------|-----------|------|-------|--------|
 | 1 | Parser | Go | `slides.md` | Slides + voiceovers |
-| 2 | TTS | ElevenLabs API | Voiceover text | `slide_*.mp3` |
+| 2 | TTS | OmniVoice (ElevenLabs) | Voiceover text | `slide_*.mp3` |
 | 3 | Renderer | Marp CLI | `slides.md` | `presentation.html` |
 | 4 | Recorder | Rod + ffmpeg | HTML + MP3 | `slide_*.mp4` |
 | 5 | Combiner | ffmpeg | `slide_*.mp4` | `output.mp4` |
@@ -481,7 +492,8 @@ marp2video/
 ├── pkg/
 │   ├── parser/              # Marp markdown parser
 │   ├── transcript/          # JSON transcript types
-│   ├── tts/                 # ElevenLabs TTS + manifest
+│   ├── tts/                 # TTS generation + manifest
+│   ├── omnivoice/           # OmniVoice TTS/STT provider wrappers
 │   ├── renderer/            # Marp HTML renderer & browser control
 │   ├── audio/               # Audio utilities
 │   ├── video/               # Video recording & combination
@@ -704,8 +716,9 @@ MIT License - see LICENSE file for details
 ## Acknowledgments
 
 - [Marp](https://marp.app/) - Markdown presentation ecosystem
-- [ElevenLabs](https://elevenlabs.io/) - AI voice generation
-- [Deepgram](https://deepgram.com/) - Speech-to-text for subtitles
+- [OmniVoice](https://github.com/agentplexus/omnivoice) - Unified TTS/STT provider interface
+- [ElevenLabs](https://elevenlabs.io/) - AI voice generation (TTS)
+- [Deepgram](https://deepgram.com/) - Speech-to-text (STT) for subtitles
 - [Rod](https://github.com/go-rod/rod) - Browser automation framework
 - [ffmpeg](https://ffmpeg.org/) - Multimedia processing
 
