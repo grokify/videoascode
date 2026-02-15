@@ -2,8 +2,8 @@ github.com/agentplexus/go-elevenlabs v0.8.1 h1:w20rOHskYJRX2iagK8VtB7JRDmY7fRUh1
 github.com/agentplexus/go-elevenlabs v0.8.1/go.mod h1:b7Ko9Lp68sCoD+6fJfgtoZ1Ip24gu+IJKmRVR5EsnoE=
 github.com/agentplexus/ogen-tools v0.1.1 h1:uj3U/YEaykEjt1VBsaAGUpsolYSoaeGPjpzpIaeXaSg=
 github.com/agentplexus/ogen-tools v0.1.1/go.mod h1:IVRZVeR/MmXwAKGsh+AxBxG9TQ63cBuAUILxP4nrumY=
-github.com/agentplexus/omnivoice v0.4.1 h1:orxrZarh6RoRd0krV/u1coqbSf0dP9Atxeip5ANp+Tk=
-github.com/agentplexus/omnivoice v0.4.1/go.mod h1:LfxHfgrgrBg5isbaggYMpnwkN+zrCD1ziQA6StOMvkQ=
+github.com/agentplexus/omnivoice v0.4.2 h1:VynNBqzAX1z3Vk+dYF/f4P+QOQEAvmYYmzyrm1SzIfQ=
+github.com/agentplexus/omnivoice v0.4.2/go.mod h1:LfxHfgrgrBg5isbaggYMpnwkN+zrCD1ziQA6StOMvkQ=
 github.com/agentplexus/omnivoice-deepgram v0.3.0 h1:JnM/juJPnsaLSD9zJg54kaVvK0wQ6FxfWc2mYFDNiU0=
 github.com/agentplexus/omnivoice-deepgram v0.3.0/go.mod h1:we+gmzg3xytPSeWsHMHIHCfyt4gQ+xbc7FQK+NNGbTQ=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=

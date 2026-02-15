@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/agentplexus/go-elevenlabs v0.8.1
-	github.com/agentplexus/omnivoice v0.4.1
+	github.com/agentplexus/omnivoice v0.4.2
 	github.com/agentplexus/omnivoice-deepgram v0.3.0
 	github.com/go-rod/rod v0.116.2
 	github.com/grokify/mogo v0.73.2
