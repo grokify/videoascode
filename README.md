@@ -729,6 +729,10 @@ MIT License - see LICENSE file for details
 - [Rod](https://github.com/go-rod/rod) - Browser automation framework
 - [ffmpeg](https://ffmpeg.org/) - Multimedia processing
 
+## Related Projects
+
+- **[Marptalk](https://github.com/imjasonh/marptalk)** - Node.js-based Marp-to-video tool using Google Cloud TTS. Features browser-based TTS fallback for quick iteration without API costs, YouTube chapter markers generation, and LLM-assisted presentation drafting.
+
 ## Roadmap
 
 - [x] Custom voice settings (stability, similarity, style)
