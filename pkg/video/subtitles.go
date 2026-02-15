@@ -5,6 +5,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/grokify/mogo/os/osutil"
 )
 
 // bcp47ToISO639Map maps BCP-47 language codes to ISO 639-2 (3-letter) codes.
@@ -176,10 +178,28 @@ func isValidLocale(s string) bool {
 // The subtitle track can be toggled on/off by the viewer.
 // Supports SRT and VTT formats.
 func EmbedSubtitles(videoPath, subtitlePath, language, outputPath string) error {
-	// Validate subtitle format
-	ext := strings.ToLower(filepath.Ext(subtitlePath))
-	if ext != ".srt" && ext != ".vtt" {
-		return fmt.Errorf("unsupported subtitle format: %s (use .srt or .vtt)", ext)
+	// Sanitize and validate input paths
+	videoPath, err := osutil.SanitizePath(videoPath, &osutil.SanitizeOpts{
+		MustExist:   true,
+		MustBeFile:  true,
+		AllowedExts: []string{".mp4", ".mov", ".avi", ".mkv", ".webm"},
+	})
+	if err != nil {
+		return fmt.Errorf("invalid video path: %w", err)
+	}
+
+	subtitlePath, err = osutil.SanitizePath(subtitlePath, &osutil.SanitizeOpts{
+		MustExist:   true,
+		MustBeFile:  true,
+		AllowedExts: []string{".srt", ".vtt"},
+	})
+	if err != nil {
+		return fmt.Errorf("invalid subtitle path: %w", err)
+	}
+
+	outputPath, err = osutil.SanitizePath(outputPath, nil)
+	if err != nil {
+		return fmt.Errorf("invalid output path: %w", err)
 	}
 
 	// Build ffmpeg command
@@ -187,7 +207,7 @@ func EmbedSubtitles(videoPath, subtitlePath, language, outputPath string) error 
 	// -c:a copy - copy audio stream without re-encoding
 	// -c:s mov_text - encode subtitles for MP4 container
 	// -metadata:s:s:0 language=XXX - set subtitle track language
-	//nolint:gosec // G204: arguments are internal file paths, not user input
+	//nolint:gosec // G204: paths sanitized via SanitizePath above
 	cmd := exec.Command("ffmpeg",
 		"-i", videoPath,
 		"-i", subtitlePath,
@@ -211,15 +231,33 @@ func EmbedSubtitles(videoPath, subtitlePath, language, outputPath string) error 
 // The subtitles become permanent and cannot be toggled off.
 // This is useful for social media or when subtitle track support is limited.
 func BurnSubtitles(videoPath, subtitlePath, outputPath string) error {
-	// Validate subtitle format
-	ext := strings.ToLower(filepath.Ext(subtitlePath))
-	if ext != ".srt" && ext != ".vtt" && ext != ".ass" {
-		return fmt.Errorf("unsupported subtitle format: %s (use .srt, .vtt, or .ass)", ext)
+	// Sanitize and validate input paths
+	videoPath, err := osutil.SanitizePath(videoPath, &osutil.SanitizeOpts{
+		MustExist:   true,
+		MustBeFile:  true,
+		AllowedExts: []string{".mp4", ".mov", ".avi", ".mkv", ".webm"},
+	})
+	if err != nil {
+		return fmt.Errorf("invalid video path: %w", err)
+	}
+
+	subtitlePath, err = osutil.SanitizePath(subtitlePath, &osutil.SanitizeOpts{
+		MustExist:   true,
+		MustBeFile:  true,
+		AllowedExts: []string{".srt", ".vtt", ".ass"},
+	})
+	if err != nil {
+		return fmt.Errorf("invalid subtitle path: %w", err)
+	}
+
+	outputPath, err = osutil.SanitizePath(outputPath, nil)
+	if err != nil {
+		return fmt.Errorf("invalid output path: %w", err)
 	}
 
 	// Build ffmpeg command
 	// -vf subtitles=file.srt - burn subtitles using the subtitles filter
-	//nolint:gosec // G204: arguments are internal file paths, not user input
+	//nolint:gosec // G204: paths sanitized via SanitizePath above
 	cmd := exec.Command("ffmpeg",
 		"-i", videoPath,
 		"-vf", fmt.Sprintf("subtitles=%s", subtitlePath),

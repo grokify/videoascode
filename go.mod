@@ -7,7 +7,7 @@ require (
 	github.com/agentplexus/omnivoice v0.4.1
 	github.com/agentplexus/omnivoice-deepgram v0.3.0
 	github.com/go-rod/rod v0.116.2
-	github.com/grokify/mogo v0.73.1
+	github.com/grokify/mogo v0.73.2
 	github.com/spf13/cobra v1.10.2
 )
 
@@ -28,6 +28,7 @@ require (
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hokaccha/go-prettyjson v0.0.0-20211117102719-0474bc63780f // indirect
+	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
