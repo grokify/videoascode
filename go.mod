@@ -1,20 +1,15 @@
 module github.com/grokify/marp2video
 
-go 1.24.11
+go 1.25.0
 
 require (
-	github.com/agentplexus/go-elevenlabs v0.7.0
-	github.com/agentplexus/omnivoice v0.3.0
-	github.com/agentplexus/omnivoice-deepgram v0.2.0
+	github.com/agentplexus/go-elevenlabs v0.8.1
+	github.com/agentplexus/omnivoice v0.4.1
+	github.com/agentplexus/omnivoice-deepgram v0.3.0
 	github.com/go-rod/rod v0.116.2
-	github.com/grokify/mogo v0.73.0
+	github.com/grokify/mogo v0.73.1
 	github.com/spf13/cobra v1.10.2
 )
-
-// Local replace for testing - REMOVE BEFORE COMMITTING
-replace github.com/agentplexus/omnivoice => ../../agentplexus/omnivoice
-
-replace github.com/agentplexus/omnivoice-deepgram => ../../agentplexus/omnivoice-deepgram
 
 require (
 	github.com/agentplexus/ogen-tools v0.1.1 // indirect
@@ -39,23 +34,29 @@ require (
 	github.com/ogen-go/ogen v1.18.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
-	github.com/spf13/pflag v1.0.9 // indirect
-	github.com/ysmood/fetchup v0.2.3 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
+	github.com/ysmood/fetchup v0.5.3 // indirect
 	github.com/ysmood/goob v0.4.0 // indirect
-	github.com/ysmood/got v0.40.0 // indirect
+	github.com/ysmood/got v0.42.3 // indirect
 	github.com/ysmood/gson v0.7.3 // indirect
 	github.com/ysmood/leakless v0.9.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel v1.39.0 // indirect
-	go.opentelemetry.io/otel/metric v1.39.0 // indirect
-	go.opentelemetry.io/otel/trace v1.39.0 // indirect
+	go.opentelemetry.io/otel v1.40.0 // indirect
+	go.opentelemetry.io/otel/metric v1.40.0 // indirect
+	go.opentelemetry.io/otel/trace v1.40.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.1 // indirect
-	golang.org/x/exp v0.0.0-20260112195511-716be5621a96 // indirect
-	golang.org/x/net v0.49.0 // indirect
+	golang.org/x/exp v0.0.0-20260212183809-81e46e3db34a // indirect
+	golang.org/x/net v0.50.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 )
+
+// Pin fetchup to v0.2.3 for compatibility with go-rod/rod v0.116.2.
+// The fetchup API changed in v0.3+ breaking rod's launcher package.
+// Remove this replace directive when upgrading rod to a version that
+// supports newer fetchup releases.
+replace github.com/ysmood/fetchup => github.com/ysmood/fetchup v0.2.3
