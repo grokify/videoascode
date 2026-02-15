@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	omnitts "github.com/grokify/marp2video/pkg/omnivoice/tts"
 	"github.com/grokify/marp2video/pkg/transcript"
 	"github.com/grokify/marp2video/pkg/tts"
 	"github.com/grokify/mogo/fmt/progress"
@@ -14,7 +15,9 @@ import (
 var ttsCmd = &cobra.Command{
 	Use:   "tts",
 	Short: "Generate audio from transcript",
-	Long: `Generate audio files from a transcript JSON file using ElevenLabs TTS.
+	Long: `Generate audio files from a transcript JSON file using TTS providers.
+
+Supports ElevenLabs and Deepgram TTS providers via OmniVoice.
 
 This command processes a transcript.json file and generates:
   - One MP3 audio file per slide
@@ -28,33 +31,37 @@ resuming interrupted runs without re-generating already completed slides.
 Use --force to regenerate all audio files.
 
 Examples:
-  # Generate audio for default language (skips existing files)
+  # Generate audio using ElevenLabs (default if ELEVENLABS_API_KEY is set)
   marp2video tts --transcript transcript.json --output audio/
 
-  # Resume an interrupted run (automatically skips completed slides)
-  marp2video tts --transcript transcript.json --output audio/
+  # Generate audio using Deepgram
+  marp2video tts --transcript transcript.json --output audio/ --provider deepgram
 
   # Force regeneration of all audio files
   marp2video tts --transcript transcript.json --output audio/ --force
 
   # Generate audio for specific language
-  marp2video tts --transcript transcript.json --output audio/ --lang es-ES`,
+  marp2video tts --transcript transcript.json --output audio/ --lang fr-FR`,
 	RunE: runTTS,
 }
 
 var (
-	ttsTranscriptFile string
-	ttsOutputDir      string
-	ttsLanguage       string
-	ttsAPIKey         string
-	ttsForce          bool
+	ttsTranscriptFile   string
+	ttsOutputDir        string
+	ttsLanguage         string
+	ttsElevenLabsAPIKey string
+	ttsDeepgramAPIKey   string
+	ttsProvider         string
+	ttsForce            bool
 )
 
 func init() {
 	ttsCmd.Flags().StringVarP(&ttsTranscriptFile, "transcript", "t", "", "Transcript JSON file (required)")
 	ttsCmd.Flags().StringVarP(&ttsOutputDir, "output", "o", "audio", "Output directory for audio files")
 	ttsCmd.Flags().StringVarP(&ttsLanguage, "lang", "l", "", "Language/locale code (e.g., en-US, es-ES)")
-	ttsCmd.Flags().StringVarP(&ttsAPIKey, "api-key", "k", "", "ElevenLabs API key (or use ELEVENLABS_API_KEY env var)")
+	ttsCmd.Flags().StringVar(&ttsElevenLabsAPIKey, "elevenlabs-api-key", "", "ElevenLabs API key (or use ELEVENLABS_API_KEY env var)")
+	ttsCmd.Flags().StringVar(&ttsDeepgramAPIKey, "deepgram-api-key", "", "Deepgram API key (or use DEEPGRAM_API_KEY env var)")
+	ttsCmd.Flags().StringVar(&ttsProvider, "provider", "", "TTS provider: elevenlabs or deepgram (overrides voice config if set)")
 	ttsCmd.Flags().BoolVarP(&ttsForce, "force", "f", false, "Regenerate audio even if files already exist")
 
 	if err := ttsCmd.MarkFlagRequired("transcript"); err != nil {
@@ -72,13 +79,20 @@ func runTTS(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("transcript file does not exist: %s", ttsTranscriptFile)
 	}
 
-	// Get API key
-	apiKey := ttsAPIKey
-	if apiKey == "" {
-		apiKey = os.Getenv("ELEVENLABS_API_KEY")
+	// Get API keys from flags or environment
+	elevenLabsKey := ttsElevenLabsAPIKey
+	if elevenLabsKey == "" {
+		elevenLabsKey = os.Getenv("ELEVENLABS_API_KEY")
 	}
-	if apiKey == "" {
-		return fmt.Errorf("ElevenLabs API key required: use --api-key flag or ELEVENLABS_API_KEY env var")
+
+	deepgramKey := ttsDeepgramAPIKey
+	if deepgramKey == "" {
+		deepgramKey = os.Getenv("DEEPGRAM_API_KEY")
+	}
+
+	// Require at least one API key
+	if elevenLabsKey == "" && deepgramKey == "" {
+		return fmt.Errorf("TTS API key required: use --elevenlabs-api-key or --deepgram-api-key flag, or set ELEVENLABS_API_KEY or DEEPGRAM_API_KEY env var")
 	}
 
 	// Load transcript
@@ -104,9 +118,13 @@ func runTTS(cmd *cobra.Command, args []string) error {
 
 	// Create generator config
 	genConfig := tts.TranscriptGeneratorConfig{
-		APIKey:    apiKey,
-		OutputDir: ttsOutputDir,
-		Force:     ttsForce,
+		ProviderConfig: omnitts.ProviderConfig{
+			ElevenLabsAPIKey: elevenLabsKey,
+			DeepgramAPIKey:   deepgramKey,
+		},
+		DefaultProvider: ttsProvider,
+		OutputDir:       ttsOutputDir,
+		Force:           ttsForce,
 	}
 
 	// Only show progress bar when not in verbose mode (logs provide progress info)

@@ -3,12 +3,11 @@ package tts
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/agentplexus/go-elevenlabs"
+	omnitts "github.com/grokify/marp2video/pkg/omnivoice/tts"
 	"github.com/grokify/marp2video/pkg/transcript"
 	"github.com/grokify/mogo/log/slogutil"
 )
@@ -18,28 +17,38 @@ type ProgressFunc func(current, total int, slideName string)
 
 // TranscriptGeneratorConfig holds configuration for transcript-based TTS generation
 type TranscriptGeneratorConfig struct {
-	APIKey       string
-	OutputDir    string
-	Force        bool         // If true, regenerate audio even if files exist
-	ProgressFunc ProgressFunc // Optional callback for progress updates
+	omnitts.ProviderConfig        // Embedded provider config (ElevenLabsAPIKey, DeepgramAPIKey)
+	DefaultProvider        string // "elevenlabs" or "deepgram" - overrides voice config if set
+	OutputDir              string
+	Force                  bool         // If true, regenerate audio even if files exist
+	ProgressFunc           ProgressFunc // Optional callback for progress updates
 }
 
 // TranscriptGenerator generates audio from transcript files
 type TranscriptGenerator struct {
-	config TranscriptGeneratorConfig
-	client *elevenlabs.Client
+	config   TranscriptGeneratorConfig
+	factory  *omnitts.Factory
+	provider *omnitts.Provider
 }
 
 // NewTranscriptGenerator creates a new transcript-based TTS generator
 func NewTranscriptGenerator(config TranscriptGeneratorConfig) (*TranscriptGenerator, error) {
-	client, err := elevenlabs.NewClient(elevenlabs.WithAPIKey(config.APIKey))
+	factory := omnitts.NewFactory(config.ProviderConfig)
+
+	if config.DefaultProvider != "" {
+		factory.SetFallback(config.DefaultProvider)
+	}
+
+	// Get the default provider to validate configuration
+	provider, err := factory.Get("")
 	if err != nil {
-		return nil, fmt.Errorf("failed to create ElevenLabs client: %w", err)
+		return nil, fmt.Errorf("failed to create TTS provider: %w", err)
 	}
 
 	return &TranscriptGenerator{
-		config: config,
-		client: client,
+		config:   config,
+		factory:  factory,
+		provider: provider,
 	}, nil
 }
 
@@ -102,12 +111,27 @@ func (g *TranscriptGenerator) GenerateFromTranscript(ctx context.Context, t *tra
 		// Determine voice configuration
 		voiceConfig := g.resolveVoiceConfig(t.Metadata.DefaultVoice, content.Voice)
 
+		// If provider is being overridden via --provider flag, clear provider-specific settings
+		// (e.g., ElevenLabs model "eleven_multilingual_v2" is not valid for Deepgram)
+		if g.config.DefaultProvider != "" && voiceConfig.Provider != "" && voiceConfig.Provider != g.config.DefaultProvider {
+			voiceConfig.Model = ""    // Clear model - let provider use its default
+			voiceConfig.VoiceID = ""  // Clear voice ID - let provider use its default
+			voiceConfig.Provider = "" // Clear so getProviderForVoice uses default
+		}
+
+		// Get provider for this voice (may be different per language/voice)
+		provider, err := g.getProviderForVoice(voiceConfig)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get provider for slide %d: %w", slide.Index, err)
+		}
+
 		logger.Info("generating audio",
 			"slide", slide.Index,
+			"provider", provider.Name(),
 			"voice", voiceConfig.VoiceID,
 			"textLength", len(text))
 
-		audioDuration, err := g.generateSlideAudio(ctx, text, audioPath, voiceConfig)
+		audioDuration, err := g.generateSlideAudio(ctx, provider, text, audioPath, voiceConfig)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate audio for slide %d: %w", slide.Index, err)
 		}
@@ -138,6 +162,19 @@ func (g *TranscriptGenerator) GenerateFromTranscript(ctx context.Context, t *tra
 	}
 
 	return manifest, nil
+}
+
+// getProviderForVoice returns the appropriate provider for a voice configuration
+func (g *TranscriptGenerator) getProviderForVoice(voice transcript.VoiceConfig) (*omnitts.Provider, error) {
+	// If --provider was explicitly set, use it (overrides voice config)
+	if g.config.DefaultProvider != "" {
+		return g.provider, nil
+	}
+	// Otherwise, use voice config's provider if specified
+	if voice.Provider != "" {
+		return g.factory.Get(voice.Provider)
+	}
+	return g.provider, nil
 }
 
 // getExistingSlideAudio checks if audio file exists and returns manifest entry if available
@@ -177,6 +214,9 @@ func (g *TranscriptGenerator) resolveVoiceConfig(defaultVoice transcript.VoiceCo
 	// Start with default, override non-zero values
 	result := defaultVoice
 
+	if override.Provider != "" {
+		result.Provider = override.Provider
+	}
 	if override.VoiceID != "" {
 		result.VoiceID = override.VoiceID
 	}
@@ -185,6 +225,18 @@ func (g *TranscriptGenerator) resolveVoiceConfig(defaultVoice transcript.VoiceCo
 	}
 	if override.Model != "" {
 		result.Model = override.Model
+	}
+	if override.OutputFormat != "" {
+		result.OutputFormat = override.OutputFormat
+	}
+	if override.SampleRate != 0 {
+		result.SampleRate = override.SampleRate
+	}
+	if override.Speed != 0 {
+		result.Speed = override.Speed
+	}
+	if override.Pitch != 0 {
+		result.Pitch = override.Pitch
 	}
 	if override.Stability != 0 {
 		result.Stability = override.Stability
@@ -200,73 +252,23 @@ func (g *TranscriptGenerator) resolveVoiceConfig(defaultVoice transcript.VoiceCo
 }
 
 // generateSlideAudio generates a single audio file and returns its duration
-func (g *TranscriptGenerator) generateSlideAudio(ctx context.Context, text, outputPath string, voice transcript.VoiceConfig) (time.Duration, error) {
-	// Build voice settings
-	voiceSettings := elevenlabs.DefaultVoiceSettings()
-	if voice.Stability != 0 {
-		voiceSettings.Stability = voice.Stability
-	}
-	if voice.SimilarityBoost != 0 {
-		voiceSettings.SimilarityBoost = voice.SimilarityBoost
-	}
-	if voice.Style != 0 {
-		voiceSettings.Style = voice.Style
-	}
-
-	// Determine model
-	model := voice.Model
-	if model == "" {
-		model = elevenlabs.DefaultModelID
-	}
-
-	// Create TTS request
-	req := &elevenlabs.TTSRequest{
-		VoiceID:       voice.VoiceID,
-		Text:          text,
-		ModelID:       model,
-		VoiceSettings: voiceSettings,
-	}
-
-	// Generate speech
-	resp, err := g.client.TextToSpeech().Generate(ctx, req)
+func (g *TranscriptGenerator) generateSlideAudio(ctx context.Context, provider *omnitts.Provider, text, outputPath string, voice transcript.VoiceConfig) (time.Duration, error) {
+	// Generate speech using OmniVoice provider
+	audioData, err := provider.Synthesize(ctx, text, voice)
 	if err != nil {
-		return 0, fmt.Errorf("ElevenLabs TTS failed: %w", err)
+		return 0, fmt.Errorf("TTS synthesis failed: %w", err)
 	}
 
-	// Read and save audio
-	audioData, err := readAllAndClose(resp.Audio)
-	if err != nil {
-		return 0, fmt.Errorf("failed to read audio: %w", err)
-	}
-
+	// Write audio to file
 	if err := os.WriteFile(outputPath, audioData, 0600); err != nil {
 		return 0, fmt.Errorf("failed to write audio file: %w", err)
 	}
 
-	// Get duration
+	// Get duration using ffprobe
 	duration, err := getAudioDuration(outputPath)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get audio duration: %w", err)
 	}
 
 	return duration, nil
-}
-
-// readAllAndClose reads all data from an io.ReadCloser and closes it
-func readAllAndClose(rc interface{ Read([]byte) (int, error) }) ([]byte, error) {
-	var data []byte
-	buf := make([]byte, 32*1024)
-	for {
-		n, err := rc.Read(buf)
-		if n > 0 {
-			data = append(data, buf[:n]...)
-		}
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return data, err
-		}
-	}
-	return data, nil
 }
