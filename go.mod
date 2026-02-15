@@ -4,15 +4,24 @@ go 1.24.11
 
 require (
 	github.com/agentplexus/go-elevenlabs v0.7.0
+	github.com/agentplexus/omnivoice v0.3.0
+	github.com/agentplexus/omnivoice-deepgram v0.2.0
 	github.com/go-rod/rod v0.116.2
 	github.com/grokify/mogo v0.73.0
 	github.com/spf13/cobra v1.10.2
 )
 
+// Local replace for testing - REMOVE BEFORE COMMITTING
+replace github.com/agentplexus/omnivoice => ../../agentplexus/omnivoice
+
+replace github.com/agentplexus/omnivoice-deepgram => ../../agentplexus/omnivoice-deepgram
+
 require (
 	github.com/agentplexus/ogen-tools v0.1.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/deepgram/deepgram-go-sdk/v3 v3.5.0 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
+	github.com/dvonthenen/websocket v1.5.1-dyv.2 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
@@ -21,7 +30,9 @@ require (
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
+	github.com/hokaccha/go-prettyjson v0.0.0-20211117102719-0474bc63780f // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -46,4 +57,5 @@ require (
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/text v0.33.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	k8s.io/klog/v2 v2.130.1 // indirect
 )
