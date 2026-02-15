@@ -9,9 +9,9 @@ import (
 func TestCaseCorrector_Correct(t *testing.T) {
 	dict := &Dictionary{
 		Corrections: map[string]string{
-			"ai":              "AI",
-			"openai":          "OpenAI",
-			"claude code":     "Claude Code",
+			"ai":               "AI",
+			"openai":           "OpenAI",
+			"claude code":      "Claude Code",
 			"frontier workers": "Frontier Workers",
 		},
 	}

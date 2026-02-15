@@ -187,6 +187,7 @@ func EmbedSubtitles(videoPath, subtitlePath, language, outputPath string) error 
 	// -c:a copy - copy audio stream without re-encoding
 	// -c:s mov_text - encode subtitles for MP4 container
 	// -metadata:s:s:0 language=XXX - set subtitle track language
+	//nolint:gosec // G204: arguments are internal file paths, not user input
 	cmd := exec.Command("ffmpeg",
 		"-i", videoPath,
 		"-i", subtitlePath,
@@ -218,6 +219,7 @@ func BurnSubtitles(videoPath, subtitlePath, outputPath string) error {
 
 	// Build ffmpeg command
 	// -vf subtitles=file.srt - burn subtitles using the subtitles filter
+	//nolint:gosec // G204: arguments are internal file paths, not user input
 	cmd := exec.Command("ffmpeg",
 		"-i", videoPath,
 		"-vf", fmt.Sprintf("subtitles=%s", subtitlePath),

@@ -10,9 +10,10 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/grokify/mogo/log/slogutil"
+
 	omnistt "github.com/grokify/marp2video/pkg/omnivoice/stt"
 	"github.com/grokify/marp2video/pkg/transcript"
-	"github.com/grokify/mogo/log/slogutil"
 )
 
 // SubtitleFormat specifies the subtitle output format.
@@ -172,19 +173,19 @@ type SubtitleManifest struct {
 
 // TimestampsData stores raw STT timestamps for later reuse.
 type TimestampsData struct {
-	Version     string                    `json:"version"`
-	Language    string                    `json:"language"`
-	GeneratedAt time.Time                 `json:"generatedAt"`
-	Provider    string                    `json:"provider"`
-	Slides      []SlideTimestamps         `json:"slides"`
+	Version     string            `json:"version"`
+	Language    string            `json:"language"`
+	GeneratedAt time.Time         `json:"generatedAt"`
+	Provider    string            `json:"provider"`
+	Slides      []SlideTimestamps `json:"slides"`
 }
 
 // SlideTimestamps stores timestamps for a single slide.
 type SlideTimestamps struct {
-	Index      int                        `json:"index"`
-	AudioFile  string                     `json:"audioFile"`
-	Duration   time.Duration              `json:"durationNs"`
-	Result     *omnistt.TranscriptionResult `json:"result"`
+	Index     int                          `json:"index"`
+	AudioFile string                       `json:"audioFile"`
+	Duration  time.Duration                `json:"durationNs"`
+	Result    *omnistt.TranscriptionResult `json:"result"`
 }
 
 // SaveTimestampsData saves timestamps to a JSON file.
