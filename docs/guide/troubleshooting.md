@@ -10,7 +10,7 @@ Common issues and solutions when using marp2video.
 
 **Cause**: This typically occurs when combining videos with audio from different TTS providers that use different sample rates (e.g., ElevenLabs at 44100 Hz, Deepgram at 22050 Hz).
 
-**Solution**: This issue was fixed in version 0.3.0. Upgrade to the latest version:
+**Solution**: This issue was fixed in version 0.2.1. Upgrade to the latest version:
 
 ```bash
 go install github.com/grokify/marp2video/cmd/marp2video@latest

@@ -29,7 +29,7 @@
         { "description": "Updated architecture docs with mixed audio sample rate handling details", "commit": "fa5fe3f" }
       ],
       "dependencies": [
-        { "description": "Upgrade `github.com/agentplexus/omnivoice` to v0.4.2 for subtitle line count fix", "commit": "c852036" }
+        { "description": "Upgrade `github.com/agentplexus/omnivoice` to v0.4.3 for subtitle line count fix and Chinese/English subtitle tests", "commit": "c852036" }
       ]
     },
     {
