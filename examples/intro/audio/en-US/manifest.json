@@ -1,0 +1,111 @@
+{
+  "version": "1.0",
+  "language": "en-US",
+  "generatedAt": "2026-02-08T21:56:15.008738Z",
+  "slides": [
+    {
+      "index": 0,
+      "title": "Title Slide",
+      "audioFile": "slide_000.mp3",
+      "audioDurationMs": 14628,
+      "pauseDurationMs": 500,
+      "totalDurationMs": 15128
+    },
+    {
+      "index": 1,
+      "title": "What is marp2video?",
+      "audioFile": "slide_001.mp3",
+      "audioDurationMs": 20427,
+      "pauseDurationMs": 300,
+      "totalDurationMs": 20727
+    },
+    {
+      "index": 2,
+      "title": "The Problem It Solves",
+      "audioFile": "slide_002.mp3",
+      "audioDurationMs": 16378,
+      "pauseDurationMs": 800,
+      "totalDurationMs": 17178
+    },
+    {
+      "index": 3,
+      "title": "How It Works",
+      "audioFile": "slide_003.mp3",
+      "audioDurationMs": 20558,
+      "pauseDurationMs": 900,
+      "totalDurationMs": 21458
+    },
+    {
+      "index": 4,
+      "title": "Writing Voiceovers",
+      "audioFile": "slide_004.mp3",
+      "audioDurationMs": 11363,
+      "pauseDurationMs": 600,
+      "totalDurationMs": 11963
+    },
+    {
+      "index": 5,
+      "title": "Pause Directives",
+      "audioFile": "slide_005.mp3",
+      "audioDurationMs": 9691,
+      "pauseDurationMs": 800,
+      "totalDurationMs": 10491
+    },
+    {
+      "index": 6,
+      "title": "Installation",
+      "audioFile": "slide_006.mp3",
+      "audioDurationMs": 12852,
+      "pauseDurationMs": 300,
+      "totalDurationMs": 13152
+    },
+    {
+      "index": 7,
+      "title": "Basic Usage",
+      "audioFile": "slide_007.mp3",
+      "audioDurationMs": 11284,
+      "pauseDurationMs": 300,
+      "totalDurationMs": 11584
+    },
+    {
+      "index": 8,
+      "title": "Output Options",
+      "audioFile": "slide_008.mp3",
+      "audioDurationMs": 15046,
+      "pauseDurationMs": 600,
+      "totalDurationMs": 15646
+    },
+    {
+      "index": 9,
+      "title": "Customization",
+      "audioFile": "slide_009.mp3",
+      "audioDurationMs": 10684,
+      "pauseDurationMs": 300,
+      "totalDurationMs": 10984
+    },
+    {
+      "index": 10,
+      "title": "Use Cases",
+      "audioFile": "slide_010.mp3",
+      "audioDurationMs": 14210,
+      "pauseDurationMs": 500,
+      "totalDurationMs": 14710
+    },
+    {
+      "index": 11,
+      "title": "This Presentation",
+      "audioFile": "slide_011.mp3",
+      "audioDurationMs": 10893,
+      "pauseDurationMs": 800,
+      "totalDurationMs": 11693
+    },
+    {
+      "index": 12,
+      "title": "Get Started",
+      "audioFile": "slide_012.mp3",
+      "audioDurationMs": 16326,
+      "pauseDurationMs": 1100,
+      "totalDurationMs": 17426
+    }
+  ]
+}
