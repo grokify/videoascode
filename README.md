@@ -25,6 +25,7 @@ This tool takes a Marp markdown presentation with voiceover text (inline comment
 - ▶️ **YouTube-ready** combined video output with optional transitions
 - 🎓 **Udemy-ready** individual slide videos for course lectures
 - 🔄 **Decoupled workflow** - generate audio and video separately
+- 📜 **Subtitle generation** - SRT/VTT from audio using Deepgram STT
 
 ## Installation
 
@@ -84,10 +85,10 @@ marp2video video --input slides.md --output video.mp4
 
 ```bash
 # Step 1: Generate audio from transcript
-marp2video tts --transcript transcript.json --output audio/ --lang en-US
+marp2video tts --transcript transcript.json --output audio/en-US/ --lang en-US
 
 # Step 2: Generate video with pre-generated audio
-marp2video video --input slides.md --manifest audio/manifest.json --output video.mp4
+marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/en-US.mp4
 ```
 
 ### Command: `marp2video tts`
@@ -106,14 +107,14 @@ Flags:
 
 **Output:**
 
-- `audio/slide_000.mp3`, `slide_001.mp3`, ... (one per slide)
-- `audio/manifest.json` (timing information for video recording)
+- `audio/{lang}/slide_000.mp3`, `slide_001.mp3`, ... (one per slide)
+- `audio/{lang}/manifest.json` (timing information for video recording)
 
 **Example:**
 
 ```bash
 # Generate audio for Spanish
-marp2video tts --transcript transcript.json --output audio_es/ --lang es-ES
+marp2video tts --transcript transcript.json --output audio/es-ES/ --lang es-ES
 ```
 
 ### Command: `marp2video video`
@@ -139,6 +140,36 @@ Flags:
       --check                     Check dependencies and exit
 ```
 
+### Command: `marp2video subtitle`
+
+Generate subtitle files (SRT/VTT) from audio files using speech-to-text.
+
+```
+marp2video subtitle [flags]
+
+Flags:
+  -a, --audio string        Audio directory containing manifest.json (required)
+  -o, --output string       Output directory for subtitle files (default "subtitles")
+  -l, --lang string         Language code (auto-detected from manifest if not specified)
+      --provider string     STT provider: deepgram or elevenlabs (default: deepgram)
+      --individual          Also generate individual subtitle files per slide
+```
+
+**Output:**
+
+- `subtitles/{lang}.srt` - SRT format subtitle file
+- `subtitles/{lang}.vtt` - WebVTT format subtitle file
+
+**Example:**
+
+```bash
+# Generate French subtitles (language auto-detected from manifest)
+marp2video subtitle --audio audio/fr-FR/
+
+# Generate with explicit language and custom output
+marp2video subtitle --audio audio/zh-Hans/ --lang zh-Hans --output subs/
+```
+
 ### Examples
 
 **Full pipeline with inline voiceovers:**
@@ -153,13 +184,49 @@ marp2video video \
 **Multi-language workflow:**
 
 ```bash
-# Generate audio for each language
-marp2video tts --transcript transcript.json --output audio_en/ --lang en-US
-marp2video tts --transcript transcript.json --output audio_es/ --lang es-ES
+# Step 1: Generate audio for each language (directory matches locale code)
+marp2video tts --transcript transcript.json --output audio/en-US/ --lang en-US
+marp2video tts --transcript transcript.json --output audio/es-ES/ --lang es-ES
+marp2video tts --transcript transcript.json --output audio/zh-Hans/ --lang zh-Hans
 
-# Generate videos
-marp2video video --input slides.md --manifest audio_en/manifest.json --output video_en.mp4
-marp2video video --input slides.md --manifest audio_es/manifest.json --output video_es.mp4
+# Step 2: Generate subtitles for each language (uses Deepgram STT)
+marp2video subtitle --audio audio/en-US/
+marp2video subtitle --audio audio/es-ES/
+marp2video subtitle --audio audio/zh-Hans/
+
+# Step 3: Generate videos for each language
+marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/en-US.mp4
+marp2video video --input slides.md --manifest audio/es-ES/manifest.json --output video/es-ES.mp4
+marp2video video --input slides.md --manifest audio/zh-Hans/manifest.json --output video/zh-Hans.mp4
+```
+
+**Directory structure** (locale codes enable automation):
+
+```
+project/
+├── presentation.md
+├── transcript.json
+├── audio/
+│   ├── en-US/
+│   │   ├── manifest.json
+│   │   └── slide_*.mp3
+│   ├── es-ES/
+│   │   ├── manifest.json
+│   │   └── slide_*.mp3
+│   └── zh-Hans/
+│       ├── manifest.json
+│       └── slide_*.mp3
+├── subtitles/
+│   ├── en-US.srt
+│   ├── en-US.vtt
+│   ├── es-ES.srt
+│   ├── es-ES.vtt
+│   ├── zh-Hans.srt
+│   └── zh-Hans.vtt
+└── video/
+    ├── en-US.mp4
+    ├── es-ES.mp4
+    └── zh-Hans.mp4
 ```
 
 **Generate individual videos for Udemy:**
@@ -326,8 +393,8 @@ presentation.md → Parse → TTS → Render → Record → Combine → video.mp
 
 **Workflow B: Two-Step (JSON transcript)**
 ```
-Step 1: transcript.json → marp2video tts → audio/*.mp3 + manifest.json
-Step 2: presentation.md + manifest.json → marp2video video → video.mp4
+Step 1: transcript.json → marp2video tts → audio/{lang}/*.mp3 + manifest.json
+Step 2: presentation.md + manifest.json → marp2video video → video/{lang}.mp4
 ```
 
 ### Detailed Pipeline
@@ -353,8 +420,8 @@ Step 2: presentation.md + manifest.json → marp2video video → video.mp4
 │  STEP 2: Generate Audio (ElevenLabs TTS)                                │
 │  • Send voiceover text to ElevenLabs API                                │
 │  • Apply voice settings (stability, similarity, style)                  │
-│  • Output: audio/slide_000.mp3, slide_001.mp3, ...                      │
-│  • Output: audio/manifest.json (timing for video recording)             │
+│  • Output: audio/{lang}/slide_000.mp3, slide_001.mp3, ...               │
+│  • Output: audio/{lang}/manifest.json (timing for video recording)      │
 └─────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -518,8 +585,12 @@ examples/
 │   ├── transcript.json       # Multi-language transcript (en-US, en-GB, es-ES)
 │   ├── README.md             # Detailed usage instructions
 │   └── audio/                # Generated audio (after running tts)
-│       ├── manifest.json
-│       └── slide_*.mp3
+│       ├── en-US/
+│       │   ├── manifest.json
+│       │   └── slide_*.mp3
+│       └── es-ES/
+│           ├── manifest.json
+│           └── slide_*.mp3
 └── README.md
 ```
 
@@ -539,25 +610,25 @@ marp2video video \
 # Generate audio for English
 marp2video tts \
   --transcript examples/intro/transcript.json \
-  --output examples/intro/audio/ \
+  --output examples/intro/audio/en-US/ \
   --lang en-US
 
 # Generate video
 marp2video video \
   --input examples/intro/presentation.md \
-  --manifest examples/intro/audio/manifest.json \
-  --output examples/intro/output.mp4
+  --manifest examples/intro/audio/en-US/manifest.json \
+  --output examples/intro/video/en-US.mp4
 
 # Generate Spanish version
 marp2video tts \
   --transcript examples/intro/transcript.json \
-  --output examples/intro/audio_es/ \
+  --output examples/intro/audio/es-ES/ \
   --lang es-ES
 
 marp2video video \
   --input examples/intro/presentation.md \
-  --manifest examples/intro/audio_es/manifest.json \
-  --output examples/intro/output_es.mp4
+  --manifest examples/intro/audio/es-ES/manifest.json \
+  --output examples/intro/video/es-ES.mp4
 ```
 
 The `intro` example is a self-documenting presentation that explains what marp2video does - using marp2video itself.
@@ -634,6 +705,7 @@ MIT License - see LICENSE file for details
 
 - [Marp](https://marp.app/) - Markdown presentation ecosystem
 - [ElevenLabs](https://elevenlabs.io/) - AI voice generation
+- [Deepgram](https://deepgram.com/) - Speech-to-text for subtitles
 - [Rod](https://github.com/go-rod/rod) - Browser automation framework
 - [ffmpeg](https://ffmpeg.org/) - Multimedia processing
 
@@ -650,7 +722,7 @@ MIT License - see LICENSE file for details
 - [ ] Batch processing of multiple presentations
 - [ ] Web UI for easier configuration
 - [ ] Export to different video formats
-- [ ] Add subtitle/caption generation
+- [x] Add subtitle/caption generation
 - [ ] Avatar integration (HeyGen, Synthesia)
 
  [build-status-svg]: https://github.com/grokify/marp2video/actions/workflows/ci.yaml/badge.svg?branch=main
