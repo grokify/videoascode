@@ -45,7 +45,8 @@ func init() {
 func newContext() context.Context {
 	ctx := context.Background()
 	if verbose {
-		logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+		// Use stderr for logs to avoid disrupting progress bar on stdout
+		logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug}))
 		ctx = slogutil.ContextWithLogger(ctx, logger)
 	}
 	return ctx

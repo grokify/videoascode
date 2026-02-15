@@ -3,6 +3,7 @@ package audio
 import (
 	"fmt"
 	"os/exec"
+	"path/filepath"
 	"time"
 )
 
@@ -47,4 +48,58 @@ func (p *Player) Play(audioPath string) error {
 	)
 
 	return cmd.Run()
+}
+
+// PadToLength pads an audio file with silence to reach the target duration.
+// If the audio is already longer than or equal to the target duration, it is copied unchanged.
+// Returns the path to the padded audio file in the output directory.
+func (p *Player) PadToLength(audioPath string, targetDuration time.Duration, outputDir string) (string, error) {
+	// Get current duration
+	currentDuration, err := p.GetDuration(audioPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to get audio duration: %w", err)
+	}
+
+	// Generate output path
+	baseName := filepath.Base(audioPath)
+	ext := filepath.Ext(baseName)
+	nameWithoutExt := baseName[:len(baseName)-len(ext)]
+	outputPath := filepath.Join(outputDir, nameWithoutExt+"_padded.m4a")
+
+	// If audio is already long enough, just convert to m4a (for consistency)
+	if currentDuration >= targetDuration {
+		cmd := exec.Command("ffmpeg",
+			"-i", audioPath,
+			"-c:a", "aac",
+			"-b:a", "192k",
+			"-y",
+			outputPath,
+		)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return "", fmt.Errorf("ffmpeg conversion failed: %w\nOutput: %s", err, string(output))
+		}
+		return outputPath, nil
+	}
+
+	// Pad with silence using the apad filter
+	// The apad filter extends the audio with silence to reach whole_dur seconds
+	targetSeconds := targetDuration.Seconds()
+	apadFilter := fmt.Sprintf("apad=whole_dur=%.3f", targetSeconds)
+
+	cmd := exec.Command("ffmpeg",
+		"-i", audioPath,
+		"-af", apadFilter,
+		"-c:a", "aac",
+		"-b:a", "192k",
+		"-y",
+		outputPath,
+	)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("ffmpeg padding failed: %w\nOutput: %s", err, string(output))
+	}
+
+	return outputPath, nil
 }
