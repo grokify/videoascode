@@ -121,7 +121,25 @@ func CombineVideos(ctx context.Context, inputPaths []string, outputPath string) 
 func CombineVideosWithTransitions(ctx context.Context, inputPaths []string, outputPath string, transition float64) error
 ```
 
-Uses FFmpeg concat filter for seamless joining.
+Uses FFmpeg `filter_complex` concat for seamless joining.
+
+#### Mixed Audio Sample Rate Handling
+
+Different TTS providers output audio at different sample rates:
+
+| Provider | Sample Rate |
+|----------|-------------|
+| ElevenLabs | 44100 Hz |
+| Deepgram | 22050 Hz |
+| OpenAI | 24000 Hz |
+
+The combiner uses `filter_complex` concat instead of the concat demuxer to properly handle mixed sample rates. This approach:
+
+1. Decodes all input audio streams
+2. Concatenates them in the filter graph
+3. Re-encodes to consistent 44100 Hz AAC output
+
+This ensures videos can seamlessly combine audio from multiple TTS providers (e.g., ElevenLabs for some languages, Deepgram for others).
 
 ## Data Flow
 
