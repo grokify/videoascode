@@ -13,8 +13,10 @@ This tool takes a Marp markdown presentation with voiceover text (inline comment
 
 **Powered by [OmniVoice](https://github.com/agentplexus/omnivoice)** - a unified interface for TTS/STT providers. Tested with:
 
-- **[ElevenLabs](https://elevenlabs.io/)** - High-quality AI voice generation (TTS)
-- **[Deepgram](https://deepgram.com/)** - Fast, accurate speech-to-text (STT) for subtitles
+- **[ElevenLabs](https://elevenlabs.io/)** - Known for high-quality AI voices (TTS and STT available)
+- **[Deepgram](https://deepgram.com/)** - Known for fast, accurate transcription (STT and TTS available)
+
+Both providers offer TTS and STT capabilities. You can use either one for both functions, though marp2video defaults to ElevenLabs for voice generation and Deepgram for subtitle transcription based on their respective strengths.
 
 ## Features
 
