@@ -147,6 +147,22 @@ This:
 2. Creates individual slide videos with synchronized audio
 3. Combines all slides into `video/presentation.mp4`
 
+### Optional: Add Subtitles
+
+You can embed subtitles directly during video generation:
+
+```bash
+# Embed subtitles (language auto-detected from filename)
+marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+  --output video/presentation.mp4 --subtitles subtitles/en-US.srt
+
+# Explicitly specify subtitle language
+marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+  --output video/presentation.mp4 --subtitles subtitles/en-US.srt --subtitles-lang en-US
+```
+
+Both SRT and VTT formats are supported. The language code is auto-detected from the filename (e.g., `en-US.srt` → `en-US`) if not specified.
+
 ### Optional: Add Transitions
 
 ```bash
@@ -261,13 +277,23 @@ export DEEPGRAM_API_KEY="your-key"
 # 2. Generate audio
 marp2video tts --input slides.md --output audio/en-US/
 
-# 3. Generate video
-marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/presentation.mp4
-
-# 4. Generate subtitles
+# 3. Generate subtitles
 marp2video subtitle --audio audio/en-US/
 
-# 5. Embed subtitles (soft)
+# 4. Generate video with embedded subtitles
+marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+  --output video/presentation.mp4 --subtitles subtitles/en-US.srt
+```
+
+### Alternative: Embed Subtitles with ffmpeg
+
+If you prefer to embed subtitles separately (e.g., to add multiple subtitle tracks), you can use ffmpeg:
+
+```bash
+# Generate video without subtitles
+marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/presentation.mp4
+
+# Then embed subtitles (soft)
 ffmpeg -i video/presentation.mp4 -i subtitles/en-US.srt \
   -c:v copy -c:a copy -c:s mov_text \
   -metadata:s:s:0 language=eng \
@@ -287,15 +313,18 @@ marp2video tts --transcript transcript.json --output audio/en-US/ --lang en-US
 marp2video tts --transcript transcript.json --output audio/fr-FR/ --lang fr-FR
 marp2video tts --transcript transcript.json --output audio/zh-Hans/ --lang zh-Hans
 
-# Generate videos
-marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/en-US.mp4
-marp2video video --input slides.md --manifest audio/fr-FR/manifest.json --output video/fr-FR.mp4
-marp2video video --input slides.md --manifest audio/zh-Hans/manifest.json --output video/zh-Hans.mp4
-
-# Generate subtitles
+# Generate subtitles for each language
 marp2video subtitle --audio audio/en-US/
 marp2video subtitle --audio audio/fr-FR/
 marp2video subtitle --audio audio/zh-Hans/
+
+# Generate videos with embedded subtitles
+marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+  --output video/en-US.mp4 --subtitles subtitles/en-US.srt
+marp2video video --input slides.md --manifest audio/fr-FR/manifest.json \
+  --output video/fr-FR.mp4 --subtitles subtitles/fr-FR.srt
+marp2video video --input slides.md --manifest audio/zh-Hans/manifest.json \
+  --output video/zh-Hans.mp4 --subtitles subtitles/zh-Hans.srt
 ```
 
 ## Troubleshooting
