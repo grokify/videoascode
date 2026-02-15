@@ -1,8 +1,34 @@
 # marp2video vs marptalk
 
-A detailed comparison of [marp2video](https://github.com/grokify/marp2video) and [marptalk](https://github.com/imjasonh/marptalk), two tools for creating narrated videos from Marp presentations.
+Two tools solving the same problem: converting [Marp](https://marp.app/) markdown presentations into narrated videos with AI-generated voiceovers. Both emerged from the same insight—that presentations are more effective when you can see slides and hear narration together—but took different paths to get there.
 
-## Overview
+## Origins
+
+### marptalk
+
+[Jason Hall](https://www.linkedin.com/in/imjasonh/) created marptalk after observing that short presentations with spoken narration and visual elements are an effective way to learn, but "not every bit of information on the internet is presented the way I prefer." His solution: a Node.js tool that takes Marp presentations with embedded speaker notes, generates audio via Google Cloud TTS, and stitches everything into a video with subtitles using Puppeteer and ffmpeg. The result processes in about a minute at minimal cost. Hall also added browser-based TTS fallback using the Web Speech API, enabling rapid iteration without any API costs during development.
+
+See Jason's [original LinkedIn post](https://www.linkedin.com/posts/imjasonh_i-find-short-presentations-to-be-a-really-activity-7378140962096693248-h_Aw) introducing marptalk.
+
+### marp2video
+
+marp2video grew from production needs at [AgentPlexus](https://github.com/agentplexus), where multi-language video generation required flexible TTS provider support. Rather than being locked into a single provider, marp2video uses [OmniVoice](https://github.com/agentplexus/omnivoice)—a unified TTS/STT abstraction layer—allowing different providers for different languages or slides. A Chinese slide might use Deepgram while English slides use ElevenLabs, all in the same video. The tool also generates subtitles from actual audio transcription (STT) rather than estimating from word count, producing word-level timestamps and proper capitalization via dictionary-based correction.
+
+## Philosophy
+
+The projects reflect different design philosophies:
+
+**marptalk** optimizes for rapid iteration and accessibility. Browser TTS fallback means you can preview presentations instantly without API keys. YouTube chapter markers are auto-generated. LLM-assisted drafting via GitHub Issues lets you generate first drafts from a topic description. It's designed for quick experimentation.
+
+**marp2video** optimizes for production workflows and flexibility. The decoupled architecture separates audio generation from video creation. JSON transcripts support per-slide voice overrides and multi-language content in a single file. Individual slide export targets platforms like Udemy. It's designed for complex, repeatable pipelines.
+
+Both tools demonstrate that with modern AI voice services, the gap between "slides with speaker notes" and "polished video content" can be bridged automatically.
+
+---
+
+## Feature Comparison
+
+### Overview
 
 | Aspect | marp2video | marptalk |
 |--------|------------|----------|
@@ -12,7 +38,7 @@ A detailed comparison of [marp2video](https://github.com/grokify/marp2video) and
 | **Primary TTS** | ElevenLabs (via OmniVoice) | Google Cloud TTS |
 | **Primary STT** | Deepgram (via OmniVoice) | N/A (duration-based timing) |
 
-## TTS Provider Support
+### TTS Provider Support
 
 | Feature | marp2video | marptalk |
 |---------|------------|----------|
@@ -23,7 +49,7 @@ A detailed comparison of [marp2video](https://github.com/grokify/marp2video) and
 | **Provider Abstraction** | :white_check_mark: OmniVoice | :x: Single provider |
 | **Voice Cloning** | :white_check_mark: (ElevenLabs) | :x: |
 
-## Multi-Language Support
+### Multi-Language Support
 
 | Feature | marp2video | marptalk |
 |---------|------------|----------|
@@ -32,7 +58,7 @@ A detailed comparison of [marp2video](https://github.com/grokify/marp2video) and
 | **Per-slide voice override** | :white_check_mark: | :x: |
 | **Mixed TTS providers per video** | :white_check_mark: (e.g., ElevenLabs + Deepgram) | :x: |
 
-## Voiceover Input Format
+### Voiceover Input Format
 
 | Feature | marp2video | marptalk |
 |---------|------------|----------|
@@ -41,7 +67,7 @@ A detailed comparison of [marp2video](https://github.com/grokify/marp2video) and
 | **Pause directives** | :white_check_mark: `[PAUSE:1000]` | :x: |
 | **Per-segment voice settings** | :white_check_mark: | :x: |
 
-## Subtitle Generation
+### Subtitle Generation
 
 | Feature | marp2video | marptalk |
 |---------|------------|----------|
@@ -52,7 +78,7 @@ A detailed comparison of [marp2video](https://github.com/grokify/marp2video) and
 | **Dictionary case correction** | :white_check_mark: (tech terms, custom JSON) | :x: |
 | **YouTube chapters** | :x: | :white_check_mark: |
 
-## Video Generation
+### Video Generation
 
 | Feature | marp2video | marptalk |
 |---------|------------|----------|
@@ -64,7 +90,7 @@ A detailed comparison of [marp2video](https://github.com/grokify/marp2video) and
 | **Individual slide export** | :white_check_mark: (Udemy-ready) | :x: |
 | **Mixed audio sample rates** | :white_check_mark: (filter_complex concat) | N/A (single provider) |
 
-## Workflow
+### Workflow
 
 | Feature | marp2video | marptalk |
 |---------|------------|----------|
