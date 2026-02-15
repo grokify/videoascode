@@ -147,6 +147,8 @@ Flags:
       --height int                Video height (default 1080)
       --fps int                   Frame rate (default 30)
       --transition float          Transition duration in seconds
+      --subtitles string          Subtitle file to embed (SRT or VTT)
+      --subtitles-lang string     Subtitle language code (auto-detected from filename)
       --output-individual string  Directory for individual slide videos
       --workdir string            Working directory for temp files
       --screen-device string      Screen capture device (macOS)
@@ -207,10 +209,13 @@ marp2video subtitle --audio audio/en-US/
 marp2video subtitle --audio audio/es-ES/
 marp2video subtitle --audio audio/zh-Hans/
 
-# Step 3: Generate videos for each language
-marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/en-US.mp4
-marp2video video --input slides.md --manifest audio/es-ES/manifest.json --output video/es-ES.mp4
-marp2video video --input slides.md --manifest audio/zh-Hans/manifest.json --output video/zh-Hans.mp4
+# Step 3: Generate videos with embedded subtitles
+marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+  --output video/en-US.mp4 --subtitles subtitles/en-US.srt
+marp2video video --input slides.md --manifest audio/es-ES/manifest.json \
+  --output video/es-ES.mp4 --subtitles subtitles/es-ES.srt
+marp2video video --input slides.md --manifest audio/zh-Hans/manifest.json \
+  --output video/zh-Hans.mp4 --subtitles subtitles/zh-Hans.srt
 ```
 
 **Directory structure** (locale codes enable automation):
