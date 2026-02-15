@@ -12,7 +12,7 @@ See Jason's [original LinkedIn post](https://www.linkedin.com/posts/imjasonh_i-f
 
 ### marp2video
 
-marp2video grew from production needs at [AgentPlexus](https://github.com/agentplexus), where multi-language video generation required flexible TTS provider support. Rather than being locked into a single provider, marp2video uses [OmniVoice](https://github.com/agentplexus/omnivoice)—a unified TTS/STT abstraction layer—allowing different providers for different languages or slides. A Chinese slide might use Deepgram while English slides use ElevenLabs, all in the same video. The tool also generates subtitles from actual audio transcription (STT) rather than estimating from word count, producing word-level timestamps and proper capitalization via dictionary-based correction.
+marp2video grew from production needs at [AgentPlexus](https://github.com/agentplexus), which publishes many Marp presentations and wanted to turn them into narrated videos. The project also served as a way to exercise the [OmniVoice](https://github.com/agentplexus/omnivoice) libraries for multi-language and multi-provider TTS/STT workflows. Rather than being locked into a single provider, marp2video uses OmniVoice as a unified abstraction layer—allowing different providers for different languages or slides. A Chinese slide might use Deepgram while English slides use ElevenLabs, all in the same video. The tool also generates subtitles from actual audio transcription (STT) rather than estimating from word count, producing word-level timestamps and proper capitalization via dictionary-based correction.
 
 ## Philosophy
 
