@@ -34,6 +34,7 @@
         { "description": "Added subtitle alignment tests", "commit": "5b95ad3" }
       ],
       "documentation": [
+        { "description": "Added complete workflow guide: Marp to video with subtitles", "commit": "256a4c4" },
         { "description": "Added subtitle generation features to README", "commit": "11c384b" },
         { "description": "Added subtitle guide and dual-language TRD", "commit": "dd29c85" }
       ],

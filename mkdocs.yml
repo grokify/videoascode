@@ -61,8 +61,10 @@ nav:
     - Quick Start: getting-started/quick-start.md
     - Requirements: getting-started/requirements.md
   - User Guide:
+    - Complete Workflow: guide/complete-workflow.md
     - Pipeline Overview: guide/pipeline.md
     - Voiceover Formats: guide/voiceover-formats.md
+    - Subtitle Generation: guide/subtitles.md
     - Multi-Language Support: guide/multi-language.md
     - Output Options: guide/output-options.md
     - Customization: guide/customization.md
