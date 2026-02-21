@@ -313,6 +313,28 @@ This is useful for:
 - Testing TTS voice settings
 - Debugging browser automation steps
 
+## Step Duration Guidelines
+
+When manually setting `minDuration` for steps, use these guidelines:
+
+| Content Type | Recommended Duration |
+|--------------|---------------------|
+| Short phrase (3-5 words) | 2000-3000ms |
+| Medium sentence (8-12 words) | 3000-5000ms |
+| Long sentence (15+ words) | 5000-8000ms |
+| Complex explanation | 8000-12000ms |
+
+**Rule of thumb**: ~150 words per minute = ~2.5 words per second
+
+For a 10-word sentence:
+
+- Base duration: 10 / 2.5 = 4 seconds = 4000ms
+- Add 20% for French: 4800ms
+- Add 500ms buffer: 5300ms
+
+!!! tip "Let TTS Drive Timing"
+    In most cases, you don't need to set `minDuration` manually. The tool automatically calculates timing from TTS audio duration and uses the longest language when generating multi-language videos.
+
 ## Troubleshooting
 
 ### Browser not opening

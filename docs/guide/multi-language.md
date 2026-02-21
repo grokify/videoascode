@@ -197,6 +197,17 @@ segments:
 
 ### Pace to Longest Language
 
+Different languages have different speech lengths for the same content:
+
+| Language | Typical Length vs English |
+|----------|---------------------------|
+| English  | 1.0x (baseline)           |
+| French   | 1.15-1.20x                |
+| German   | 1.10-1.15x                |
+| Spanish  | 1.10-1.15x                |
+| Japanese | 0.90-0.95x                |
+| Chinese  | 0.85-0.90x                |
+
 marp2video automatically paces the video to the longest audio:
 
 1. TTS audio is generated for all requested languages
