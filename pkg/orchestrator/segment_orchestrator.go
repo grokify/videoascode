@@ -12,10 +12,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/grokify/marp2video/pkg/segment"
-	"github.com/grokify/marp2video/pkg/source"
-	"github.com/grokify/marp2video/pkg/tts"
-	"github.com/grokify/marp2video/pkg/video"
+	"github.com/grokify/videoascode/pkg/segment"
+	"github.com/grokify/videoascode/pkg/source"
+	"github.com/grokify/videoascode/pkg/tts"
+	"github.com/grokify/videoascode/pkg/video"
 
 	"github.com/grokify/mogo/fmt/progress"
 )

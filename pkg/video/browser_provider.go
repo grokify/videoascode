@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/grokify/marp2video/pkg/browser"
-	"github.com/grokify/marp2video/pkg/media"
-	"github.com/grokify/marp2video/pkg/segment"
+	"github.com/grokify/videoascode/pkg/browser"
+	"github.com/grokify/videoascode/pkg/media"
+	"github.com/grokify/videoascode/pkg/segment"
 )
 
 // BrowserVideoProvider creates videos by recording browser sessions.

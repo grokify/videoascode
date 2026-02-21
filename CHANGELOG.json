@@ -1,7 +1,7 @@
 {
   "irVersion": "1.0",
-  "project": "marp2video",
-  "repository": "https://github.com/grokify/marp2video",
+  "project": "videoascode",
+  "repository": "https://github.com/grokify/videoascode",
   "versioning": "semver",
   "commitConvention": "conventional",
   "maintainers": ["grokify", "johncwang@gmail.com"],

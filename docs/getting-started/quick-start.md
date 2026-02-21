@@ -14,7 +14,7 @@ theme: default
 
 # Welcome
 
-This is my first marp2video presentation!
+This is my first vac presentation!
 
 <!-- Welcome to this presentation.
      We'll create a video with AI narration. -->
@@ -49,12 +49,12 @@ export ELEVENLABS_API_KEY="your-api-key"
 ## Step 3: Generate the Video
 
 ```bash
-marp2video --input slides.md --output my_video.mp4
+vac --input slides.md --output my_video.mp4
 ```
 
 ## What Happens
 
-1. **Parsing** - marp2video extracts voiceover text from `<!-- comments -->`
+1. **Parsing** - vac extracts voiceover text from `<!-- comments -->`
 2. **TTS Generation** - Text is sent to ElevenLabs, audio files created
 3. **HTML Rendering** - Marp CLI converts markdown to HTML
 4. **Recording** - Each slide is recorded with synchronized audio

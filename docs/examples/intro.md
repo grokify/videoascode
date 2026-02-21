@@ -1,10 +1,10 @@
 # Intro Example
 
-A self-documenting presentation that introduces marp2video.
+A self-documenting presentation that introduces vac.
 
 ## Overview
 
-This example demonstrates marp2video by creating a video about marp2video itself. It includes:
+This example demonstrates vac by creating a video about vac itself. It includes:
 
 - 13 slides covering features and usage
 - Multi-language transcripts (en-US, en-GB, es-ES)
@@ -24,8 +24,8 @@ examples/intro/
 The presentation covers:
 
 1. Title slide
-2. What is marp2video?
-3. Why use marp2video?
+2. What is vac?
+3. Why use vac?
 4. Key features
 5. How it works (pipeline)
 6. Installation
@@ -42,7 +42,7 @@ The presentation covers:
 ### Using Inline Comments (Default Language)
 
 ```bash
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --output examples/intro/output.mp4
 ```
@@ -50,7 +50,7 @@ marp2video \
 ### Using Transcript (American English)
 
 ```bash
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --transcript examples/intro/transcript.json \
   --lang en-US \
@@ -60,7 +60,7 @@ marp2video \
 ### Using Transcript (British English)
 
 ```bash
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --transcript examples/intro/transcript.json \
   --lang en-GB \
@@ -70,7 +70,7 @@ marp2video \
 ### Using Transcript (Spanish)
 
 ```bash
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --transcript examples/intro/transcript.json \
   --lang es-ES \
@@ -131,7 +131,7 @@ Add a new locale to each slide's `transcripts` object:
     "en-US": { ... },
     "fr-FR": {
       "segments": [
-        { "text": "Bienvenue dans marp2video." }
+        { "text": "Bienvenue dans vac." }
       ]
     }
   }

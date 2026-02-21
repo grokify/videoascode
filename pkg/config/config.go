@@ -3,8 +3,8 @@ package config
 import (
 	"strings"
 
-	"github.com/grokify/marp2video/pkg/browser"
-	"github.com/grokify/marp2video/pkg/transcript"
+	"github.com/grokify/videoascode/pkg/browser"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 // SourceType identifies the segment content source

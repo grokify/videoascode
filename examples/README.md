@@ -1,6 +1,6 @@
 # Examples
 
-This directory contains example presentations demonstrating marp2video.
+This directory contains example presentations demonstrating vac.
 
 ## Structure
 
@@ -8,7 +8,7 @@ Each example is in its own subdirectory with a consistent structure:
 
 ```
 examples/
-├── intro/                    # Introduction to marp2video
+├── intro/                    # Introduction to vac
 │   ├── presentation.md       # Marp markdown source (with inline voiceovers)
 │   ├── transcript.json       # Structured transcript (multi-language, TTS settings)
 │   └── output.mp4            # Generated video (after running)
@@ -21,7 +21,7 @@ examples/
 
 ## Transcript Formats
 
-marp2video supports two voiceover formats:
+vac supports two voiceover formats:
 
 ### 1. Inline Comments (Simple)
 
@@ -66,31 +66,31 @@ See `pkg/transcript/transcript.schema.json` for the full schema.
 
 | Example | Description | Slides | Languages |
 |---------|-------------|--------|-----------|
-| [intro](./intro/) | Self-documenting introduction to marp2video | 13 | en-US, en-GB, es-ES |
+| [intro](./intro/) | Self-documenting introduction to vac | 13 | en-US, en-GB, es-ES |
 
 ## Running an Example
 
 ```bash
 # Using inline comments (from presentation.md)
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --output examples/intro/output.mp4
 
 # Using transcript.json (American English - default)
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --transcript examples/intro/transcript.json \
   --output examples/intro/output_en-US.mp4
 
 # Using transcript.json (British English)
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --transcript examples/intro/transcript.json \
   --lang en-GB \
   --output examples/intro/output_en-GB.mp4
 
 # Using transcript.json (Spanish - Spain)
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --transcript examples/intro/transcript.json \
   --lang es-ES \
@@ -104,7 +104,7 @@ marp2video \
 3. Choose your voiceover approach:
    - **Simple**: Add `<!-- voiceover comments -->` inline
    - **Advanced**: Create `transcript.json` with multi-language support
-4. Run marp2video to generate `output.mp4`
+4. Run vac to generate `output.mp4`
 
 ## Transcript JSON Features
 

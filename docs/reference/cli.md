@@ -4,10 +4,10 @@ Complete command-line interface reference.
 
 ## Command Structure
 
-marp2video uses a hierarchical command structure:
+vac uses a hierarchical command structure:
 
 ```
-marp2video
+vac
 ├── slides              # Marp slide presentations
 │   ├── video          # Full pipeline: parse, TTS, record, combine
 │   └── tts            # Generate audio from transcript
@@ -24,7 +24,7 @@ marp2video
 Generate video from Marp presentation (full pipeline).
 
 ```bash
-marp2video slides video [flags]
+vac slides video [flags]
 ```
 
 ### Flags
@@ -51,21 +51,21 @@ marp2video slides video [flags]
 
 ```bash
 # Full pipeline with inline voiceovers
-marp2video slides video --input slides.md --output video.mp4
+vac slides video --input slides.md --output video.mp4
 
 # Use pre-generated audio
-marp2video slides video --input slides.md --manifest audio/manifest.json --output video.mp4
+vac slides video --input slides.md --manifest audio/manifest.json --output video.mp4
 
 # With transitions and custom resolution
-marp2video slides video --input slides.md --output video.mp4 \
+vac slides video --input slides.md --output video.mp4 \
   --transition 0.5 --width 1280 --height 720
 
 # Generate individual slide videos for Udemy
-marp2video slides video --input slides.md --output combined.mp4 \
+vac slides video --input slides.md --output combined.mp4 \
   --output-individual ./lectures/
 
 # Check dependencies
-marp2video slides video --check
+vac slides video --check
 ```
 
 ---
@@ -75,7 +75,7 @@ marp2video slides video --check
 Generate audio files from a transcript JSON file.
 
 ```bash
-marp2video slides tts [flags]
+vac slides tts [flags]
 ```
 
 ### Flags
@@ -94,14 +94,14 @@ marp2video slides tts [flags]
 
 ```bash
 # Generate English audio
-marp2video slides tts --transcript transcript.json --output audio/en-US/ --lang en-US
+vac slides tts --transcript transcript.json --output audio/en-US/ --lang en-US
 
 # Generate Spanish audio with Deepgram
-marp2video slides tts --transcript transcript.json --output audio/es-ES/ \
+vac slides tts --transcript transcript.json --output audio/es-ES/ \
   --lang es-ES --provider deepgram
 
 # Force regeneration
-marp2video slides tts --transcript transcript.json --output audio/ --force
+vac slides tts --transcript transcript.json --output audio/ --force
 ```
 
 ---
@@ -111,7 +111,7 @@ marp2video slides tts --transcript transcript.json --output audio/ --force
 Record browser-driven demos with AI-generated voiceover.
 
 ```bash
-marp2video browser video [flags]
+vac browser video [flags]
 ```
 
 ### Flags
@@ -144,39 +144,39 @@ marp2video browser video [flags]
 
 ```bash
 # Basic browser demo
-marp2video browser video --config demo.yaml --output demo.mp4
+vac browser video --config demo.yaml --output demo.mp4
 
 # Multi-language with audio caching
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --audio-dir ./audio --lang en-US,fr-FR,zh-Hans
 
 # With subtitles burned in (requires FFmpeg with libass)
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --subtitles --subtitles-burn
 
 # Silent video with burned subtitles (no audio track)
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --subtitles --subtitles-burn --no-audio
 
 # Headless mode for CI/CD
-marp2video browser video --config demo.yaml --output demo.mp4 --headless
+vac browser video --config demo.yaml --output demo.mp4 --headless
 
 # Using Deepgram TTS
-marp2video browser video --config demo.yaml --output demo.mp4 --provider deepgram
+vac browser video --config demo.yaml --output demo.mp4 --provider deepgram
 
 # Fast encoding with hardware acceleration (macOS VideoToolbox)
-marp2video browser video --config demo.yaml --output demo.mp4 --fast
+vac browser video --config demo.yaml --output demo.mp4 --fast
 
 # Test with limited segments (faster iteration)
-marp2video browser video --config demo.yaml --output demo.mp4 --limit 2
+vac browser video --config demo.yaml --output demo.mp4 --limit 2
 
 # Test with limited browser steps (faster iteration)
-marp2video browser video --config demo.yaml --output demo.mp4 --limit-steps 3
+vac browser video --config demo.yaml --output demo.mp4 --limit-steps 3
 ```
 
 ### Audio Caching
 
-When using `--audio-dir`, marp2video caches generated TTS audio:
+When using `--audio-dir`, vac caches generated TTS audio:
 
 - Audio files stored as `{audio-dir}/{language}/segment_XXX.mp3`
 - Metadata JSON files store per-voiceover timing information
@@ -198,7 +198,7 @@ When generating multiple languages, the video is paced to the longest audio:
 Record browser session without audio (silent recording).
 
 ```bash
-marp2video browser record [flags]
+vac browser record [flags]
 ```
 
 ### Flags
@@ -222,17 +222,17 @@ marp2video browser record [flags]
 
 ```bash
 # Record from steps file
-marp2video browser record --url https://example.com --steps demo.json --output demo.mp4
+vac browser record --url https://example.com --steps demo.json --output demo.mp4
 
 # Record from config file
-marp2video browser record --config demo.yaml --output demo.mp4
+vac browser record --config demo.yaml --output demo.mp4
 
 # Export timing data for later audio sync
-marp2video browser record --url https://example.com --steps demo.json \
+vac browser record --url https://example.com --steps demo.json \
   --output demo.mp4 --timing timing.json
 
 # Headless mode
-marp2video browser record --url https://example.com --steps demo.json \
+vac browser record --url https://example.com --steps demo.json \
   --output demo.mp4 --headless
 ```
 
@@ -243,7 +243,7 @@ marp2video browser record --url https://example.com --steps demo.json \
 Generate subtitles from audio files using speech-to-text.
 
 ```bash
-marp2video subtitle [flags]
+vac subtitle [flags]
 ```
 
 ### Flags
@@ -260,13 +260,13 @@ marp2video subtitle [flags]
 
 ```bash
 # Generate subtitles (language auto-detected)
-marp2video subtitle --audio audio/en-US/
+vac subtitle --audio audio/en-US/
 
 # Custom output directory
-marp2video subtitle --audio audio/fr-FR/ --output subs/
+vac subtitle --audio audio/fr-FR/ --output subs/
 
 # Keep individual slide subtitles
-marp2video subtitle --audio audio/en-US/ --individual
+vac subtitle --audio audio/en-US/ --individual
 ```
 
 ---

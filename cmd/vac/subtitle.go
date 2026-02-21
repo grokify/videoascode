@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	omnistt "github.com/grokify/marp2video/pkg/omnivoice/stt"
-	"github.com/grokify/marp2video/pkg/transcript"
-	"github.com/grokify/marp2video/pkg/tts"
 	"github.com/grokify/mogo/fmt/progress"
+	omnistt "github.com/grokify/videoascode/pkg/omnivoice/stt"
+	"github.com/grokify/videoascode/pkg/transcript"
+	"github.com/grokify/videoascode/pkg/tts"
 	"github.com/spf13/cobra"
 )
 

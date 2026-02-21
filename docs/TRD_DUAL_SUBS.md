@@ -2,7 +2,7 @@
 
 ## Overview
 
-Support for dual-language subtitles in marp2video presentations to enable language learning use cases. Users want to see subtitles in both their native language and the language they're learning simultaneously.
+Support for dual-language subtitles in vac presentations to enable language learning use cases. Users want to see subtitles in both their native language and the language they're learning simultaneously.
 
 ## Problem Statement
 
@@ -10,7 +10,7 @@ When learning a language via video content, users benefit from seeing:
 1. Subtitles in the target language (what they're learning)
 2. Subtitles in their native language (for comprehension)
 
-Current marp2video supports single-language subtitle tracks, but not dual-language display.
+Current vac supports single-language subtitle tracks, but not dual-language display.
 
 ## Use Cases
 
@@ -98,9 +98,9 @@ Build a custom HTML5 video player that:
 
 ### Phase 1: Stacked Bilingual Subtitles (MVP)
 
-1. Add `marp2video subtitle merge` command:
+1. Add `vac subtitle merge` command:
    ```bash
-   marp2video subtitle merge \
+   vac subtitle merge \
      --primary subtitles/fr-FR.srt \
      --secondary subtitles/en-US.srt \
      --output subtitles/fr-en-bilingual.srt
@@ -114,9 +114,9 @@ Build a custom HTML5 video player that:
 
 ### Phase 2: Extended Duration Video
 
-1. Add `marp2video video` options:
+1. Add `vac video` options:
    ```bash
-   marp2video video \
+   vac video \
      --input presentation.md \
      --manifests audio/en-US/manifest.json,audio/fr-FR/manifest.json \
      --duration-strategy max \
@@ -132,7 +132,7 @@ Build a custom HTML5 video player that:
 
 1. Enhance `--subtitles` flag to accept multiple files:
    ```bash
-   marp2video video \
+   vac video \
      --subtitles subtitles/en-US.srt:eng,subtitles/fr-FR.srt:fra
    ```
 
@@ -140,7 +140,7 @@ Build a custom HTML5 video player that:
 
 ## Related Changes in This Session
 
-### marp2video Changes
+### vac Changes
 
 1. **Dictionary-based case correction** (`pkg/tts/dictionary.go`):
    - Built-in dictionary with 200+ tech terms
@@ -157,8 +157,8 @@ Build a custom HTML5 video player that:
 
 ### Files Modified
 
-- `cmd/marp2video/tts.go` - Provider override flag
-- `cmd/marp2video/subtitle.go` - Dictionary flags, auto-detection
+- `cmd/vac/tts.go` - Provider override flag
+- `cmd/vac/subtitle.go` - Dictionary flags, auto-detection
 - `pkg/tts/transcript_generator.go` - ForceProvider logic, clear provider settings
 - `pkg/tts/subtitle_generator.go` - Timestamps caching, case correction
 - `pkg/tts/dictionary.go` - New file: dictionary system

@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/grokify/marp2video/pkg/media"
-	"github.com/grokify/marp2video/pkg/segment"
+	"github.com/grokify/videoascode/pkg/media"
+	"github.com/grokify/videoascode/pkg/segment"
 )
 
 // ImageVideoProvider creates videos from static images (for slide segments).

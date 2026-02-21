@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-marp2video requires the following tools to be installed:
+vac requires the following tools to be installed:
 
 ### 1. Go 1.21+
 
@@ -49,20 +49,20 @@ npm install -g @marp-team/marp-cli
 export ELEVENLABS_API_KEY="your-api-key-here"
 ```
 
-## Install marp2video
+## Install vac
 
 ### From Source
 
 ```bash
-git clone https://github.com/grokify/marp2video
-cd marp2video
-go build -o bin/marp2video ./cmd/marp2video
+git clone https://github.com/grokify/videoascode
+cd vac
+go build -o bin/vac ./cmd/vac
 ```
 
 ### Using Go Install
 
 ```bash
-go install github.com/grokify/marp2video/cmd/marp2video@latest
+go install github.com/grokify/videoascode/cmd/vac@latest
 ```
 
 ## Verify Installation
@@ -70,7 +70,7 @@ go install github.com/grokify/marp2video/cmd/marp2video@latest
 Check that all dependencies are available:
 
 ```bash
-marp2video --check
+vac --check
 ```
 
 This will verify:

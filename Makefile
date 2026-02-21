@@ -2,9 +2,9 @@
 
 # Build the binary
 build:
-	@echo "Building marp2video..."
-	@go build -o bin/marp2video ./cmd/marp2video
-	@echo "✓ Build complete: bin/marp2video"
+	@echo "Building vac..."
+	@go build -o bin/vac ./cmd/vac
+	@echo "✓ Build complete: bin/vac"
 
 # Install dependencies
 install:
@@ -26,17 +26,17 @@ test:
 clean:
 	@echo "Cleaning build artifacts..."
 	@rm -rf bin/
-	@rm -rf /tmp/marp2video/
+	@rm -rf /tmp/videoascode/
 	@echo "✓ Clean complete"
 
 # Check dependencies
 check:
-	@./bin/marp2video --check || echo "Build the binary first with 'make build'"
+	@./bin/vac --check || echo "Build the binary first with 'make build'"
 
 # Run example
 run: build
 	@echo "Running example..."
-	@./bin/marp2video \
+	@./bin/vac \
 		--input example_presentation.md \
 		--output example_output.mp4 \
 		--width 1920 \
@@ -45,7 +45,7 @@ run: build
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  make build    - Build the marp2video binary"
+	@echo "  make build    - Build the vac binary"
 	@echo "  make install  - Install Go dependencies"
 	@echo "  make test     - Run tests"
 	@echo "  make clean    - Clean build artifacts"

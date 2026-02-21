@@ -1,6 +1,6 @@
 # Intro Example
 
-A self-documenting presentation that introduces marp2video.
+A self-documenting presentation that introduces vac.
 
 ## Files
 
@@ -14,7 +14,7 @@ A self-documenting presentation that introduces marp2video.
 
 ## Step 1: Generate Audio from Transcript
 
-Use the `marp2video tts` command to generate audio files from the transcript.
+Use the `vac tts` command to generate audio files from the transcript.
 
 ### Using CLI (Recommended)
 
@@ -23,13 +23,13 @@ Use the `marp2video tts` command to generate audio files from the transcript.
 export ELEVENLABS_API_KEY="your-api-key"
 
 # Generate audio for default language (en-US)
-marp2video tts --transcript transcript.json --output audio/
+vac tts --transcript transcript.json --output audio/
 
 # Generate audio for specific language
-marp2video tts --transcript transcript.json --output audio/ --lang es-ES
+vac tts --transcript transcript.json --output audio/ --lang es-ES
 
 # Generate audio for British English
-marp2video tts --transcript transcript.json --output audio/ --lang en-GB
+vac tts --transcript transcript.json --output audio/ --lang en-GB
 ```
 
 This generates:
@@ -66,8 +66,8 @@ package main
 
 import (
     "context"
-    "github.com/grokify/marp2video/pkg/transcript"
-    "github.com/grokify/marp2video/pkg/tts"
+    "github.com/grokify/videoascode/pkg/transcript"
+    "github.com/grokify/videoascode/pkg/tts"
 )
 
 func main() {
@@ -92,12 +92,12 @@ func main() {
 
 ## Step 2: Generate Video
 
-Use the `marp2video video` command with the audio manifest.
+Use the `vac video` command with the audio manifest.
 
 ### Using Pre-generated Audio (Recommended)
 
 ```bash
-marp2video video \
+vac video \
   --input presentation.md \
   --manifest audio/manifest.json \
   --output output.mp4
@@ -106,7 +106,7 @@ marp2video video \
 ### Using Inline Voiceovers (Full Pipeline)
 
 ```bash
-marp2video video \
+vac video \
   --input presentation.md \
   --output output.mp4
 ```
@@ -128,7 +128,7 @@ marp2video video \
 ```json
 {
   "metadata": {
-    "title": "Introduction to marp2video",
+    "title": "Introduction to vac",
     "defaultLanguage": "en-US",
     "defaultVoice": {
       "provider": "elevenlabs",
@@ -152,7 +152,7 @@ marp2video video \
   "transcripts": {
     "en-US": {
       "segments": [
-        { "text": "Welcome to marp2video...", "pause": 500 },
+        { "text": "Welcome to vac...", "pause": 500 },
         { "text": "In this presentation..." }
       ]
     },
@@ -162,7 +162,7 @@ marp2video video \
         "voiceName": "Daniel"
       },
       "segments": [
-        { "text": "Bienvenido a marp2video...", "pause": 500 },
+        { "text": "Bienvenido a vac...", "pause": 500 },
         { "text": "En esta presentación..." }
       ]
     }
@@ -241,16 +241,16 @@ config := omnitts.SynthesisConfig{
 # 1. Set API key
 export ELEVENLABS_API_KEY="your-key"
 
-# 2. Generate audio (using Go script above or marp2video)
+# 2. Generate audio (using Go script above or vac)
 go run generate_audio.go
 
 # 3. Generate video
-marp2video \
+vac \
   --input presentation.md \
   --output output.mp4
 
 # 4. For different languages
-marp2video \
+vac \
   --input presentation.md \
   --transcript transcript.json \
   --lang es-ES \

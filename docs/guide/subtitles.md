@@ -1,6 +1,6 @@
 # Subtitle Generation
 
-marp2video can generate subtitle files (SRT/VTT) in two ways:
+vac can generate subtitle files (SRT/VTT) in two ways:
 
 1. **STT-based**: Using speech-to-text for word-level accuracy (Marp slides)
 2. **Timing-based**: Using voiceover timing without STT (Browser videos)
@@ -11,7 +11,7 @@ marp2video can generate subtitle files (SRT/VTT) in two ways:
 
     ```bash
     # Generate subtitles using speech-to-text
-    marp2video subtitle --audio audio/en-US/
+    vac subtitle --audio audio/en-US/
 
     # Output:
     # subtitles/en-US.srt
@@ -22,7 +22,7 @@ marp2video can generate subtitle files (SRT/VTT) in two ways:
 
     ```bash
     # Generate subtitles from voiceover timing
-    marp2video browser video --config demo.yaml --output demo.mp4 \
+    vac browser video --config demo.yaml --output demo.mp4 \
       --subtitles
 
     # Output:
@@ -42,7 +42,7 @@ The `subtitle` command uses Deepgram STT to transcribe the audio files and extra
 ## Command Reference
 
 ```
-marp2video subtitle [flags]
+vac subtitle [flags]
 
 Flags:
   -a, --audio string        Audio directory containing manifest.json (required)
@@ -56,29 +56,29 @@ Flags:
 
 ```bash
 # Generate French subtitles
-marp2video subtitle --audio audio/fr-FR/
+vac subtitle --audio audio/fr-FR/
 
 # Custom output directory
-marp2video subtitle --audio audio/zh-Hans/ --output subs/
+vac subtitle --audio audio/zh-Hans/ --output subs/
 
 # Keep individual slide subtitle files
-marp2video subtitle --audio audio/en-US/ --individual
+vac subtitle --audio audio/en-US/ --individual
 ```
 
 ## Multi-Language Workflow
 
 ```bash
 # Step 1: Generate audio for each language
-marp2video tts --transcript transcript.json --output audio/en-US/ --lang en-US
-marp2video tts --transcript transcript.json --output audio/fr-FR/ --lang fr-FR
+vac tts --transcript transcript.json --output audio/en-US/ --lang en-US
+vac tts --transcript transcript.json --output audio/fr-FR/ --lang fr-FR
 
 # Step 2: Generate subtitles for each language
-marp2video subtitle --audio audio/en-US/
-marp2video subtitle --audio audio/fr-FR/
+vac subtitle --audio audio/en-US/
+vac subtitle --audio audio/fr-FR/
 
 # Step 3: Generate videos
-marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/en-US.mp4
-marp2video video --input slides.md --manifest audio/fr-FR/manifest.json --output video/fr-FR.mp4
+vac video --input slides.md --manifest audio/en-US/manifest.json --output video/en-US.mp4
+vac video --input slides.md --manifest audio/fr-FR/manifest.json --output video/fr-FR.mp4
 ```
 
 ### Output Structure
@@ -134,20 +134,20 @@ The `browser-video` command supports built-in subtitle generation:
 
 ```bash
 # Simple subtitles from voiceover timing (no API cost)
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --subtitles
 
 # Word-level subtitles using speech-to-text
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --subtitles-stt
 
 # Burn subtitles permanently into video
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --subtitles --subtitles-burn
 
 # Silent video with burned subtitles (no audio track)
 # Useful for demos where viewers read subtitles instead of listening
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --subtitles --subtitles-burn --no-audio
 ```
 
@@ -304,14 +304,14 @@ Words animate in with effects (pop, slide, bounce):
 
 ```bash
 # Burn subtitles into video (standard style)
-marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+vac video --input slides.md --manifest audio/en-US/manifest.json \
   --subtitles subtitles/en-US.srt --output video/en-US.mp4
 
 # Karaoke style (future)
-marp2video subtitle --audio audio/en-US/ --style karaoke --output subtitles/
+vac subtitle --audio audio/en-US/ --style karaoke --output subtitles/
 
 # Word-by-word reveal (future)
-marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+vac video --input slides.md --manifest audio/en-US/manifest.json \
   --caption-style reveal --output video/en-US.mp4
 ```
 

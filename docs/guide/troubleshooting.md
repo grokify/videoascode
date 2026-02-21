@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Common issues and solutions when using marp2video.
+Common issues and solutions when using vac.
 
 ## Audio Issues
 
@@ -13,14 +13,14 @@ Common issues and solutions when using marp2video.
 **Solution**: This issue was fixed in version 0.2.1. Upgrade to the latest version:
 
 ```bash
-go install github.com/grokify/marp2video/cmd/marp2video@latest
+go install github.com/grokify/videoascode/cmd/vac@latest
 ```
 
 **Technical Details**: The fix uses FFmpeg's `filter_complex` concat filter instead of the concat demuxer. This properly decodes and re-encodes audio to ensure consistent sample rates across all segments.
 
 ### Mixed TTS Provider Support
 
-marp2video supports using multiple TTS providers in a single video. For example, you might use:
+vac supports using multiple TTS providers in a single video. For example, you might use:
 
 - ElevenLabs for English (44100 Hz output)
 - Deepgram for Chinese (22050 Hz output)
@@ -34,7 +34,7 @@ The video combiner automatically normalizes all audio to 44100 Hz AAC for consis
 To see detailed FFmpeg output during video generation:
 
 ```bash
-MARP2VIDEO_DEBUG=1 marp2video video --input slides.md --output video.mp4
+MARP2VIDEO_DEBUG=1 vac video --input slides.md --output video.mp4
 ```
 
 This streams FFmpeg's stderr/stdout to your terminal, showing encoding progress and any warnings.
@@ -61,7 +61,7 @@ Video generation involves multiple steps that take time:
 Tips for faster generation:
 
 - Use `--preset fast` for quicker encoding (slightly larger files)
-- Pre-generate audio with `marp2video tts` and reuse the manifest
+- Pre-generate audio with `vac tts` and reuse the manifest
 - Use lower resolution for drafts: `--width 1280 --height 720`
 
 ### VLC Playback Issues (Sluggish Controls)
@@ -70,7 +70,7 @@ Tips for faster generation:
 
 **Cause**: This can happen when audio/video streams have mismatched durations.
 
-**Solution**: Regenerate the video with the latest version of marp2video, which properly syncs all streams.
+**Solution**: Regenerate the video with the latest version of vac, which properly syncs all streams.
 
 ## Subtitle Issues
 
@@ -84,7 +84,7 @@ Tips for faster generation:
 
 ```bash
 go get -u github.com/agentplexus/omnivoice@latest
-go install github.com/grokify/marp2video/cmd/marp2video@latest
+go install github.com/grokify/videoascode/cmd/vac@latest
 ```
 
 ### Chinese/CJK Subtitle Spacing
@@ -110,10 +110,10 @@ def fix_cjk_spacing(text):
 
 If you encounter issues not covered here:
 
-1. Check the [GitHub Issues](https://github.com/grokify/marp2video/issues)
+1. Check the [GitHub Issues](https://github.com/grokify/videoascode/issues)
 2. Enable debug mode to gather detailed logs
 3. Open a new issue with:
-   - marp2video version (`marp2video version`)
+   - vac version (`vac version`)
    - FFmpeg version (`ffmpeg -version`)
    - Full error message and debug output
    - Minimal reproduction steps

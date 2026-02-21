@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"time"
 
-	omnitts "github.com/grokify/marp2video/pkg/omnivoice/tts"
-	"github.com/grokify/marp2video/pkg/transcript"
 	"github.com/grokify/mogo/log/slogutil"
+	omnitts "github.com/grokify/videoascode/pkg/omnivoice/tts"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 // ProgressFunc is called during generation with current progress

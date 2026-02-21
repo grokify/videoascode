@@ -4,7 +4,7 @@ Create videos in multiple languages from a single presentation.
 
 ## Locale Codes
 
-marp2video uses BCP-47 locale codes:
+vac uses BCP-47 locale codes:
 
 | Code | Language |
 |------|----------|
@@ -98,27 +98,27 @@ Generate a video for each language:
 
 ```bash
 # English (US) - default
-marp2video \
+vac \
   --input slides.md \
   --transcript transcript.json \
   --output video_en-US.mp4
 
 # English (UK)
-marp2video \
+vac \
   --input slides.md \
   --transcript transcript.json \
   --lang en-GB \
   --output video_en-GB.mp4
 
 # Spanish (Spain)
-marp2video \
+vac \
   --input slides.md \
   --transcript transcript.json \
   --lang es-ES \
   --output video_es-ES.mp4
 
 # French (Canada)
-marp2video \
+vac \
   --input slides.md \
   --transcript transcript.json \
   --lang fr-CA \
@@ -142,7 +142,7 @@ Generate all languages with a script:
 LANGUAGES=("en-US" "en-GB" "es-ES" "fr-CA")
 
 for lang in "${LANGUAGES[@]}"; do
-  marp2video \
+  vac \
     --input slides.md \
     --transcript transcript.json \
     --lang "$lang" \
@@ -158,7 +158,7 @@ The `browser-video` command generates all language versions in a single run:
 
 ```bash
 # Generate English, French, and Chinese versions at once
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --lang en-US,fr-FR,zh-Hans
 ```
 
@@ -208,7 +208,7 @@ Different languages have different speech lengths for the same content:
 | Japanese | 0.90-0.95x                |
 | Chinese  | 0.85-0.90x                |
 
-marp2video automatically paces the video to the longest audio:
+vac automatically paces the video to the longest audio:
 
 1. TTS audio is generated for all requested languages
 2. For each step, the maximum voiceover duration is calculated
@@ -223,11 +223,11 @@ Use `--audio-dir` to cache audio and speed up subsequent runs:
 
 ```bash
 # First run: generates all TTS audio
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --audio-dir ./audio --lang en-US,fr-FR,zh-Hans
 
 # Second run: reuses cached audio
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --audio-dir ./audio --lang en-US,fr-FR,zh-Hans
 ```
 

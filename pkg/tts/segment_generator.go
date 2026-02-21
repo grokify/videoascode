@@ -8,10 +8,10 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/grokify/marp2video/pkg/media"
-	omnitts "github.com/grokify/marp2video/pkg/omnivoice/tts"
-	"github.com/grokify/marp2video/pkg/segment"
-	"github.com/grokify/marp2video/pkg/transcript"
+	"github.com/grokify/videoascode/pkg/media"
+	omnitts "github.com/grokify/videoascode/pkg/omnivoice/tts"
+	"github.com/grokify/videoascode/pkg/segment"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 // segmentMetadata stores per-voiceover duration info for caching

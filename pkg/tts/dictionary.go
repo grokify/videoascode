@@ -30,7 +30,7 @@ func NewDictionaryLoader() *DictionaryLoader {
 	// Default config directory
 	configDir := ""
 	if home, err := os.UserHomeDir(); err == nil {
-		configDir = filepath.Join(home, ".config", "marp2video", "dictionaries")
+		configDir = filepath.Join(home, ".config", "videoascode", "dictionaries")
 	}
 
 	return &DictionaryLoader{
@@ -79,7 +79,7 @@ func (dl *DictionaryLoader) Load() (*Dictionary, error) {
 		}
 	}
 
-	// 2. User config directory (~/.config/marp2video/dictionaries/*.json)
+	// 2. User config directory (~/.config/videoascode/dictionaries/*.json)
 	if dl.configDir != "" {
 		if err := dl.loadFromDir(dl.configDir, merged); err != nil {
 			// Don't fail if config dir doesn't exist

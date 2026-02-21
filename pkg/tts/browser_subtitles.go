@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/grokify/marp2video/pkg/segment"
+	"github.com/grokify/videoascode/pkg/segment"
 )
 
 // BrowserSubtitleGenerator generates subtitles for browser segments using voiceover timing.

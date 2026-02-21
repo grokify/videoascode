@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"time"
 
-	omnitts "github.com/grokify/marp2video/pkg/omnivoice/tts"
-	"github.com/grokify/marp2video/pkg/transcript"
+	omnitts "github.com/grokify/videoascode/pkg/omnivoice/tts"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 // Config holds TTS generator configuration.

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/grokify/marp2video/pkg/transcript"
+	"github.com/grokify/videoascode/pkg/transcript"
 
 	"github.com/agentplexus/omnivoice/tts"
 )

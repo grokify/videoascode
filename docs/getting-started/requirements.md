@@ -13,7 +13,7 @@
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **Go** | 1.21+ | Building marp2video |
+| **Go** | 1.21+ | Building vac |
 | **ffmpeg** | 4.0+ | Video recording and encoding |
 | **Marp CLI** | 3.0+ | Markdown to HTML rendering |
 | **Node.js** | 16+ | Required for Marp CLI |

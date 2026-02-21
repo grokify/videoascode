@@ -3,7 +3,7 @@ package segment
 import (
 	"fmt"
 
-	"github.com/grokify/marp2video/pkg/transcript"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 // SlideSegment represents a static slide from a presentation

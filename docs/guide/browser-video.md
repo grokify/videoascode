@@ -56,7 +56,7 @@ export DEEPGRAM_API_KEY="your-key"
 ### 3. Generate Video
 
 ```bash
-marp2video browser video --config demo.yaml --output demo.mp4
+vac browser video --config demo.yaml --output demo.mp4
 ```
 
 ## Config File Format
@@ -136,7 +136,7 @@ segments:
 Generate videos in multiple languages with a single command:
 
 ```bash
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --lang en-US,fr-FR,zh-Hans
 ```
 
@@ -161,7 +161,7 @@ demo_zh-Hans.mp4  # Chinese version
 Use `--audio-dir` to cache TTS audio and avoid repeated API calls:
 
 ```bash
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --audio-dir ./audio
 ```
 
@@ -195,19 +195,19 @@ Add subtitles to your videos:
 
 ```bash
 # Simple subtitles from voiceover timing (no STT required)
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --subtitles
 
 # Word-level subtitles using speech-to-text
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --subtitles-stt
 
 # Burn subtitles into video (permanent, requires FFmpeg with libass)
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --subtitles --subtitles-burn
 
 # Silent video with burned subtitles (no audio track)
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --subtitles --subtitles-burn --no-audio
 ```
 
@@ -236,7 +236,7 @@ marp2video browser video --config demo.yaml --output demo.mp4 \
 High-quality AI voices with emotional range.
 
 ```bash
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --provider elevenlabs \
   --voice pNInz6obpgDQGcFmaJgB
 ```
@@ -254,7 +254,7 @@ Popular voice IDs:
 Fast and cost-effective TTS.
 
 ```bash
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --provider deepgram \
   --voice aura-asteria-en
 ```
@@ -266,21 +266,21 @@ marp2video browser video --config demo.yaml --output demo.mp4 \
 Run without displaying the browser (useful for CI/CD):
 
 ```bash
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --headless
 ```
 
 ### Custom Resolution
 
 ```bash
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --width 1280 --height 720 --fps 24
 ```
 
 ### Transitions Between Segments
 
 ```bash
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --transition 0.5  # 0.5 second crossfade
 ```
 
@@ -289,7 +289,7 @@ marp2video browser video --config demo.yaml --output demo.mp4 \
 Use `--fast` for hardware-accelerated video encoding (VideoToolbox on macOS):
 
 ```bash
-marp2video browser video --config demo.yaml --output demo.mp4 --fast
+vac browser video --config demo.yaml --output demo.mp4 --fast
 ```
 
 This significantly reduces encoding time for long videos.
@@ -300,13 +300,13 @@ When iterating on demos, use `--limit` and `--limit-steps` to test partial conte
 
 ```bash
 # Test only the first 2 segments
-marp2video browser video --config demo.yaml --output demo.mp4 --limit 2
+vac browser video --config demo.yaml --output demo.mp4 --limit 2
 
 # Test only the first 3 browser steps
-marp2video browser video --config demo.yaml --output demo.mp4 --limit-steps 3
+vac browser video --config demo.yaml --output demo.mp4 --limit-steps 3
 
 # Combine both for fastest iteration
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --limit 1 --limit-steps 3
 ```
 
@@ -364,11 +364,11 @@ Use `--audio-dir` to cache audio:
 
 ```bash
 # First run generates audio
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --audio-dir ./audio
 
 # Subsequent runs reuse cached audio
-marp2video browser video --config demo.yaml --output demo.mp4 \
+vac browser video --config demo.yaml --output demo.mp4 \
   --audio-dir ./audio
 ```
 

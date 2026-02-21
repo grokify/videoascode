@@ -15,7 +15,7 @@ This guide walks through the entire process of creating a narrated video with su
 
 ## Prerequisites
 
-- [marp2video installed](../getting-started/installation.md)
+- [vac installed](../getting-started/installation.md)
 - [Marp CLI](https://github.com/marp-team/marp-cli) installed
 - [ffmpeg](https://ffmpeg.org/) installed
 - ElevenLabs API key (for TTS)
@@ -108,7 +108,7 @@ Convert your voiceover text to speech using ElevenLabs:
 
 ```bash
 # Parse the presentation and generate audio
-marp2video tts --input slides.md --output audio/en-US/
+vac tts --input slides.md --output audio/en-US/
 ```
 
 This creates:
@@ -127,10 +127,10 @@ audio/en-US/
 
 ```bash
 # Use a specific voice
-marp2video tts --input slides.md --output audio/en-US/ --voice "Rachel"
+vac tts --input slides.md --output audio/en-US/ --voice "Rachel"
 
 # Adjust speaking rate
-marp2video tts --input slides.md --output audio/en-US/ --stability 0.5 --similarity 0.75
+vac tts --input slides.md --output audio/en-US/ --stability 0.5 --similarity 0.75
 ```
 
 ## Step 3: Generate Video
@@ -138,7 +138,7 @@ marp2video tts --input slides.md --output audio/en-US/ --stability 0.5 --similar
 Create the video by combining slides with audio:
 
 ```bash
-marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/presentation.mp4
+vac video --input slides.md --manifest audio/en-US/manifest.json --output video/presentation.mp4
 ```
 
 This:
@@ -153,11 +153,11 @@ You can embed subtitles directly during video generation:
 
 ```bash
 # Embed subtitles (language auto-detected from filename)
-marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+vac video --input slides.md --manifest audio/en-US/manifest.json \
   --output video/presentation.mp4 --subtitles subtitles/en-US.srt
 
 # Explicitly specify subtitle language
-marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+vac video --input slides.md --manifest audio/en-US/manifest.json \
   --output video/presentation.mp4 --subtitles subtitles/en-US.srt --subtitles-lang en-US
 ```
 
@@ -167,7 +167,7 @@ Both SRT and VTT formats are supported. The language code is auto-detected from 
 
 ```bash
 # Add 500ms crossfade between slides
-marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+vac video --input slides.md --manifest audio/en-US/manifest.json \
   --output video/presentation.mp4 --transition 500
 ```
 
@@ -175,7 +175,7 @@ marp2video video --input slides.md --manifest audio/en-US/manifest.json \
 
 ```bash
 # Also export individual slide videos (for Udemy, etc.)
-marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+vac video --input slides.md --manifest audio/en-US/manifest.json \
   --output video/presentation.mp4 --output-individual video/slides/
 ```
 
@@ -184,7 +184,7 @@ marp2video video --input slides.md --manifest audio/en-US/manifest.json \
 Create subtitles from the audio using speech-to-text:
 
 ```bash
-marp2video subtitle --audio audio/en-US/
+vac subtitle --audio audio/en-US/
 ```
 
 This creates:
@@ -215,7 +215,7 @@ that can perceive their environment,
 ### Optional: Keep Individual Slide Subtitles
 
 ```bash
-marp2video subtitle --audio audio/en-US/ --individual
+vac subtitle --audio audio/en-US/ --individual
 ```
 
 ## Step 5: Embed Subtitles into Video
@@ -275,13 +275,13 @@ export ELEVENLABS_API_KEY="your-key"
 export DEEPGRAM_API_KEY="your-key"
 
 # 2. Generate audio
-marp2video tts --input slides.md --output audio/en-US/
+vac tts --input slides.md --output audio/en-US/
 
 # 3. Generate subtitles
-marp2video subtitle --audio audio/en-US/
+vac subtitle --audio audio/en-US/
 
 # 4. Generate video with embedded subtitles
-marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+vac video --input slides.md --manifest audio/en-US/manifest.json \
   --output video/presentation.mp4 --subtitles subtitles/en-US.srt
 ```
 
@@ -291,7 +291,7 @@ If you prefer to embed subtitles separately (e.g., to add multiple subtitle trac
 
 ```bash
 # Generate video without subtitles
-marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/presentation.mp4
+vac video --input slides.md --manifest audio/en-US/manifest.json --output video/presentation.mp4
 
 # Then embed subtitles (soft)
 ffmpeg -i video/presentation.mp4 -i subtitles/en-US.srt \
@@ -309,21 +309,21 @@ To create videos in multiple languages, see the [multi-language guide](multi-lan
 # (see transcript-schema reference)
 
 # Generate audio for each language
-marp2video tts --transcript transcript.json --output audio/en-US/ --lang en-US
-marp2video tts --transcript transcript.json --output audio/fr-FR/ --lang fr-FR
-marp2video tts --transcript transcript.json --output audio/zh-Hans/ --lang zh-Hans
+vac tts --transcript transcript.json --output audio/en-US/ --lang en-US
+vac tts --transcript transcript.json --output audio/fr-FR/ --lang fr-FR
+vac tts --transcript transcript.json --output audio/zh-Hans/ --lang zh-Hans
 
 # Generate subtitles for each language
-marp2video subtitle --audio audio/en-US/
-marp2video subtitle --audio audio/fr-FR/
-marp2video subtitle --audio audio/zh-Hans/
+vac subtitle --audio audio/en-US/
+vac subtitle --audio audio/fr-FR/
+vac subtitle --audio audio/zh-Hans/
 
 # Generate videos with embedded subtitles
-marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+vac video --input slides.md --manifest audio/en-US/manifest.json \
   --output video/en-US.mp4 --subtitles subtitles/en-US.srt
-marp2video video --input slides.md --manifest audio/fr-FR/manifest.json \
+vac video --input slides.md --manifest audio/fr-FR/manifest.json \
   --output video/fr-FR.mp4 --subtitles subtitles/fr-FR.srt
-marp2video video --input slides.md --manifest audio/zh-Hans/manifest.json \
+vac video --input slides.md --manifest audio/zh-Hans/manifest.json \
   --output video/zh-Hans.mp4 --subtitles subtitles/zh-Hans.srt
 ```
 
@@ -336,7 +336,7 @@ marp2video video --input slides.md --manifest audio/zh-Hans/manifest.json \
 echo $ELEVENLABS_API_KEY
 
 # Use verbose mode for debugging
-marp2video tts --input slides.md --output audio/en-US/ --verbose
+vac tts --input slides.md --output audio/en-US/ --verbose
 ```
 
 ### Video is blank or has timing issues
@@ -349,7 +349,7 @@ marp --version
 ffmpeg -version
 
 # Use verbose mode
-marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/test.mp4 --verbose
+vac video --input slides.md --manifest audio/en-US/manifest.json --output video/test.mp4 --verbose
 ```
 
 ### Subtitle timing is off

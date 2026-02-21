@@ -1,6 +1,6 @@
 # Pipeline Overview
 
-marp2video uses a 6-step pipeline to convert presentations to video.
+vac uses a 6-step pipeline to convert presentations to video.
 
 ## Pipeline Diagram
 
@@ -76,10 +76,10 @@ marp2video uses a 6-step pipeline to convert presentations to video.
 
 ## Working Directory
 
-During processing, marp2video creates a temporary working directory:
+During processing, vac creates a temporary working directory:
 
 ```
-/tmp/marp2video/
+/tmp/vac/
 ├── audio/
 │   ├── slide_000.mp3
 │   ├── slide_001.mp3

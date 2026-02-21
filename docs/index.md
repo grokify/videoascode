@@ -1,8 +1,8 @@
-# marp2video
+# vac
 
 **Transform Marp Markdown Presentations into Videos with AI Voiceovers**
 
-marp2video is a command-line tool that automates the conversion of [Marp](https://marp.app/) presentations into professional videos with AI-generated narration.
+vac is a command-line tool that automates the conversion of [Marp](https://marp.app/) presentations into professional videos with AI-generated narration.
 
 ## Features
 
@@ -22,10 +22,10 @@ marp2video is a command-line tool that automates the conversion of [Marp](https:
 
     ```bash
     # Simple: inline voiceover comments
-    marp2video slides video --input slides.md --output video.mp4
+    vac slides video --input slides.md --output video.mp4
 
     # Advanced: multi-language transcript
-    marp2video slides video --input slides.md \
+    vac slides video --input slides.md \
                --transcript transcript.json \
                --lang es-ES \
                --output video_spanish.mp4
@@ -35,14 +35,14 @@ marp2video is a command-line tool that automates the conversion of [Marp](https:
 
     ```bash
     # Record browser demo with voiceover
-    marp2video browser video --config demo.yaml --output demo.mp4
+    vac browser video --config demo.yaml --output demo.mp4
 
     # Multi-language with audio caching
-    marp2video browser video --config demo.yaml --output demo.mp4 \
+    vac browser video --config demo.yaml --output demo.mp4 \
                --audio-dir ./audio --lang en-US,fr-FR,zh-Hans
 
     # With subtitles burned in
-    marp2video browser video --config demo.yaml --output demo.mp4 \
+    vac browser video --config demo.yaml --output demo.mp4 \
                --subtitles --subtitles-burn
     ```
 
@@ -69,7 +69,7 @@ flowchart LR
 
 - :material-download: **[Installation](getting-started/installation.md)**
 
-    Install marp2video and its dependencies
+    Install vac and its dependencies
 
 - :material-rocket-launch: **[Quick Start](getting-started/quick-start.md)**
 

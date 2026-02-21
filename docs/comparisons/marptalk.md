@@ -1,4 +1,4 @@
-# marp2video vs marptalk
+# vac vs marptalk
 
 Two tools solving the same problem: converting [Marp](https://marp.app/) markdown presentations into narrated videos with AI-generated voiceovers. Both emerged from the same insight—that presentations are more effective when you can see slides and hear narration together—but took different paths to get there.
 
@@ -10,9 +10,9 @@ Two tools solving the same problem: converting [Marp](https://marp.app/) markdow
 
 See Jason's [original LinkedIn post](https://www.linkedin.com/posts/imjasonh_i-find-short-presentations-to-be-a-really-activity-7378140962096693248-h_Aw) introducing marptalk.
 
-### marp2video
+### vac
 
-marp2video grew from production needs at [AgentPlexus](https://github.com/agentplexus), which publishes many Marp presentations and wanted to turn them into narrated videos. The project also served as a way to exercise the [OmniVoice](https://github.com/agentplexus/omnivoice) libraries for multi-language and multi-provider TTS/STT workflows. Rather than being locked into a single provider, marp2video uses OmniVoice as a unified abstraction layer—allowing different providers for different languages or slides. A Chinese slide might use Deepgram while English slides use ElevenLabs, all in the same video. The tool also generates subtitles from actual audio transcription (STT) rather than estimating from word count, producing word-level timestamps and proper capitalization via dictionary-based correction.
+vac grew from production needs at [AgentPlexus](https://github.com/agentplexus), which publishes many Marp presentations and wanted to turn them into narrated videos. The project also served as a way to exercise the [OmniVoice](https://github.com/agentplexus/omnivoice) libraries for multi-language and multi-provider TTS/STT workflows. Rather than being locked into a single provider, vac uses OmniVoice as a unified abstraction layer—allowing different providers for different languages or slides. A Chinese slide might use Deepgram while English slides use ElevenLabs, all in the same video. The tool also generates subtitles from actual audio transcription (STT) rather than estimating from word count, producing word-level timestamps and proper capitalization via dictionary-based correction.
 
 ## Philosophy
 
@@ -20,7 +20,7 @@ The projects reflect different design philosophies:
 
 **marptalk** optimizes for rapid iteration and accessibility. Browser TTS fallback means you can preview presentations instantly without API keys. YouTube chapter markers are auto-generated. LLM-assisted drafting via GitHub Issues lets you generate first drafts from a topic description. It's designed for quick experimentation.
 
-**marp2video** optimizes for production workflows and flexibility. The decoupled architecture separates audio generation from video creation. JSON transcripts support per-slide voice overrides and multi-language content in a single file. Individual slide export targets platforms like Udemy. It's designed for complex, repeatable pipelines.
+**vac** optimizes for production workflows and flexibility. The decoupled architecture separates audio generation from video creation. JSON transcripts support per-slide voice overrides and multi-language content in a single file. Individual slide export targets platforms like Udemy. It's designed for complex, repeatable pipelines.
 
 Both tools demonstrate that with modern AI voice services, the gap between "slides with speaker notes" and "polished video content" can be bridged automatically.
 
@@ -30,7 +30,7 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 
 ### Overview
 
-| Aspect | marp2video | marptalk |
+| Aspect | vac | marptalk |
 |--------|------------|----------|
 | **Language** | Go | Node.js |
 | **License** | MIT | Apache-2.0 |
@@ -40,7 +40,7 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 
 ### TTS Provider Support
 
-| Feature | marp2video | marptalk |
+| Feature | vac | marptalk |
 |---------|------------|----------|
 | **ElevenLabs** | :white_check_mark: Primary | :x: |
 | **Google Cloud TTS** | :x: | :white_check_mark: Primary |
@@ -51,7 +51,7 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 
 ### Multi-Language Support
 
-| Feature | marp2video | marptalk |
+| Feature | vac | marptalk |
 |---------|------------|----------|
 | **Multi-language transcripts** | :white_check_mark: JSON with per-slide locales | :x: Single language per run |
 | **Locale codes** | BCP-47 (en-US, zh-Hans, etc.) | Language codes (en-US, es-ES) |
@@ -60,7 +60,7 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 
 ### Voiceover Input Format
 
-| Feature | marp2video | marptalk |
+| Feature | vac | marptalk |
 |---------|------------|----------|
 | **Inline HTML comments** | :white_check_mark: `<!-- voiceover text -->` | :white_check_mark: `<!-- speaker notes -->` |
 | **JSON transcript** | :white_check_mark: Structured, multi-language | :x: |
@@ -69,7 +69,7 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 
 ### Subtitle Generation
 
-| Feature | marp2video | marptalk |
+| Feature | vac | marptalk |
 |---------|------------|----------|
 | **SRT output** | :white_check_mark: | :white_check_mark: |
 | **VTT output** | :white_check_mark: | :x: |
@@ -80,7 +80,7 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 
 ### Video Generation
 
-| Feature | marp2video | marptalk |
+| Feature | vac | marptalk |
 |---------|------------|----------|
 | **Method** | Image-based (Marp PNG export) | Static slide screenshots |
 | **Audio sync** | Manifest-based (actual durations) | Audio file duration analysis |
@@ -92,7 +92,7 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 
 ### Workflow
 
-| Feature | marp2video | marptalk |
+| Feature | vac | marptalk |
 |---------|------------|----------|
 | **Decoupled TTS/Video** | :white_check_mark: Separate `tts` and `video` commands | :white_check_mark: `--generate-tts` flag |
 | **Audio manifest** | :white_check_mark: JSON with timing info | :x: |
@@ -101,7 +101,7 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 
 ## Unique Features
 
-### marp2video only
+### vac only
 
 - **OmniVoice provider abstraction** - Swap TTS/STT providers without code changes
 - **Mixed TTS providers** - Use ElevenLabs for some slides, Deepgram for others
@@ -121,11 +121,11 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 
 ## Architecture Comparison
 
-=== "marp2video (Go)"
+=== "vac (Go)"
 
     ```
-    marp2video/
-    ├── cmd/marp2video/
+    vac/
+    ├── cmd/vac/
     │   ├── tts.go
     │   ├── video.go
     │   └── subtitle.go
@@ -157,24 +157,24 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 | Use Case | Recommended |
 |----------|-------------|
 | Quick prototyping without API costs | **marptalk** (browser TTS fallback) |
-| High-quality production voices | **marp2video** (ElevenLabs) |
-| Multi-language presentations | **marp2video** (JSON transcripts) |
+| High-quality production voices | **vac** (ElevenLabs) |
+| Multi-language presentations | **vac** (JSON transcripts) |
 | YouTube publishing with chapters | **marptalk** |
-| Udemy course creation | **marp2video** (individual slide export) |
-| Mixed TTS providers | **marp2video** (OmniVoice) |
+| Udemy course creation | **vac** (individual slide export) |
+| Mixed TTS providers | **vac** (OmniVoice) |
 | Google Cloud ecosystem | **marptalk** |
-| Voice cloning | **marp2video** (ElevenLabs) |
+| Voice cloning | **vac** (ElevenLabs) |
 | LLM-assisted content creation | **marptalk** (GitHub Issues workflow) |
 
 ## Summary
 
-**marp2video** is more feature-rich for production workflows with its provider abstraction layer (OmniVoice), multi-language support, and STT-based subtitle generation. It handles complex scenarios like mixed audio sample rates from different TTS providers.
+**vac** is more feature-rich for production workflows with its provider abstraction layer (OmniVoice), multi-language support, and STT-based subtitle generation. It handles complex scenarios like mixed audio sample rates from different TTS providers.
 
 **marptalk** excels at rapid iteration with its browser TTS fallback and YouTube-focused features (chapter markers). Its LLM-assisted drafting workflow via GitHub Issues is innovative for content creation.
 
 ## Links
 
-- [marp2video on GitHub](https://github.com/grokify/marp2video)
+- [vac on GitHub](https://github.com/grokify/videoascode)
 - [marptalk on GitHub](https://github.com/imjasonh/marptalk)
 - [OmniVoice - TTS/STT abstraction layer](https://github.com/agentplexus/omnivoice)
 - [Marp - Markdown Presentation Ecosystem](https://marp.app/)

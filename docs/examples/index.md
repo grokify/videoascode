@@ -1,6 +1,6 @@
 # Examples
 
-Example presentations demonstrating marp2video features.
+Example presentations demonstrating vac features.
 
 ## Available Examples
 
@@ -24,7 +24,7 @@ examples/<name>/
 ### Using Inline Comments
 
 ```bash
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --output examples/intro/output.mp4
 ```
@@ -32,7 +32,7 @@ marp2video \
 ### Using Transcript (English)
 
 ```bash
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --transcript examples/intro/transcript.json \
   --output examples/intro/output_en-US.mp4
@@ -41,7 +41,7 @@ marp2video \
 ### Using Transcript (Spanish)
 
 ```bash
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --transcript examples/intro/transcript.json \
   --lang es-ES \
@@ -70,7 +70,7 @@ marp2video \
 
 4. Generate video:
    ```bash
-   marp2video \
+   vac \
      --input examples/my-example/presentation.md \
      --output examples/my-example/output.mp4
    ```

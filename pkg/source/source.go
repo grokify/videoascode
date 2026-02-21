@@ -3,8 +3,8 @@
 package source
 
 import (
-	"github.com/grokify/marp2video/pkg/segment"
-	"github.com/grokify/marp2video/pkg/transcript"
+	"github.com/grokify/videoascode/pkg/segment"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 // ContentSource represents a source of content that can be loaded into segments.

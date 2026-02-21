@@ -1,6 +1,6 @@
 # Contributing
 
-Guidelines for contributing to marp2video.
+Guidelines for contributing to vac.
 
 ## Getting Started
 
@@ -14,10 +14,10 @@ Guidelines for contributing to marp2video.
 ### Clone and Build
 
 ```bash
-git clone https://github.com/grokify/marp2video.git
-cd marp2video
+git clone https://github.com/grokify/videoascode.git
+cd vac
 go mod download
-go build -o marp2video ./cmd/marp2video
+go build -o vac ./cmd/vac
 ```
 
 ### Run Tests

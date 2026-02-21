@@ -118,7 +118,7 @@ Polished, engaging.
 
 ## OmniVoice Compatibility
 
-marp2video's VoiceConfig aligns with OmniVoice's SynthesisConfig:
+vac's VoiceConfig aligns with OmniVoice's SynthesisConfig:
 
 ```go
 type SynthesisConfig struct {

@@ -3,7 +3,7 @@ package video
 import (
 	"context"
 
-	"github.com/grokify/marp2video/pkg/segment"
+	"github.com/grokify/videoascode/pkg/segment"
 )
 
 // VideoProvider creates videos from segments.

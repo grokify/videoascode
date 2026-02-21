@@ -1,6 +1,6 @@
 # Voiceover Formats
 
-marp2video supports two formats for defining voiceovers.
+vac supports two formats for defining voiceovers.
 
 ## Inline Comments (Simple)
 
@@ -96,7 +96,7 @@ Use a separate `transcript.json` file for advanced features:
 ### Usage
 
 ```bash
-marp2video \
+vac \
   --input slides.md \
   --transcript transcript.json \
   --lang es-ES \

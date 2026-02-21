@@ -12,8 +12,8 @@ import (
 
 	"github.com/grokify/mogo/log/slogutil"
 
-	omnistt "github.com/grokify/marp2video/pkg/omnivoice/stt"
-	"github.com/grokify/marp2video/pkg/transcript"
+	omnistt "github.com/grokify/videoascode/pkg/omnivoice/stt"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 // SubtitleFormat specifies the subtitle output format.

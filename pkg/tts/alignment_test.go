@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	omnistt "github.com/grokify/marp2video/pkg/omnivoice/stt"
+	omnistt "github.com/grokify/videoascode/pkg/omnivoice/stt"
 )
 
 func TestSplitIntoWords(t *testing.T) {

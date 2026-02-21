@@ -4,7 +4,7 @@ Technical architecture and design decisions.
 
 ## Overview
 
-marp2video follows a pipeline architecture with distinct stages:
+vac follows a pipeline architecture with distinct stages:
 
 ```
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
@@ -17,8 +17,8 @@ marp2video follows a pipeline architecture with distinct stages:
 ## Package Structure
 
 ```
-marp2video/
-├── cmd/marp2video/     # CLI entry point
+vac/
+├── cmd/vac/     # CLI entry point
 │   └── main.go
 ├── pkg/
 │   ├── orchestrator/   # Pipeline coordination

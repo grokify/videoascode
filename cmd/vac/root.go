@@ -15,9 +15,9 @@ const version = "0.2.0"
 var verbose bool
 
 var rootCmd = &cobra.Command{
-	Use:   "marp2video",
+	Use:   "vac",
 	Short: "Convert Marp presentations and browser demos to video with AI voiceovers",
-	Long: `marp2video creates professional videos with AI-generated voiceovers.
+	Long: `vac (VideoAsCode) creates professional videos with AI-generated voiceovers.
 
 Two main workflows:
 
@@ -30,24 +30,24 @@ Additional commands:
 
 Examples:
   # Marp slides: full pipeline
-  marp2video slides video --input slides.md --output video.mp4
+  vac slides video --input slides.md --output video.mp4
 
   # Marp slides: generate audio only
-  marp2video slides tts --transcript transcript.json --output audio/
+  vac slides tts --transcript transcript.json --output audio/
 
   # Browser: record with voiceover
-  marp2video browser video --config demo.yaml --output demo.mp4
+  vac browser video --config demo.yaml --output demo.mp4
 
   # Browser: silent recording
-  marp2video browser record --url https://example.com --steps demo.json --output demo.mp4
+  vac browser record --url https://example.com --steps demo.json --output demo.mp4
 
   # Generate subtitles
-  marp2video subtitle --audio audio/en-US/`,
+  vac subtitle --audio audio/en-US/`,
 	Version: version,
 }
 
 func init() {
-	rootCmd.SetVersionTemplate("marp2video version {{.Version}}\n")
+	rootCmd.SetVersionTemplate("vac version {{.Version}}\n")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "V", false, "Enable verbose logging")
 }
 

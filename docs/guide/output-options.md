@@ -7,7 +7,7 @@ Configure video output for different platforms.
 Generate a single video file with all slides:
 
 ```bash
-marp2video \
+vac \
   --input slides.md \
   --output video.mp4
 ```
@@ -17,7 +17,7 @@ marp2video \
 Add crossfade transitions between slides:
 
 ```bash
-marp2video \
+vac \
   --input slides.md \
   --output video.mp4 \
   --transition 0.5
@@ -30,7 +30,7 @@ The `--transition` value is in seconds (0.5 = half second crossfade).
 Export each slide as a separate video file:
 
 ```bash
-marp2video \
+vac \
   --input slides.md \
   --output combined.mp4 \
   --output-individual ./lectures/
@@ -54,7 +54,7 @@ lectures/
 Generate combined and individual videos:
 
 ```bash
-marp2video \
+vac \
   --input slides.md \
   --output youtube_video.mp4 \
   --output-individual ./udemy_videos/ \
@@ -80,11 +80,11 @@ All videos are encoded with platform-optimized settings:
 
 ```bash
 # 720p
-marp2video --input slides.md --output video.mp4 \
+vac --input slides.md --output video.mp4 \
   --width 1280 --height 720
 
 # 4K
-marp2video --input slides.md --output video.mp4 \
+vac --input slides.md --output video.mp4 \
   --width 3840 --height 2160
 ```
 
@@ -92,10 +92,10 @@ marp2video --input slides.md --output video.mp4 \
 
 ```bash
 # 24fps (cinematic)
-marp2video --input slides.md --output video.mp4 --fps 24
+vac --input slides.md --output video.mp4 --fps 24
 
 # 60fps (smooth)
-marp2video --input slides.md --output video.mp4 --fps 60
+vac --input slides.md --output video.mp4 --fps 60
 ```
 
 ## Platform Compatibility

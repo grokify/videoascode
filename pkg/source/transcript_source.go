@@ -3,8 +3,8 @@ package source
 import (
 	"fmt"
 
-	"github.com/grokify/marp2video/pkg/segment"
-	"github.com/grokify/marp2video/pkg/transcript"
+	"github.com/grokify/videoascode/pkg/segment"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 // TranscriptSource loads content from a transcript JSON file.

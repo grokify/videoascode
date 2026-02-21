@@ -3,9 +3,9 @@ package source
 import (
 	"fmt"
 
-	"github.com/grokify/marp2video/pkg/config"
-	"github.com/grokify/marp2video/pkg/segment"
-	"github.com/grokify/marp2video/pkg/transcript"
+	"github.com/grokify/videoascode/pkg/config"
+	"github.com/grokify/videoascode/pkg/segment"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 // ConfigSource loads content from a unified config file (YAML/JSON).

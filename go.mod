@@ -1,4 +1,4 @@
-module github.com/grokify/marp2video
+module github.com/grokify/videoascode
 
 go 1.25.5
 

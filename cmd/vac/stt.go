@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	omnistt "github.com/grokify/marp2video/pkg/omnivoice/stt"
-	"github.com/grokify/marp2video/pkg/tts"
 	"github.com/grokify/mogo/fmt/progress"
+	omnistt "github.com/grokify/videoascode/pkg/omnivoice/stt"
+	"github.com/grokify/videoascode/pkg/tts"
 	"github.com/spf13/cobra"
 )
 

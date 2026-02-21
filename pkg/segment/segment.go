@@ -4,7 +4,7 @@
 package segment
 
 import (
-	"github.com/grokify/marp2video/pkg/transcript"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 // SourceType identifies the content source type

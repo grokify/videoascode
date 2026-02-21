@@ -9,13 +9,13 @@ import (
 	"sort"
 	"time"
 
-	"github.com/grokify/marp2video/pkg/audio"
-	omnitts "github.com/grokify/marp2video/pkg/omnivoice/tts"
-	"github.com/grokify/marp2video/pkg/parser"
-	"github.com/grokify/marp2video/pkg/renderer"
-	"github.com/grokify/marp2video/pkg/tts"
-	"github.com/grokify/marp2video/pkg/video"
 	"github.com/grokify/mogo/fmt/progress"
+	"github.com/grokify/videoascode/pkg/audio"
+	omnitts "github.com/grokify/videoascode/pkg/omnivoice/tts"
+	"github.com/grokify/videoascode/pkg/parser"
+	"github.com/grokify/videoascode/pkg/renderer"
+	"github.com/grokify/videoascode/pkg/tts"
+	"github.com/grokify/videoascode/pkg/video"
 )
 
 // Config holds orchestrator configuration
@@ -54,7 +54,7 @@ func NewOrchestrator(config Config) *Orchestrator {
 		config.FrameRate = 30
 	}
 	if config.WorkDir == "" {
-		config.WorkDir = filepath.Join(os.TempDir(), "marp2video")
+		config.WorkDir = filepath.Join(os.TempDir(), "videoascode")
 	}
 
 	o := &Orchestrator{config: config}

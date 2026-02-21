@@ -9,7 +9,7 @@ Customize voice, video, and output settings.
 Set via command line:
 
 ```bash
-marp2video \
+vac \
   --input slides.md \
   --voice pNInz6obpgDQGcFmaJgB \
   --output video.mp4
@@ -113,7 +113,7 @@ Auto-detected, but can be overridden:
 ffmpeg -f avfoundation -list_devices true -i ""
 
 # Use specific device
-marp2video --input slides.md --output video.mp4 \
+vac --input slides.md --output video.mp4 \
   --screen-device "4:none"
 ```
 
@@ -122,7 +122,7 @@ marp2video --input slides.md --output video.mp4 \
 Customize temp file location:
 
 ```bash
-marp2video --input slides.md --output video.mp4 \
+vac --input slides.md --output video.mp4 \
   --workdir /path/to/workdir
 ```
 

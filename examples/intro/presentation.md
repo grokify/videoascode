@@ -33,19 +33,19 @@ style: |
   }
 ---
 
-# marp2video
+# vac
 
 ## Transform Markdown Presentations into Videos with AI Voiceovers
 
 <!--
-Welcome to marp2video, a command-line tool that transforms your Marp markdown presentations into professional videos with AI-generated voiceovers.
+Welcome to vac, a command-line tool that transforms your Marp markdown presentations into professional videos with AI-generated voiceovers.
 [PAUSE:500]
-In this presentation, we'll explore what marp2video can do and how to use it.
+In this presentation, we'll explore what vac can do and how to use it.
 -->
 
 ---
 
-# What is marp2video?
+# What is vac?
 
 - **Marp** presentations + **ElevenLabs** TTS = **Video**
 - Automates the entire workflow:
@@ -71,7 +71,7 @@ Creating video content from presentations typically requires:
 3. Video editing tools
 4. Hours of manual work
 
-**marp2video automates all of this.**
+**vac automates all of this.**
 
 <!--
 Creating video tutorials or course content traditionally requires significant effort.
@@ -161,7 +161,7 @@ This helps create natural breaks in the narration.
 
 ```bash
 # Install the CLI
-go install github.com/grokify/marp2video/cmd/marp2video@latest
+go install github.com/grokify/videoascode/cmd/vac@latest
 
 # Requirements:
 # - Marp CLI (npm install -g @marp-team/marp-cli)
@@ -170,7 +170,7 @@ go install github.com/grokify/marp2video/cmd/marp2video@latest
 ```
 
 <!--
-To install marp2video, use Go's install command.
+To install vac, use Go's install command.
 [PAUSE:300]
 You'll also need the Marp CLI from npm, ffmpeg for video processing, and an ElevenLabs API key for the text-to-speech functionality.
 -->
@@ -184,11 +184,11 @@ You'll also need the Marp CLI from npm, ffmpeg for video processing, and an Elev
 export ELEVENLABS_API_KEY="your-key-here"
 
 # Generate video from presentation
-marp2video --input slides.md --output video.mp4
+vac --input slides.md --output video.mp4
 ```
 
 <!--
-Using marp2video is straightforward.
+Using vac is straightforward.
 [PAUSE:300]
 Set your ElevenLabs API key as an environment variable, then run the command with your input markdown file and desired output path.
 -->
@@ -199,15 +199,15 @@ Set your ElevenLabs API key as an environment variable, then run the command wit
 
 ```bash
 # Combined video for YouTube
-marp2video --input slides.md --output video.mp4
+vac --input slides.md --output video.mp4
 
 # Individual videos for Udemy courses
-marp2video --input slides.md \
+vac --input slides.md \
            --output combined.mp4 \
            --output-individual ./lessons/
 
 # With slide transitions
-marp2video --input slides.md \
+vac --input slides.md \
            --output video.mp4 \
            --transition 0.5
 ```
@@ -258,16 +258,16 @@ Any scenario where you need to turn slides into video content.
 
 # This Presentation
 
-**Fun fact:** This video was created using marp2video!
+**Fun fact:** This video was created using vac!
 
 ```bash
 # Using inline comments:
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --output examples/intro/output.mp4
 
 # Or using transcript.json for multi-language:
-marp2video \
+vac \
   --input examples/intro/presentation.md \
   --transcript examples/intro/transcript.json \
   --lang es \
@@ -279,7 +279,7 @@ A self-documenting example.
 <!--
 Here's something meta.
 [PAUSE:300]
-This very presentation was converted to video using marp2video itself.
+This very presentation was converted to video using vac itself.
 [PAUSE:500]
 It's a self-contained, self-documenting example of what the tool can do.
 -->
@@ -291,10 +291,10 @@ It's a self-contained, self-documenting example of what the tool can do.
 1. Install the prerequisites
 2. Write your Marp presentation
 3. Add voiceover comments
-4. Run marp2video
+4. Run vac
 5. Share your video!
 
-**Repository:** `github.com/grokify/marp2video`
+**Repository:** `github.com/grokify/videoascode`
 
 <!--
 Getting started is easy.

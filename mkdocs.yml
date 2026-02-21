@@ -1,8 +1,8 @@
-site_name: marp2video
+site_name: VideoAsCode
 site_description: Convert Marp presentations to videos with AI voiceovers
-site_url: https://grokify.github.io/marp2video
-repo_url: https://github.com/grokify/marp2video
-repo_name: grokify/marp2video
+site_url: https://grokify.github.io/videoascode
+repo_url: https://github.com/grokify/videoascode
+repo_name: grokify/videoascode
 
 theme:
   name: material
@@ -92,4 +92,4 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/grokify/marp2video
+      link: https://github.com/grokify/videoascode
