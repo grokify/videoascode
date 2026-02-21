@@ -37,10 +37,10 @@ func TestNewImageVideoConverter_DefaultFrameRate(t *testing.T) {
 	}
 }
 
-func TestGetAudioDuration_NonexistentFile(t *testing.T) {
-	_, err := getAudioDuration("/nonexistent/audio.mp3")
+func TestGetAudioDurationSeconds_NonexistentFile(t *testing.T) {
+	_, err := getAudioDurationSeconds("/nonexistent/audio.mp3")
 	if err == nil {
-		t.Error("getAudioDuration() with nonexistent file should return error")
+		t.Error("getAudioDurationSeconds() with nonexistent file should return error")
 	}
 }
 

@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"time"
+
+	"github.com/grokify/ffutil"
 )
 
 // ImageVideoConfig holds configuration for image-to-video conversion
@@ -32,15 +33,13 @@ func NewImageVideoConverter(config ImageVideoConfig) *ImageVideoConverter {
 
 // CreateSlideVideo creates a video from a static image and audio file
 func (c *ImageVideoConverter) CreateSlideVideo(ctx context.Context, slideIndex int, imagePath, audioPath string, duration time.Duration) (string, error) {
-	_ = ctx // reserved for future use
-
 	// Ensure output directory exists
 	if err := os.MkdirAll(c.config.OutputDir, 0755); err != nil {
 		return "", fmt.Errorf("failed to create output directory: %w", err)
 	}
 
 	// Get actual audio duration using ffprobe for precise timing
-	audioDuration, err := getAudioDuration(audioPath)
+	audioDuration, err := getAudioDurationSeconds(audioPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to get audio duration: %w", err)
 	}
@@ -54,41 +53,24 @@ func (c *ImageVideoConverter) CreateSlideVideo(ctx context.Context, slideIndex i
 	// Build ffmpeg command to create video from static image with audio
 	// -loop 1: loop the image
 	// -t: explicit duration matching audio length
-	args := []string{
-		"-loop", "1",
-		"-i", imagePath,
-		"-i", audioPath,
-		"-c:v", codec,
-	}
-	args = append(args, codecArgs...)
+	cmd := ffutil.New().
+		InputImage(imagePath, c.config.FrameRate).
+		Input(audioPath).
+		VideoCodec(codec).
+		Args(codecArgs...).
+		AudioCodec("aac").
+		AudioBitrate("192k").
+		PixelFormat("yuv420p").
+		Duration(audioDuration).
+		Output(outputPath)
+
 	// Add stillimage tune only for libx264
 	if codec == "libx264" {
-		args = append(args, "-tune", "stillimage")
+		cmd.Args("-tune", "stillimage")
 	}
-	args = append(args,
-		"-c:a", "aac",
-		"-b:a", "192k",
-		"-pix_fmt", "yuv420p",
-		"-t", fmt.Sprintf("%.6f", audioDuration),
-		"-y",
-		outputPath,
-	)
 
-	cmd := exec.Command("ffmpeg", args...)
-
-	// Show debug output if enabled - use Run() instead of CombinedOutput()
-	// since we're redirecting stdout/stderr directly
-	if os.Getenv("MARP2VIDEO_DEBUG") != "" {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
-			return "", fmt.Errorf("ffmpeg failed: %w", err)
-		}
-	} else {
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return "", fmt.Errorf("ffmpeg failed: %w\nOutput: %s", err, string(output))
-		}
+	if err := cmd.Run(ctx); err != nil {
+		return "", fmt.Errorf("ffmpeg failed: %w", err)
 	}
 
 	return outputPath, nil
@@ -96,15 +78,13 @@ func (c *ImageVideoConverter) CreateSlideVideo(ctx context.Context, slideIndex i
 
 // CreateSlideVideoWithSize creates a video with specific dimensions
 func (c *ImageVideoConverter) CreateSlideVideoWithSize(ctx context.Context, slideIndex int, imagePath, audioPath string, duration time.Duration, width, height int) (string, error) {
-	_ = ctx // reserved for future use
-
 	// Ensure output directory exists
 	if err := os.MkdirAll(c.config.OutputDir, 0755); err != nil {
 		return "", fmt.Errorf("failed to create output directory: %w", err)
 	}
 
 	// Get actual audio duration using ffprobe for precise timing
-	audioDuration, err := getAudioDuration(audioPath)
+	audioDuration, err := getAudioDurationSeconds(audioPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to get audio duration: %w", err)
 	}
@@ -119,68 +99,36 @@ func (c *ImageVideoConverter) CreateSlideVideoWithSize(ctx context.Context, slid
 	encConfig := GetGlobalEncoderConfig()
 	encCodec, encCodecArgs := GetVideoCodec(encConfig)
 
-	// Use explicit -t with audio duration for precise video length
-	// -shortest doesn't work reliably with -loop 1 on images
-	args := []string{
-		"-loop", "1",
-		"-i", imagePath,
-		"-i", audioPath,
-		"-vf", scaleFilter,
-		"-c:v", encCodec,
-	}
-	args = append(args, encCodecArgs...)
+	// Build ffmpeg command using ffutil
+	cmd := ffutil.New().
+		InputImage(imagePath, c.config.FrameRate).
+		Input(audioPath).
+		VideoFilter(scaleFilter).
+		VideoCodec(encCodec).
+		Args(encCodecArgs...).
+		AudioCodec("aac").
+		AudioBitrate("192k").
+		PixelFormat("yuv420p").
+		Duration(audioDuration).
+		Output(outputPath)
+
 	// Add stillimage tune only for libx264
 	if encCodec == "libx264" {
-		args = append(args, "-tune", "stillimage")
+		cmd.Args("-tune", "stillimage")
 	}
-	args = append(args,
-		"-c:a", "aac",
-		"-b:a", "192k",
-		"-pix_fmt", "yuv420p",
-		"-t", fmt.Sprintf("%.6f", audioDuration),
-		"-y",
-		outputPath,
-	)
 
-	cmd := exec.Command("ffmpeg", args...)
-
-	// Show debug output if enabled - use Run() instead of CombinedOutput()
-	// since we're redirecting stdout/stderr directly
-	if os.Getenv("MARP2VIDEO_DEBUG") != "" {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
-			return "", fmt.Errorf("ffmpeg failed: %w", err)
-		}
-	} else {
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return "", fmt.Errorf("ffmpeg failed: %w\nOutput: %s", err, string(output))
-		}
+	if err := cmd.Run(ctx); err != nil {
+		return "", fmt.Errorf("ffmpeg failed: %w", err)
 	}
 
 	return outputPath, nil
 }
 
-// getAudioDuration uses ffprobe to get the exact duration of an audio file in seconds
-func getAudioDuration(audioPath string) (float64, error) {
-	cmd := exec.Command("ffprobe",
-		"-v", "error",
-		"-show_entries", "format=duration",
-		"-of", "default=noprint_wrappers=1:nokey=1",
-		audioPath,
-	)
-
-	output, err := cmd.Output()
+// getAudioDurationSeconds uses ffprobe to get the exact duration of an audio file in seconds
+func getAudioDurationSeconds(audioPath string) (float64, error) {
+	dur, err := ffutil.Duration(audioPath)
 	if err != nil {
-		return 0, fmt.Errorf("ffprobe failed: %w", err)
+		return 0, err
 	}
-
-	var seconds float64
-	_, err = fmt.Sscanf(string(output), "%f", &seconds)
-	if err != nil {
-		return 0, fmt.Errorf("failed to parse duration: %w", err)
-	}
-
-	return seconds, nil
+	return dur.Seconds(), nil
 }

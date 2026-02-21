@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
+	"github.com/grokify/ffutil"
 	"github.com/grokify/mogo/log/slogutil"
 )
 
@@ -33,15 +33,6 @@ func (c *Combiner) CombineVideos(ctx context.Context, videoPaths []string, outpu
 		return copyFile(videoPaths[0], outputPath)
 	}
 
-	// Build ffmpeg command with filter_complex concat
-	// This properly handles mixed audio formats by re-encoding
-	args := []string{}
-
-	// Add all input files
-	for _, path := range videoPaths {
-		args = append(args, "-i", path)
-	}
-
 	// Build the concat filter
 	// [0:v][0:a][1:v][1:a]...[n:v][n:a]concat=n=N:v=1:a=1[outv][outa]
 	var filterParts strings.Builder
@@ -54,25 +45,23 @@ func (c *Combiner) CombineVideos(ctx context.Context, videoPaths []string, outpu
 	encoderConfig := GetGlobalEncoderConfig()
 	codec, codecArgs := GetVideoCodec(encoderConfig)
 
-	args = append(args,
-		"-filter_complex", filterParts.String(),
-		"-map", "[outv]",
-		"-map", "[outa]",
-		"-c:v", codec,
-	)
-	args = append(args, codecArgs...)
-	args = append(args,
-		"-c:a", "aac",
-		"-b:a", "192k",
-		"-ar", "44100",
-		"-y",
-		outputPath,
-	)
+	// Build command using ffutil
+	cmd := ffutil.New()
+	for _, path := range videoPaths {
+		cmd.Input(path)
+	}
+	cmd.FilterComplex(filterParts.String()).
+		Args("-map", "[outv]").
+		Args("-map", "[outa]").
+		VideoCodec(codec).
+		Args(codecArgs...).
+		AudioCodec("aac").
+		AudioBitrate("192k").
+		AudioRate(44100).
+		Output(outputPath)
 
-	cmd := exec.Command("ffmpeg", args...)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("ffmpeg concat failed: %w\nOutput: %s", err, string(output))
+	if err := cmd.Run(ctx); err != nil {
+		return fmt.Errorf("ffmpeg concat failed: %w", err)
 	}
 
 	return nil
@@ -99,14 +88,6 @@ func (c *Combiner) CombineVideosWithTransitions(ctx context.Context, videoPaths 
 			return fmt.Errorf("failed to get duration of video %d: %w", i, err)
 		}
 		durations[i] = dur
-	}
-
-	// Build ffmpeg command with xfade filter
-	args := []string{}
-
-	// Add all input files
-	for _, path := range videoPaths {
-		args = append(args, "-i", path)
 	}
 
 	// Build the complex filter graph for video
@@ -166,53 +147,36 @@ func (c *Combiner) CombineVideosWithTransitions(ctx context.Context, videoPaths 
 	encConfig := GetGlobalEncoderConfig()
 	encCodec, encCodecArgs := GetVideoCodec(encConfig)
 
-	args = append(args,
-		"-filter_complex", filterComplex,
-		"-map", finalVideoLabel,
-		"-map", finalAudioLabel,
-		"-c:v", encCodec,
-	)
-	args = append(args, encCodecArgs...)
-	args = append(args,
-		"-c:a", "aac",
-		"-b:a", "192k",
-		"-y",
-		outputPath,
-	)
+	// Build command using ffutil
+	cmd := ffutil.New()
+	for _, path := range videoPaths {
+		cmd.Input(path)
+	}
+	cmd.FilterComplex(filterComplex).
+		Args("-map", finalVideoLabel).
+		Args("-map", finalAudioLabel).
+		VideoCodec(encCodec).
+		Args(encCodecArgs...).
+		AudioCodec("aac").
+		AudioBitrate("192k").
+		Output(outputPath)
 
-	cmd := exec.Command("ffmpeg", args...)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
+	if err := cmd.Run(ctx); err != nil {
 		// If xfade fails (e.g., older ffmpeg), fall back to simple concatenation
 		logger.Warn("xfade transition failed, falling back to simple concatenation", "error", err)
 		return c.CombineVideos(ctx, videoPaths, outputPath)
 	}
-	_ = output
 
 	return nil
 }
 
 // GetVideoDuration gets the duration of a video file using ffprobe
 func GetVideoDuration(videoPath string) (float64, error) {
-	cmd := exec.Command("ffprobe",
-		"-v", "error",
-		"-show_entries", "format=duration",
-		"-of", "default=noprint_wrappers=1:nokey=1",
-		videoPath,
-	)
-
-	output, err := cmd.Output()
+	dur, err := ffutil.Duration(videoPath)
 	if err != nil {
-		return 0, fmt.Errorf("ffprobe failed: %w", err)
+		return 0, err
 	}
-
-	var duration float64
-	_, err = fmt.Sscanf(string(output), "%f", &duration)
-	if err != nil {
-		return 0, fmt.Errorf("failed to parse duration: %w", err)
-	}
-
-	return duration, nil
+	return dur.Seconds(), nil
 }
 
 // copyFile copies a file from src to dst

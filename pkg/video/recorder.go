@@ -9,6 +9,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/grokify/ffutil"
 )
 
 // RecorderConfig holds video recording configuration
@@ -221,8 +223,7 @@ func (r *Recorder) buildWindowsCommand(outputPath, audioPath string, duration ti
 
 // CheckFFmpeg verifies that ffmpeg is installed
 func CheckFFmpeg() error {
-	cmd := exec.Command("ffmpeg", "-version")
-	if err := cmd.Run(); err != nil {
+	if !ffutil.FFmpegAvailable() {
 		return fmt.Errorf("ffmpeg not found. Please install ffmpeg")
 	}
 	return nil

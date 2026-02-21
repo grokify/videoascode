@@ -1,6 +1,6 @@
 module github.com/grokify/marp2video
 
-go 1.25.0
+go 1.25.5
 
 require (
 	github.com/agentplexus/go-elevenlabs v0.8.1
@@ -8,6 +8,7 @@ require (
 	github.com/agentplexus/omnivoice-deepgram v0.3.0
 	github.com/go-rod/rod v0.116.2
 	github.com/google/uuid v1.6.0
+	github.com/grokify/ffutil v0.1.0
 	github.com/grokify/mogo v0.73.2
 	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v3 v3.0.1

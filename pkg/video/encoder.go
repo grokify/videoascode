@@ -1,11 +1,10 @@
 package video
 
 import (
-	"context"
-	"os/exec"
 	"runtime"
-	"strings"
 	"sync"
+
+	"github.com/grokify/ffutil"
 )
 
 // EncoderType represents the type of video encoder to use.
@@ -117,48 +116,35 @@ func getHardwareEncoder() (codec string, args []string, available bool) {
 
 // detectHardwareEncoder probes FFmpeg to find available hardware encoders.
 func detectHardwareEncoder() (codec string, args []string, available bool) {
-	ctx := context.Background()
-
 	// Check platform-specific encoders
 	switch runtime.GOOS {
 	case "darwin":
 		// macOS: VideoToolbox
-		if checkEncoder(ctx, "h264_videotoolbox") {
+		if ffutil.EncoderAvailable("h264_videotoolbox") {
 			return "h264_videotoolbox", []string{"-q:v", "65"}, true
 		}
 	case "linux":
 		// Linux: NVIDIA NVENC (most common), then VAAPI
-		if checkEncoder(ctx, "h264_nvenc") {
+		if ffutil.EncoderAvailable("h264_nvenc") {
 			return "h264_nvenc", []string{"-preset", "p4", "-tune", "ll"}, true
 		}
-		if checkEncoder(ctx, "h264_vaapi") {
+		if ffutil.EncoderAvailable("h264_vaapi") {
 			return "h264_vaapi", []string{"-qp", "23"}, true
 		}
 	case "windows":
 		// Windows: NVIDIA NVENC, then AMD AMF, then Intel QSV
-		if checkEncoder(ctx, "h264_nvenc") {
+		if ffutil.EncoderAvailable("h264_nvenc") {
 			return "h264_nvenc", []string{"-preset", "p4", "-tune", "ll"}, true
 		}
-		if checkEncoder(ctx, "h264_amf") {
+		if ffutil.EncoderAvailable("h264_amf") {
 			return "h264_amf", []string{"-quality", "speed"}, true
 		}
-		if checkEncoder(ctx, "h264_qsv") {
+		if ffutil.EncoderAvailable("h264_qsv") {
 			return "h264_qsv", []string{"-preset", "fast"}, true
 		}
 	}
 
 	return "", nil, false
-}
-
-// checkEncoder tests if an encoder is available in FFmpeg.
-func checkEncoder(ctx context.Context, encoder string) bool {
-	// Try to get encoder info
-	cmd := exec.CommandContext(ctx, "ffmpeg", "-hide_banner", "-encoders")
-	output, err := cmd.Output()
-	if err != nil {
-		return false
-	}
-	return strings.Contains(string(output), encoder)
 }
 
 // GetEncoderDescription returns a human-readable description of the encoder being used.

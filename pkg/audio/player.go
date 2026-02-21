@@ -1,10 +1,13 @@
 package audio
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"path/filepath"
 	"time"
+
+	"github.com/grokify/ffutil"
 )
 
 // Player handles audio playback
@@ -17,25 +20,7 @@ func NewPlayer() *Player {
 
 // GetDuration gets the duration of an audio file using ffprobe
 func (p *Player) GetDuration(audioPath string) (time.Duration, error) {
-	cmd := exec.Command("ffprobe",
-		"-v", "error",
-		"-show_entries", "format=duration",
-		"-of", "default=noprint_wrappers=1:nokey=1",
-		audioPath,
-	)
-
-	output, err := cmd.Output()
-	if err != nil {
-		return 0, fmt.Errorf("ffprobe failed: %w", err)
-	}
-
-	var seconds float64
-	_, err = fmt.Sscanf(string(output), "%f", &seconds)
-	if err != nil {
-		return 0, fmt.Errorf("failed to parse duration: %w", err)
-	}
-
-	return time.Duration(seconds * float64(time.Second)), nil
+	return ffutil.Duration(audioPath)
 }
 
 // Play plays an audio file (blocking)
@@ -66,18 +51,18 @@ func (p *Player) PadToLength(audioPath string, targetDuration time.Duration, out
 	nameWithoutExt := baseName[:len(baseName)-len(ext)]
 	outputPath := filepath.Join(outputDir, nameWithoutExt+"_padded.m4a")
 
+	ctx := context.Background()
+
 	// If audio is already long enough, just convert to m4a (for consistency)
 	if currentDuration >= targetDuration {
-		cmd := exec.Command("ffmpeg",
-			"-i", audioPath,
-			"-c:a", "aac",
-			"-b:a", "192k",
-			"-y",
-			outputPath,
-		)
-		output, err := cmd.CombinedOutput()
+		err := ffutil.New().
+			Input(audioPath).
+			AudioCodec("aac").
+			AudioBitrate("192k").
+			Output(outputPath).
+			Run(ctx)
 		if err != nil {
-			return "", fmt.Errorf("ffmpeg conversion failed: %w\nOutput: %s", err, string(output))
+			return "", fmt.Errorf("ffmpeg conversion failed: %w", err)
 		}
 		return outputPath, nil
 	}
@@ -87,18 +72,15 @@ func (p *Player) PadToLength(audioPath string, targetDuration time.Duration, out
 	targetSeconds := targetDuration.Seconds()
 	apadFilter := fmt.Sprintf("apad=whole_dur=%.3f", targetSeconds)
 
-	cmd := exec.Command("ffmpeg",
-		"-i", audioPath,
-		"-af", apadFilter,
-		"-c:a", "aac",
-		"-b:a", "192k",
-		"-y",
-		outputPath,
-	)
-
-	output, err := cmd.CombinedOutput()
+	err = ffutil.New().
+		Input(audioPath).
+		AudioFilter(apadFilter).
+		AudioCodec("aac").
+		AudioBitrate("192k").
+		Output(outputPath).
+		Run(ctx)
 	if err != nil {
-		return "", fmt.Errorf("ffmpeg padding failed: %w\nOutput: %s", err, string(output))
+		return "", fmt.Errorf("ffmpeg padding failed: %w", err)
 	}
 
 	return outputPath, nil

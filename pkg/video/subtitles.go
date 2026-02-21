@@ -1,11 +1,12 @@
 package video
 
 import (
+	"context"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/grokify/ffutil"
 	"github.com/grokify/mogo/os/osutil"
 )
 
@@ -202,26 +203,22 @@ func EmbedSubtitles(videoPath, subtitlePath, language, outputPath string) error 
 		return fmt.Errorf("invalid output path: %w", err)
 	}
 
-	// Build ffmpeg command
+	// Build ffmpeg command using ffutil
 	// -c:v copy - copy video stream without re-encoding
 	// -c:a copy - copy audio stream without re-encoding
 	// -c:s mov_text - encode subtitles for MP4 container
 	// -metadata:s:s:0 language=XXX - set subtitle track language
-	//nolint:gosec // G204: paths sanitized via SanitizePath above
-	cmd := exec.Command("ffmpeg",
-		"-i", videoPath,
-		"-i", subtitlePath,
-		"-c:v", "copy",
-		"-c:a", "copy",
-		"-c:s", "mov_text",
-		"-metadata:s:s:0", fmt.Sprintf("language=%s", language),
-		"-y",
-		outputPath,
-	)
-
-	output, err := cmd.CombinedOutput()
+	err = ffutil.New().
+		Input(videoPath).
+		Input(subtitlePath).
+		CopyVideo().
+		CopyAudio().
+		Args("-c:s", "mov_text").
+		Args("-metadata:s:s:0", fmt.Sprintf("language=%s", language)).
+		Output(outputPath).
+		Run(context.Background())
 	if err != nil {
-		return fmt.Errorf("ffmpeg subtitle embedding failed: %w\nOutput: %s", err, string(output))
+		return fmt.Errorf("ffmpeg subtitle embedding failed: %w", err)
 	}
 
 	return nil
@@ -255,20 +252,16 @@ func BurnSubtitles(videoPath, subtitlePath, outputPath string) error {
 		return fmt.Errorf("invalid output path: %w", err)
 	}
 
-	// Build ffmpeg command
+	// Build ffmpeg command using ffutil
 	// -vf subtitles=file.srt - burn subtitles using the subtitles filter
-	//nolint:gosec // G204: paths sanitized via SanitizePath above
-	cmd := exec.Command("ffmpeg",
-		"-i", videoPath,
-		"-vf", fmt.Sprintf("subtitles=%s", subtitlePath),
-		"-c:a", "copy",
-		"-y",
-		outputPath,
-	)
-
-	output, err := cmd.CombinedOutput()
+	err = ffutil.New().
+		Input(videoPath).
+		VideoFilter(fmt.Sprintf("subtitles=%s", subtitlePath)).
+		CopyAudio().
+		Output(outputPath).
+		Run(context.Background())
 	if err != nil {
-		return fmt.Errorf("ffmpeg subtitle burning failed: %w\nOutput: %s", err, string(output))
+		return fmt.Errorf("ffmpeg subtitle burning failed: %w", err)
 	}
 
 	return nil
