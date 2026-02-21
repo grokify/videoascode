@@ -16,23 +16,33 @@ var verbose bool
 
 var rootCmd = &cobra.Command{
 	Use:   "marp2video",
-	Short: "Convert Marp presentations to video with AI voiceovers",
-	Long: `marp2video transforms Marp markdown presentations into professional videos
-with AI-generated voiceovers using ElevenLabs text-to-speech.
+	Short: "Convert Marp presentations and browser demos to video with AI voiceovers",
+	Long: `marp2video creates professional videos with AI-generated voiceovers.
 
-Use subcommands to run specific stages of the pipeline:
-  tts    - Generate audio from transcript
-  video  - Generate video from presentation (full pipeline)
+Two main workflows:
+
+  slides   - Marp markdown presentations
+  browser  - Browser automation recordings
+
+Additional commands:
+
+  subtitle - Generate subtitles from audio
 
 Examples:
-  # Full pipeline (original behavior)
-  marp2video video --input slides.md --output video.mp4
+  # Marp slides: full pipeline
+  marp2video slides video --input slides.md --output video.mp4
 
-  # Generate audio only from transcript
-  marp2video tts --transcript transcript.json --output audio/ --lang en-US
+  # Marp slides: generate audio only
+  marp2video slides tts --transcript transcript.json --output audio/
 
-  # Generate video using pre-generated audio
-  marp2video video --input slides.md --manifest audio/manifest.json --output video.mp4`,
+  # Browser: record with voiceover
+  marp2video browser video --config demo.yaml --output demo.mp4
+
+  # Browser: silent recording
+  marp2video browser record --url https://example.com --steps demo.json --output demo.mp4
+
+  # Generate subtitles
+  marp2video subtitle --audio audio/en-US/`,
 	Version: version,
 }
 
