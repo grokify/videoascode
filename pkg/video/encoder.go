@@ -101,10 +101,10 @@ func getSoftwareEncoder(config EncoderConfig) (string, []string) {
 
 // Hardware encoder detection cache
 var (
-	hwEncoderOnce   sync.Once
-	hwEncoderCodec  string
-	hwEncoderArgs   []string
-	hwEncoderAvail  bool
+	hwEncoderOnce  sync.Once
+	hwEncoderCodec string
+	hwEncoderArgs  []string
+	hwEncoderAvail bool
 )
 
 // getHardwareEncoder returns the best available hardware encoder.
