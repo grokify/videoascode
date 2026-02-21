@@ -1,17 +1,33 @@
 # Subtitle Generation
 
-marp2video can generate subtitle files (SRT/VTT) from your presentation audio using speech-to-text.
+marp2video can generate subtitle files (SRT/VTT) in two ways:
+
+1. **STT-based**: Using speech-to-text for word-level accuracy (Marp slides)
+2. **Timing-based**: Using voiceover timing without STT (Browser videos)
 
 ## Quick Start
 
-```bash
-# Generate subtitles for a language
-marp2video subtitle --audio audio/en-US/
+=== "Marp Slides (STT)"
 
-# Output:
-# subtitles/en-US.srt
-# subtitles/en-US.vtt
-```
+    ```bash
+    # Generate subtitles using speech-to-text
+    marp2video subtitle --audio audio/en-US/
+
+    # Output:
+    # subtitles/en-US.srt
+    # subtitles/en-US.vtt
+    ```
+
+=== "Browser Video (No STT)"
+
+    ```bash
+    # Generate subtitles from voiceover timing
+    marp2video browser video --config demo.yaml --output demo.mp4 \
+      --subtitles
+
+    # Output:
+    # demo.srt (alongside demo.mp4)
+    ```
 
 ## How It Works
 
@@ -86,6 +102,84 @@ project/
     └── fr-FR.mp4
 ```
 
+## Browser Video Subtitles
+
+The `browser-video` command supports built-in subtitle generation:
+
+### Options
+
+| Flag | Description | Requirements |
+|------|-------------|--------------|
+| `--subtitles` | Generate subtitles from voiceover timing | None |
+| `--subtitles-stt` | Generate word-level subtitles using STT | Deepgram API |
+| `--subtitles-burn` | Burn subtitles into video (permanent) | FFmpeg with libass |
+| `--no-audio` | Generate video without audio (TTS used for timing) | None |
+
+!!! warning "FFmpeg libass Requirement"
+    The `--subtitles-burn` flag requires FFmpeg compiled with libass support.
+    Check with: `ffmpeg -filters 2>&1 | grep subtitles`
+
+    If not available, install via:
+    ```bash
+    # macOS
+    brew uninstall ffmpeg
+    brew tap homebrew-ffmpeg/ffmpeg
+    brew install homebrew-ffmpeg/ffmpeg/ffmpeg
+
+    # Linux (Ubuntu/Debian)
+    sudo apt install ffmpeg libass-dev
+    ```
+
+### Examples
+
+```bash
+# Simple subtitles from voiceover timing (no API cost)
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --subtitles
+
+# Word-level subtitles using speech-to-text
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --subtitles-stt
+
+# Burn subtitles permanently into video
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --subtitles --subtitles-burn
+
+# Silent video with burned subtitles (no audio track)
+# Useful for demos where viewers read subtitles instead of listening
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --subtitles --subtitles-burn --no-audio
+```
+
+### How Timing-Based Subtitles Work
+
+When using `--subtitles` (without `--subtitles-stt`):
+
+1. Each voiceover text becomes a subtitle entry
+2. Long text is automatically split into 2-line chunks (max 42 chars per line)
+3. Start/end times are calculated from TTS audio durations with word-based timing
+4. Pauses between voiceovers are accounted for
+5. No additional API calls required
+
+### Automatic Text Chunking
+
+Long voiceover text is automatically split into readable subtitle chunks:
+
+- **Max 2 lines per chunk** - Standard for video subtitles
+- **Max 42 characters per line** - Optimized for 1080p display
+- **Word-aware splitting** - Text breaks at word boundaries, not mid-word
+- **Proportional timing** - Each chunk's duration is based on word count, not character count
+
+Example: A 100-word voiceover becomes multiple 2-line subtitle entries, each timed proportionally based on the words it contains.
+
+This approach provides sentence-level accuracy and is ideal when:
+
+- You want to avoid STT API costs
+- Your voiceover text matches what should appear as subtitles
+- You're iterating quickly on content
+
+---
+
 ## Current Implementation: Standard Subtitles
 
 The current implementation generates **standard subtitles** - the most professional and widely-used format:
@@ -103,8 +197,10 @@ The current implementation generates **standard subtitles** - the most professio
 **Characteristics:**
 
 - White text with black outline or semi-transparent background
-- 1-2 lines maximum, positioned at bottom of screen
-- Static display during speech segment
+- 1-2 lines maximum (42 chars per line), positioned at bottom of screen
+- Automatic text chunking for long voiceovers
+- Word-based timing distribution for natural reading pace
+- VFR to CFR conversion ensures reliable timing when burning subtitles
 - Industry standard for professional content
 
 **Used by:** Netflix, YouTube, broadcast TV, Udemy, Coursera
@@ -198,7 +294,8 @@ Words animate in with effects (pop, slide, bounce):
 | Style | Status | Priority | Notes |
 |-------|--------|----------|-------|
 | Standard (SRT/VTT) | ✅ Implemented | - | Current default |
-| Burned-in standard | 🔲 Planned | High | ffmpeg subtitle overlay |
+| Burned-in standard | ✅ Implemented | - | `--subtitles-burn` flag |
+| Timing-based (no STT) | ✅ Implemented | - | `browser-video --subtitles` |
 | Karaoke highlight | 🔲 Planned | Medium | ASS format + ffmpeg |
 | Word-by-word reveal | 🔲 Planned | Medium | Social media use case |
 | Animated captions | 🔲 Planned | Low | Complex, may use templates |

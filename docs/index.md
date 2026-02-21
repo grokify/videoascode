@@ -8,24 +8,43 @@ marp2video is a command-line tool that automates the conversion of [Marp](https:
 
 - :material-file-document: **Parse Marp presentations** with voiceover in HTML comments or JSON transcripts
 - :material-microphone: **Text-to-speech** using ElevenLabs, Deepgram, and other providers via OmniVoice
-- :material-web: **Browser automation** with Rod to display slides
+- :material-web: **Browser automation** with Rod to display slides and record demos
 - :material-video: **Screen recording** with synchronized audio using ffmpeg
 - :material-earth: **Multi-language support** with BCP-47 locale codes (en-US, en-GB, fr-CA, etc.)
 - :material-television: **Platform-optimized** output for YouTube, Udemy, Coursera
 - :material-transition: **Crossfade transitions** between slides
+- :material-subtitles: **Subtitle generation** from voiceover timing or speech-to-text
+- :material-cached: **Audio caching** for faster iterations without re-incurring TTS costs
 
 ## Quick Example
 
-```bash
-# Simple: inline voiceover comments
-marp2video --input slides.md --output video.mp4
+=== "Marp Slides"
 
-# Advanced: multi-language transcript
-marp2video --input slides.md \
-           --transcript transcript.json \
-           --lang es-ES \
-           --output video_spanish.mp4
-```
+    ```bash
+    # Simple: inline voiceover comments
+    marp2video slides video --input slides.md --output video.mp4
+
+    # Advanced: multi-language transcript
+    marp2video slides video --input slides.md \
+               --transcript transcript.json \
+               --lang es-ES \
+               --output video_spanish.mp4
+    ```
+
+=== "Browser Demo"
+
+    ```bash
+    # Record browser demo with voiceover
+    marp2video browser video --config demo.yaml --output demo.mp4
+
+    # Multi-language with audio caching
+    marp2video browser video --config demo.yaml --output demo.mp4 \
+               --audio-dir ./audio --lang en-US,fr-FR,zh-Hans
+
+    # With subtitles burned in
+    marp2video browser video --config demo.yaml --output demo.mp4 \
+               --subtitles --subtitles-burn
+    ```
 
 ## How It Works
 
@@ -58,19 +77,28 @@ flowchart LR
 
 - :material-book-open-variant: **[User Guide](guide/pipeline.md)**
 
-    Learn about the full pipeline
+    Learn about the Marp slides pipeline
+
+- :material-web: **[Browser Video](guide/browser-video.md)**
+
+    Record browser demos with voiceover
 
 - :material-code-json: **[Transcript Schema](reference/transcript-schema.md)**
 
     Multi-language JSON format reference
 
+- :material-subtitles: **[Subtitles](guide/subtitles.md)**
+
+    Generate SRT/VTT subtitles
+
 </div>
 
 ## Use Cases
 
-| Platform | Use Case | Features |
-|----------|----------|----------|
-| **YouTube** | Tutorials, demos | Combined video with transitions |
-| **Udemy** | Course lectures | Individual slide videos |
-| **Coursera** | Academic content | Professional voice settings |
-| **Documentation** | Animated guides | Multi-language support |
+| Platform | Use Case | Command | Features |
+|----------|----------|---------|----------|
+| **YouTube** | Tutorials, demos | `slides video` | Combined video with transitions |
+| **Udemy** | Course lectures | `slides video` | Individual slide videos |
+| **Coursera** | Academic content | `slides video` | Professional voice settings |
+| **Product Demos** | SaaS walkthroughs | `browser video` | Automated browser recording |
+| **Documentation** | Animated guides | Both | Multi-language support |

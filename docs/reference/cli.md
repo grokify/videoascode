@@ -2,140 +2,283 @@
 
 Complete command-line interface reference.
 
-## Synopsis
+## Command Structure
 
-```bash
-marp2video [options]
+marp2video uses a hierarchical command structure:
+
+```
+marp2video
+├── slides              # Marp slide presentations
+│   ├── video          # Full pipeline: parse, TTS, record, combine
+│   └── tts            # Generate audio from transcript
+├── browser            # Browser automation recordings
+│   ├── video          # Record with TTS voiceover
+│   └── record         # Silent recording (no audio)
+└── subtitle           # Generate subtitles from audio
 ```
 
-## Options
+---
 
-### Input/Output
+## slides video
 
-| Flag | Type | Default | Description |
-|------|------|---------|-------------|
-| `--input` | string | *required* | Input Marp markdown file |
-| `--output` | string | `output.mp4` | Output video file |
-| `--output-individual` | string | | Directory for individual slide videos |
-| `--transcript` | string | | JSON transcript file for multi-language |
-| `--lang` | string | | Language/locale code (e.g., `en-US`, `es-ES`) |
-| `--workdir` | string | system temp | Working directory for temp files |
+Generate video from Marp presentation (full pipeline).
 
-### TTS Settings
+```bash
+marp2video slides video [flags]
+```
+
+### Flags
 
 | Flag | Type | Default | Description |
 |------|------|---------|-------------|
-| `--api-key` | string | `$ELEVENLABS_API_KEY` | ElevenLabs API key |
-| `--voice` | string | `pNInz6obpgDQGcFmaJgB` | ElevenLabs voice ID (Adam) |
-
-### Video Settings
-
-| Flag | Type | Default | Description |
-|------|------|---------|-------------|
+| `-i, --input` | string | *required* | Input Marp markdown file |
+| `-o, --output` | string | `output.mp4` | Output video file |
+| `-m, --manifest` | string | | Audio manifest file (from `slides tts`) |
+| `-k, --api-key` | string | `$ELEVENLABS_API_KEY` | ElevenLabs API key |
+| `-v, --voice` | string | `pNInz6obpgDQGcFmaJgB` | ElevenLabs voice ID (Adam) |
 | `--width` | int | `1920` | Video width in pixels |
 | `--height` | int | `1080` | Video height in pixels |
 | `--fps` | int | `30` | Video frame rate |
 | `--transition` | float | `0` | Transition duration (seconds) |
+| `--subtitles` | string | | Subtitle file to embed (SRT or VTT) |
+| `--subtitles-lang` | string | auto-detect | Subtitle language code |
+| `--output-individual` | string | | Directory for individual slide videos |
+| `--screen-device` | string | auto-detect | macOS screen capture device |
+| `--workdir` | string | system temp | Working directory for temp files |
+| `--check` | bool | | Verify dependencies and exit |
 
-### Platform-Specific
+### Examples
+
+```bash
+# Full pipeline with inline voiceovers
+marp2video slides video --input slides.md --output video.mp4
+
+# Use pre-generated audio
+marp2video slides video --input slides.md --manifest audio/manifest.json --output video.mp4
+
+# With transitions and custom resolution
+marp2video slides video --input slides.md --output video.mp4 \
+  --transition 0.5 --width 1280 --height 720
+
+# Generate individual slide videos for Udemy
+marp2video slides video --input slides.md --output combined.mp4 \
+  --output-individual ./lectures/
+
+# Check dependencies
+marp2video slides video --check
+```
+
+---
+
+## slides tts
+
+Generate audio files from a transcript JSON file.
+
+```bash
+marp2video slides tts [flags]
+```
+
+### Flags
 
 | Flag | Type | Default | Description |
 |------|------|---------|-------------|
-| `--screen-device` | string | auto-detected | macOS screen capture device |
+| `-t, --transcript` | string | *required* | Transcript JSON file |
+| `-o, --output` | string | `audio` | Output directory for audio files |
+| `-l, --lang` | string | from transcript | Language/locale code (e.g., `en-US`) |
+| `--provider` | string | auto-detect | TTS provider: `elevenlabs` or `deepgram` |
+| `--elevenlabs-api-key` | string | `$ELEVENLABS_API_KEY` | ElevenLabs API key |
+| `--deepgram-api-key` | string | `$DEEPGRAM_API_KEY` | Deepgram API key |
+| `-f, --force` | bool | `false` | Regenerate audio even if files exist |
 
-### Utility
+### Examples
 
-| Flag | Type | Description |
-|------|------|-------------|
-| `--check` | bool | Verify dependencies and exit |
-| `--version` | bool | Show version and exit |
-| `--help` | bool | Show help and exit |
+```bash
+# Generate English audio
+marp2video slides tts --transcript transcript.json --output audio/en-US/ --lang en-US
+
+# Generate Spanish audio with Deepgram
+marp2video slides tts --transcript transcript.json --output audio/es-ES/ \
+  --lang es-ES --provider deepgram
+
+# Force regeneration
+marp2video slides tts --transcript transcript.json --output audio/ --force
+```
+
+---
+
+## browser video
+
+Record browser-driven demos with AI-generated voiceover.
+
+```bash
+marp2video browser video [flags]
+```
+
+### Flags
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `-c, --config` | string | *required* | Configuration file (YAML/JSON) |
+| `-o, --output` | string | `output.mp4` | Output video file |
+| `-a, --audio-dir` | string | | Directory to save/reuse audio tracks |
+| `-p, --provider` | string | auto-detect | TTS provider: `elevenlabs` or `deepgram` |
+| `-v, --voice` | string | from config | TTS voice ID |
+| `-l, --lang` | string | `en-US` | Languages to generate (comma-separated) |
+| `--elevenlabs-api-key` | string | `$ELEVENLABS_API_KEY` | ElevenLabs API key |
+| `--deepgram-api-key` | string | `$DEEPGRAM_API_KEY` | Deepgram API key |
+| `--width` | int | `1920` | Video width in pixels |
+| `--height` | int | `1080` | Video height in pixels |
+| `--fps` | int | `30` | Video frame rate |
+| `--transition` | float | `0` | Transition duration (seconds) |
+| `--headless` | bool | `false` | Run browser in headless mode |
+| `--subtitles` | bool | `false` | Generate subtitles from voiceover timing |
+| `--subtitles-stt` | bool | `false` | Generate word-level subtitles using STT |
+| `--subtitles-burn` | bool | `false` | Burn subtitles into video (requires FFmpeg with libass) |
+| `--no-audio` | bool | `false` | Generate video without audio (TTS used for timing/subtitles) |
+| `--fast` | bool | `false` | Use hardware-accelerated encoding (VideoToolbox on macOS) |
+| `--limit` | int | `0` | Limit to first N segments (0 = no limit, for testing) |
+| `--limit-steps` | int | `0` | Limit browser segments to first N steps (0 = no limit, for testing) |
+| `--workdir` | string | system temp | Working directory for temp files |
+
+### Examples
+
+```bash
+# Basic browser demo
+marp2video browser video --config demo.yaml --output demo.mp4
+
+# Multi-language with audio caching
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --audio-dir ./audio --lang en-US,fr-FR,zh-Hans
+
+# With subtitles burned in (requires FFmpeg with libass)
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --subtitles --subtitles-burn
+
+# Silent video with burned subtitles (no audio track)
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --subtitles --subtitles-burn --no-audio
+
+# Headless mode for CI/CD
+marp2video browser video --config demo.yaml --output demo.mp4 --headless
+
+# Using Deepgram TTS
+marp2video browser video --config demo.yaml --output demo.mp4 --provider deepgram
+
+# Fast encoding with hardware acceleration (macOS VideoToolbox)
+marp2video browser video --config demo.yaml --output demo.mp4 --fast
+
+# Test with limited segments (faster iteration)
+marp2video browser video --config demo.yaml --output demo.mp4 --limit 2
+
+# Test with limited browser steps (faster iteration)
+marp2video browser video --config demo.yaml --output demo.mp4 --limit-steps 3
+```
+
+### Audio Caching
+
+When using `--audio-dir`, marp2video caches generated TTS audio:
+
+- Audio files stored as `{audio-dir}/{language}/segment_XXX.mp3`
+- Metadata JSON files store per-voiceover timing information
+- Subsequent runs skip TTS generation if cached audio exists
+
+### Multi-Language Timing
+
+When generating multiple languages, the video is paced to the longest audio:
+
+1. TTS audio is generated for all requested languages
+2. Per-voiceover durations are compared across languages
+3. Each browser step uses the maximum duration
+4. All language versions sync with the same video
+
+---
+
+## browser record
+
+Record browser session without audio (silent recording).
+
+```bash
+marp2video browser record [flags]
+```
+
+### Flags
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `-c, --config` | string | | Configuration file (YAML/JSON) |
+| `-s, --steps` | string | | Steps file defining browser actions |
+| `-u, --url` | string | | Starting URL for the browser |
+| `-o, --output` | string | `recording.mp4` | Output video file |
+| `--width` | int | `1920` | Browser viewport width |
+| `--height` | int | `1080` | Browser viewport height |
+| `--fps` | int | `30` | Video frame rate |
+| `--headless` | bool | `false` | Run browser in headless mode |
+| `-t, --timing` | string | | Output timing JSON file |
+| `--timeout` | int | `30000` | Default step timeout (ms) |
+| `--workdir` | string | system temp | Working directory |
+| `--cleanup` | bool | `true` | Clean up temp files after recording |
+
+### Examples
+
+```bash
+# Record from steps file
+marp2video browser record --url https://example.com --steps demo.json --output demo.mp4
+
+# Record from config file
+marp2video browser record --config demo.yaml --output demo.mp4
+
+# Export timing data for later audio sync
+marp2video browser record --url https://example.com --steps demo.json \
+  --output demo.mp4 --timing timing.json
+
+# Headless mode
+marp2video browser record --url https://example.com --steps demo.json \
+  --output demo.mp4 --headless
+```
+
+---
+
+## subtitle
+
+Generate subtitles from audio files using speech-to-text.
+
+```bash
+marp2video subtitle [flags]
+```
+
+### Flags
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `-a, --audio` | string | *required* | Audio directory containing manifest.json |
+| `-o, --output` | string | `subtitles` | Output directory for subtitle files |
+| `-l, --lang` | string | from manifest | Language code |
+| `--provider` | string | `deepgram` | STT provider: `deepgram` or `elevenlabs` |
+| `--individual` | bool | `false` | Also generate per-slide subtitle files |
+
+### Examples
+
+```bash
+# Generate subtitles (language auto-detected)
+marp2video subtitle --audio audio/en-US/
+
+# Custom output directory
+marp2video subtitle --audio audio/fr-FR/ --output subs/
+
+# Keep individual slide subtitles
+marp2video subtitle --audio audio/en-US/ --individual
+```
+
+---
 
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `ELEVENLABS_API_KEY` | ElevenLabs API key (alternative to `--api-key`) |
+| `ELEVENLABS_API_KEY` | ElevenLabs API key for TTS |
+| `DEEPGRAM_API_KEY` | Deepgram API key for TTS/STT |
 
-## Examples
-
-### Basic Usage
-
-```bash
-# Minimal - uses inline comments
-marp2video --input slides.md --output video.mp4
-
-# With API key
-marp2video --input slides.md --output video.mp4 \
-  --api-key "your-api-key"
-```
-
-### Multi-Language
-
-```bash
-# English (default from transcript)
-marp2video --input slides.md \
-  --transcript transcript.json \
-  --output video_en.mp4
-
-# Spanish
-marp2video --input slides.md \
-  --transcript transcript.json \
-  --lang es-ES \
-  --output video_es.mp4
-```
-
-### Platform-Specific Output
-
-```bash
-# YouTube (combined with transitions)
-marp2video --input slides.md \
-  --output youtube.mp4 \
-  --transition 0.5
-
-# Udemy (individual + combined)
-marp2video --input slides.md \
-  --output combined.mp4 \
-  --output-individual ./lectures/
-```
-
-### Custom Video Settings
-
-```bash
-# 720p at 24fps
-marp2video --input slides.md \
-  --output video.mp4 \
-  --width 1280 --height 720 --fps 24
-
-# 4K at 60fps
-marp2video --input slides.md \
-  --output video.mp4 \
-  --width 3840 --height 2160 --fps 60
-```
-
-### Custom Voice
-
-```bash
-# Use Rachel voice
-marp2video --input slides.md \
-  --output video.mp4 \
-  --voice 21m00Tcm4TlvDq8ikWAM
-```
-
-### Dependency Check
-
-```bash
-marp2video --check
-```
-
-Output:
-
-```
-✓ ffmpeg found
-✓ Marp CLI found
-✓ ELEVENLABS_API_KEY set
-All dependencies OK!
-```
+---
 
 ## Exit Codes
 
