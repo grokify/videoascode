@@ -7,6 +7,31 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.4.0",
+      "date": "2026-02-21",
+      "highlights": [
+        { "description": "Project renamed to VideoAsCode with new `vac` CLI" },
+        { "description": "Breaking change: Module path changed to `github.com/grokify/videoascode`" }
+      ],
+      "breaking": [
+        { "description": "Project renamed from `marp2video` to `videoascode`", "commit": "e339358" },
+        { "description": "CLI renamed from `marp2video` to `vac`", "commit": "e339358" },
+        { "description": "Go module path changed to `github.com/grokify/videoascode`", "commit": "e339358" },
+        { "description": "Config directory changed from `~/.config/marp2video/` to `~/.config/videoascode/`", "commit": "e339358" }
+      ],
+      "changed": [
+        { "description": "Refactored to use `ffutil` package for FFmpeg/FFprobe operations", "commit": "531049a" }
+      ],
+      "documentation": [
+        { "description": "Added known limitations section for v0.3.0", "commit": "0161213" },
+        { "description": "Updated all documentation with new project name and CLI commands", "commit": "e339358" }
+      ],
+      "chore": [
+        { "description": "Remove scroll debug output from browser package", "commit": "d04e9f5" },
+        { "description": "Update module dependencies", "commit": "0de7068" }
+      ]
+    },
+    {
       "version": "v0.3.0",
       "date": "2026-02-21",
       "highlights": [
