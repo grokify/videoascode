@@ -7,8 +7,10 @@ require (
 	github.com/agentplexus/omnivoice v0.4.3
 	github.com/agentplexus/omnivoice-deepgram v0.3.0
 	github.com/go-rod/rod v0.116.2
+	github.com/google/uuid v1.6.0
 	github.com/grokify/mogo v0.73.2
 	github.com/spf13/cobra v1.10.2
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -24,7 +26,6 @@ require (
 	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hokaccha/go-prettyjson v0.0.0-20211117102719-0474bc63780f // indirect
