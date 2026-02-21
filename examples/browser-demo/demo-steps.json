@@ -1,0 +1,65 @@
+{
+  "name": "React App Demo",
+  "url": "https://example.com",
+  "defaultTimeout": 30000,
+  "steps": [
+    {
+      "action": "wait",
+      "duration": 1000,
+      "description": "Wait for page to settle",
+      "voiceover": "Welcome to our React application demo."
+    },
+    {
+      "action": "click",
+      "selector": "#login-button",
+      "description": "Click the login button",
+      "voiceover": "Let's start by clicking the login button."
+    },
+    {
+      "action": "wait",
+      "duration": 500,
+      "description": "Wait for login form"
+    },
+    {
+      "action": "input",
+      "selector": "#username",
+      "value": "demo@example.com",
+      "description": "Enter username",
+      "voiceover": "We'll enter our demo credentials."
+    },
+    {
+      "action": "input",
+      "selector": "#password",
+      "value": "password123",
+      "description": "Enter password"
+    },
+    {
+      "action": "click",
+      "selector": "#submit-login",
+      "description": "Submit login form",
+      "voiceover": "Now we click submit to log in."
+    },
+    {
+      "action": "waitFor",
+      "selector": "#dashboard",
+      "description": "Wait for dashboard to load",
+      "voiceover": "The dashboard loads with our account information."
+    },
+    {
+      "action": "scroll",
+      "scrollY": 300,
+      "description": "Scroll down to see more content",
+      "voiceover": "Scrolling down, we can see more features."
+    },
+    {
+      "action": "hover",
+      "selector": "#user-menu",
+      "description": "Hover over user menu",
+      "voiceover": "The user menu provides quick access to settings."
+    },
+    {
+      "action": "screenshot",
+      "description": "Capture final state"
+    }
+  ]
+}

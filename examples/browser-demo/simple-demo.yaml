@@ -1,0 +1,37 @@
+# Simple browser demo for testing marp2video browser-video command
+# Uses example.com which is a publicly accessible test page
+version: "1.0"
+title: "Simple Browser Demo"
+description: "A minimal demo showing browser recording with voiceover"
+
+defaultLanguage: en-US
+defaultVoice:
+  provider: elevenlabs
+  voiceId: pNInz6obpgDQGcFmaJgB
+  voiceName: Adam
+
+resolution:
+  width: 1920
+  height: 1080
+frameRate: 30
+
+segments:
+  - type: browser
+    name: example-demo
+    url: https://example.com
+    steps:
+      - action: wait
+        duration: 1500
+        voiceover: "Welcome to this browser demo. We're visiting a simple example page."
+
+      - action: scroll
+        scrollY: 100
+        voiceover: "Let's scroll down to see the content."
+
+      - action: wait
+        duration: 1000
+        voiceover: "As you can see, this is a very basic page demonstrating the browser recording feature."
+
+      - action: scroll
+        scrollY: 0
+        voiceover: "And that concludes our demo. Thank you for watching."

@@ -1,0 +1,95 @@
+# Example configuration mixing slides and browser demos
+version: "1.0"
+title: "Product Demo Video"
+description: "A demo video combining slides and live browser demonstration"
+
+defaultLanguage: en-US
+defaultVoice:
+  provider: elevenlabs
+  voiceId: pNInz6obpgDQGcFmaJgB
+  voiceName: Adam
+
+resolution:
+  width: 1920
+  height: 1080
+frameRate: 30
+
+transitionDuration: 0.5
+
+segments:
+  # Introduction slides
+  - type: slide
+    name: intro
+    source: slides/intro.md
+    slides: [0, 1, 2]
+
+  # Browser demo of the login flow
+  - type: browser
+    name: login-demo
+    url: https://app.example.com
+    steps:
+      - action: wait
+        duration: 1000
+        voiceover: "Let me show you how easy it is to log in."
+
+      - action: click
+        selector: "#login-button"
+        voiceover: "Click the login button to get started."
+
+      - action: input
+        selector: "#email"
+        value: "demo@example.com"
+        voiceover: "Enter your email address."
+
+      - action: input
+        selector: "#password"
+        value: "demo123"
+
+      - action: click
+        selector: "#submit"
+        voiceover: "Click submit and you're in!"
+
+      - action: waitFor
+        selector: "#dashboard"
+        voiceover: "The dashboard loads instantly."
+
+  # Feature overview slides
+  - type: slide
+    name: features
+    source: slides/intro.md
+    slides: [3, 4]
+
+  # Browser demo of key features
+  - type: browser
+    name: feature-demo
+    url: https://app.example.com/dashboard
+    steps:
+      - action: click
+        selector: "#create-new"
+        voiceover: "Creating a new project is simple."
+
+      - action: input
+        selector: "#project-name"
+        value: "My First Project"
+
+      - action: click
+        selector: "#save"
+        voiceover: "Just give it a name and save."
+
+      - action: wait
+        duration: 2000
+        voiceover: "And that's it! Your project is ready."
+
+  # Closing slides
+  - type: slide
+    name: conclusion
+    source: slides/intro.md
+    slides: [5, 6]
+
+# Output multiple language versions
+languages:
+  - en-US
+  - fr-FR
+  - es-ES
+
+outputDir: output/
