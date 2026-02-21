@@ -429,9 +429,6 @@ func (r *Recorder) executeInput(page *rod.Page, step Step) error {
 }
 
 func (r *Recorder) executeScroll(page *rod.Page, step Step) error {
-	fmt.Fprintf(os.Stderr, "executeScroll: scrollX=%d, scrollY=%d, mode=%s, behavior=%s, selector=%q\n",
-		step.ScrollX, step.ScrollY, step.ScrollMode, step.ScrollBehavior, step.Selector)
-
 	if step.Selector != "" {
 		// Scroll element into view
 		el, err := page.Element(step.Selector)
@@ -454,12 +451,6 @@ func (r *Recorder) executeScroll(page *rod.Page, step Step) error {
 	scrollBehavior := step.ScrollBehavior
 	if scrollBehavior == "" {
 		scrollBehavior = ScrollBehaviorAuto
-	}
-
-	// Get scroll position before
-	beforeResult, err := page.Eval(`() => ({x: window.scrollX, y: window.scrollY})`)
-	if err == nil && beforeResult != nil {
-		fmt.Fprintf(os.Stderr, "executeScroll: before position x=%v, y=%v\n", beforeResult.Value.Get("x"), beforeResult.Value.Get("y"))
 	}
 
 	// For React/SPA apps, we need to find the actual scrollable container
@@ -525,20 +516,9 @@ func (r *Recorder) executeScroll(page *rod.Page, step Step) error {
 		return "auto"
 	}(), scrollMode == ScrollModeAbsolute)
 
-	fmt.Fprintf(os.Stderr, "executeScroll: attempting scroll scrollY=%d, scrollX=%d, mode=%s\n",
-		step.ScrollY, step.ScrollX, scrollMode)
-
-	result, err := page.Eval(scrollScript)
+	_, err := page.Eval(scrollScript)
 	if err != nil {
 		return fmt.Errorf("scroll failed: %w", err)
-	}
-
-	if result != nil {
-		scrolled := result.Value.Get("scrolled").Bool()
-		element := result.Value.Get("element").Str()
-		position := result.Value.Get("position").Int()
-		fmt.Fprintf(os.Stderr, "executeScroll: result scrolled=%v, element=%s, position=%d\n",
-			scrolled, element, position)
 	}
 
 	// Wait for smooth scroll to complete if applicable
