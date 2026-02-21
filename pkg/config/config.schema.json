@@ -1,0 +1,457 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/grokify/marp2video/config.schema.json",
+  "title": "Marp2Video Configuration",
+  "description": "Schema for marp2video video configuration with browser demos and slides. AI assistants can use this schema to generate valid browser automation scripts.",
+  "type": "object",
+  "required": ["version", "segments"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version",
+      "pattern": "^\\d+\\.\\d+$",
+      "default": "1.0"
+    },
+    "title": {
+      "type": "string",
+      "description": "Video title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Video description"
+    },
+    "defaultLanguage": {
+      "type": "string",
+      "description": "BCP-47 language code (e.g., 'en-US', 'fr-FR', 'zh-Hans')",
+      "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,4})?(-[A-Z]{2})?$",
+      "default": "en-US"
+    },
+    "defaultVoice": {
+      "$ref": "#/$defs/VoiceConfig"
+    },
+    "resolution": {
+      "$ref": "#/$defs/Resolution"
+    },
+    "frameRate": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 120,
+      "default": 30,
+      "description": "Video frame rate (fps)"
+    },
+    "transitionDuration": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 5,
+      "description": "Crossfade duration between segments (seconds)"
+    },
+    "segments": {
+      "type": "array",
+      "description": "Ordered list of video segments (slides or browser demos)",
+      "items": {
+        "$ref": "#/$defs/Segment"
+      },
+      "minItems": 1
+    },
+    "languages": {
+      "type": "array",
+      "description": "Languages to generate (creates separate video per language)",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,4})?(-[A-Z]{2})?$"
+      }
+    },
+    "outputDir": {
+      "type": "string",
+      "description": "Output directory for generated files"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Custom key-value metadata",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "Resolution": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 320,
+          "maximum": 7680,
+          "default": 1920,
+          "description": "Video width in pixels"
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 240,
+          "maximum": 4320,
+          "default": 1080,
+          "description": "Video height in pixels"
+        }
+      }
+    },
+    "VoiceConfig": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": ["elevenlabs", "deepgram", "google", "azure", "amazon"],
+          "description": "TTS provider"
+        },
+        "voiceId": {
+          "type": "string",
+          "description": "Provider-specific voice ID (e.g., 'pNInz6obpgDQGcFmaJgB' for ElevenLabs Adam)"
+        },
+        "voiceName": {
+          "type": "string",
+          "description": "Human-readable voice name"
+        },
+        "model": {
+          "type": "string",
+          "description": "Provider-specific model (e.g., 'eleven_multilingual_v2')"
+        },
+        "speed": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 4.0,
+          "default": 1.0,
+          "description": "Speech speed multiplier"
+        },
+        "stability": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Voice consistency (ElevenLabs)"
+        },
+        "similarityBoost": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Voice similarity enhancement (ElevenLabs)"
+        }
+      }
+    },
+    "Segment": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["slide", "browser"],
+          "description": "Segment type: 'slide' for Marp slides, 'browser' for web automation"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable segment identifier"
+        },
+        "voice": {
+          "$ref": "#/$defs/VoiceConfig",
+          "description": "Override default voice for this segment"
+        },
+        "minDuration": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum segment duration in milliseconds"
+        },
+        "transcripts": {
+          "type": "object",
+          "description": "Per-language voiceover content (for multi-language support)",
+          "additionalProperties": {
+            "$ref": "#/$defs/SegmentTranscript"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "slide" } }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "type": "string",
+                "description": "Path to Marp markdown file"
+              },
+              "slides": {
+                "type": "array",
+                "items": { "type": "integer", "minimum": 0 },
+                "description": "Slide indices to include (all slides if empty)"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "browser" } }
+          },
+          "then": {
+            "required": ["url", "steps"],
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "Starting URL for browser session"
+              },
+              "steps": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/BrowserStep" },
+                "minItems": 1,
+                "description": "Browser automation steps"
+              },
+              "headless": {
+                "type": "boolean",
+                "default": false,
+                "description": "Run browser without visible UI"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SegmentTranscript": {
+      "type": "object",
+      "description": "Voiceover content for a specific language",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Single voiceover text for entire segment"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["text"],
+            "properties": {
+              "text": { "type": "string" },
+              "pause": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Pause after segment in milliseconds"
+              }
+            }
+          },
+          "description": "Multiple voiceover segments with pauses"
+        },
+        "voice": {
+          "$ref": "#/$defs/VoiceConfig",
+          "description": "Override voice for this language"
+        }
+      }
+    },
+    "BrowserStep": {
+      "type": "object",
+      "required": ["action"],
+      "description": "A single browser automation step. Each step can include a voiceover that will be spoken during execution.",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["navigate", "click", "input", "scroll", "wait", "waitFor", "screenshot", "evaluate", "hover", "select", "keypress"],
+          "description": "Type of browser action to perform"
+        },
+        "selector": {
+          "type": "string",
+          "description": "CSS selector or XPath for targeting elements. Required for: input, hover, waitFor, select. For click, either selector or text is required.",
+          "examples": ["#login-button", ".submit-btn", "[data-testid='email-input']", "//button[text()='Submit']"]
+        },
+        "value": {
+          "type": "string",
+          "description": "Text to enter for 'input' action, or option value for 'select' action",
+          "examples": ["user@example.com", "password123"]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for 'navigate' action"
+        },
+        "duration": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Duration in milliseconds for 'wait' action"
+        },
+        "script": {
+          "type": "string",
+          "description": "JavaScript code for 'evaluate' action",
+          "examples": ["document.querySelector('#app').classList.add('ready')", "window.scrollTo(0, document.body.scrollHeight)"]
+        },
+        "key": {
+          "type": "string",
+          "description": "Key name for 'keypress' action",
+          "examples": ["Enter", "Tab", "Escape", "ArrowDown"]
+        },
+        "scrollX": {
+          "type": "integer",
+          "description": "Horizontal scroll amount in pixels for 'scroll' action"
+        },
+        "scrollY": {
+          "type": "integer",
+          "description": "Vertical scroll amount in pixels for 'scroll' action"
+        },
+        "scrollMode": {
+          "type": "string",
+          "enum": ["relative", "absolute"],
+          "default": "relative",
+          "description": "Scroll positioning mode. 'relative' scrolls by delta (default), 'absolute' scrolls to position. Use 'absolute' with scrollY: 0 to scroll to top."
+        },
+        "scrollBehavior": {
+          "type": "string",
+          "enum": ["auto", "smooth"],
+          "default": "auto",
+          "description": "Scroll animation. 'auto' is instant (default), 'smooth' animates and auto-waits for completion."
+        },
+        "text": {
+          "type": "string",
+          "description": "Click by text content instead of selector. Finds elements containing this text. Alternative to 'selector' for click actions.",
+          "examples": ["Submit", "Access Requests", "Log In"]
+        },
+        "textScope": {
+          "type": "string",
+          "description": "CSS selector to scope text search. Only search within elements matching this selector.",
+          "examples": [".sidebar", ".nav-menu", "#main-content"]
+        },
+        "textMatch": {
+          "type": "string",
+          "enum": ["contains", "exact", "regex"],
+          "default": "contains",
+          "description": "How to match text content. 'contains' (default) matches substring, 'exact' requires full match, 'regex' uses pattern."
+        },
+        "voiceover": {
+          "type": "string",
+          "description": "Text to speak during this step. The step duration will be extended to match voiceover length.",
+          "examples": ["Click the login button to get started.", "Enter your email address in the form."]
+        },
+        "minDuration": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum step duration in milliseconds (auto-calculated from voiceover if not set)"
+        },
+        "timeout": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Override default timeout for this step in milliseconds"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what this step does (for documentation)"
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "action": { "const": "navigate" } } },
+          "then": { "required": ["url"] }
+        },
+        {
+          "if": { "properties": { "action": { "const": "click" } } },
+          "then": {
+            "anyOf": [
+              { "required": ["selector"] },
+              { "required": ["text"] }
+            ]
+          }
+        },
+        {
+          "if": { "properties": { "action": { "const": "input" } } },
+          "then": { "required": ["selector", "value"] }
+        },
+        {
+          "if": { "properties": { "action": { "const": "hover" } } },
+          "then": { "required": ["selector"] }
+        },
+        {
+          "if": { "properties": { "action": { "const": "waitFor" } } },
+          "then": { "required": ["selector"] }
+        },
+        {
+          "if": { "properties": { "action": { "const": "select" } } },
+          "then": { "required": ["selector", "value"] }
+        },
+        {
+          "if": { "properties": { "action": { "const": "wait" } } },
+          "then": { "required": ["duration"] }
+        },
+        {
+          "if": { "properties": { "action": { "const": "evaluate" } } },
+          "then": { "required": ["script"] }
+        },
+        {
+          "if": { "properties": { "action": { "const": "keypress" } } },
+          "then": { "required": ["key"] }
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "version": "1.0",
+      "title": "Product Demo",
+      "defaultLanguage": "en-US",
+      "defaultVoice": {
+        "provider": "elevenlabs",
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "voiceName": "Adam"
+      },
+      "resolution": { "width": 1920, "height": 1080 },
+      "frameRate": 30,
+      "segments": [
+        {
+          "type": "browser",
+          "name": "login-demo",
+          "url": "https://app.example.com",
+          "steps": [
+            {
+              "action": "wait",
+              "duration": 1000,
+              "voiceover": "Welcome to our application demo."
+            },
+            {
+              "action": "click",
+              "selector": "#login-button",
+              "voiceover": "Click the login button to get started."
+            },
+            {
+              "action": "input",
+              "selector": "#email",
+              "value": "demo@example.com",
+              "voiceover": "Enter your email address."
+            },
+            {
+              "action": "input",
+              "selector": "#password",
+              "value": "demo123"
+            },
+            {
+              "action": "click",
+              "selector": "#submit",
+              "voiceover": "Click submit and you're logged in!"
+            },
+            {
+              "action": "scroll",
+              "scrollY": 300,
+              "scrollMode": "absolute",
+              "scrollBehavior": "smooth",
+              "voiceover": "Let's scroll down to see more features.",
+              "description": "Smooth scroll to 300px from top"
+            },
+            {
+              "action": "click",
+              "text": "Access Requests",
+              "textScope": ".sidebar",
+              "voiceover": "Click on Access Requests in the sidebar.",
+              "description": "Click by text content instead of selector"
+            },
+            {
+              "action": "scroll",
+              "scrollY": 0,
+              "scrollMode": "absolute",
+              "scrollBehavior": "smooth",
+              "voiceover": "Back to the top of the page.",
+              "description": "Scroll to top with smooth animation"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
