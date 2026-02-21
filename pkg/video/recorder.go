@@ -141,7 +141,7 @@ func (r *Recorder) buildMacOSCommand(outputPath, audioPath string, duration time
 		"-capture_cursor", "1",
 		"-framerate", fmt.Sprintf("%d", r.config.FrameRate),
 		"-i", screenDevice, // Auto-detected screen capture device
-		"-i", audioPath,    // Audio input
+		"-i", audioPath, // Audio input
 		"-t", fmt.Sprintf("%.2f", duration.Seconds()),
 		"-map", "0:v", // Map video from screen capture
 		"-map", "1:a", // Map audio from audio file
@@ -155,7 +155,7 @@ func (r *Recorder) buildMacOSCommand(outputPath, audioPath string, duration time
 	args = append(args,
 		"-pix_fmt", "yuv420p",
 		"-acodec", "aac", // AAC audio for compatibility
-		"-b:a", "192k",   // Audio bitrate
+		"-b:a", "192k", // Audio bitrate
 		"-y",
 		outputPath,
 	)
