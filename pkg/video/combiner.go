@@ -50,13 +50,18 @@ func (c *Combiner) CombineVideos(ctx context.Context, videoPaths []string, outpu
 	}
 	filterParts.WriteString(fmt.Sprintf("concat=n=%d:v=1:a=1[outv][outa]", len(videoPaths)))
 
+	// Get encoder settings
+	encoderConfig := GetGlobalEncoderConfig()
+	codec, codecArgs := GetVideoCodec(encoderConfig)
+
 	args = append(args,
 		"-filter_complex", filterParts.String(),
 		"-map", "[outv]",
 		"-map", "[outa]",
-		"-c:v", "libx264",
-		"-preset", "fast",
-		"-crf", "23",
+		"-c:v", codec,
+	)
+	args = append(args, codecArgs...)
+	args = append(args,
 		"-c:a", "aac",
 		"-b:a", "192k",
 		"-ar", "44100",
@@ -157,13 +162,18 @@ func (c *Combiner) CombineVideosWithTransitions(ctx context.Context, videoPaths 
 	// Complete filter
 	filterComplex := videoFilter.String() + ";" + audioFilter.String()
 
+	// Get encoder settings
+	encConfig := GetGlobalEncoderConfig()
+	encCodec, encCodecArgs := GetVideoCodec(encConfig)
+
 	args = append(args,
 		"-filter_complex", filterComplex,
 		"-map", finalVideoLabel,
 		"-map", finalAudioLabel,
-		"-c:v", "libx264",
-		"-preset", "medium",
-		"-crf", "23",
+		"-c:v", encCodec,
+	)
+	args = append(args, encCodecArgs...)
+	args = append(args,
 		"-c:a", "aac",
 		"-b:a", "192k",
 		"-y",

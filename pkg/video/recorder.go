@@ -136,30 +136,36 @@ func (r *Recorder) buildMacOSCommand(outputPath, audioPath string, duration time
 	if screenDevice == "" {
 		screenDevice = "1:none" // Fallback
 	}
-	return []string{
+	args := []string{
 		"-f", "avfoundation",
 		"-capture_cursor", "1",
 		"-framerate", fmt.Sprintf("%d", r.config.FrameRate),
 		"-i", screenDevice, // Auto-detected screen capture device
-		"-i", audioPath, // Audio input
+		"-i", audioPath,    // Audio input
 		"-t", fmt.Sprintf("%.2f", duration.Seconds()),
 		"-map", "0:v", // Map video from screen capture
 		"-map", "1:a", // Map audio from audio file
-		"-vcodec", "libx264",
-		"-preset", "medium", // Better quality for uploads
-		"-crf", "23", // Constant rate factor (18-28 is good, lower = better)
+	}
+
+	// Get encoder settings
+	encoderConfig := GetGlobalEncoderConfig()
+	codec, codecArgs := GetVideoCodec(encoderConfig)
+	args = append(args, "-vcodec", codec)
+	args = append(args, codecArgs...)
+	args = append(args,
 		"-pix_fmt", "yuv420p",
 		"-acodec", "aac", // AAC audio for compatibility
-		"-b:a", "192k", // Audio bitrate
+		"-b:a", "192k",   // Audio bitrate
 		"-y",
 		outputPath,
-	}
+	)
+	return args
 }
 
 // buildLinuxCommand builds ffmpeg command for Linux using x11grab
 func (r *Recorder) buildLinuxCommand(outputPath, audioPath string, duration time.Duration) []string {
 	// Output format optimized for YouTube/Udemy upload
-	return []string{
+	args := []string{
 		"-f", "x11grab",
 		"-framerate", fmt.Sprintf("%d", r.config.FrameRate),
 		"-video_size", fmt.Sprintf("%dx%d", r.config.Width, r.config.Height),
@@ -168,21 +174,27 @@ func (r *Recorder) buildLinuxCommand(outputPath, audioPath string, duration time
 		"-t", fmt.Sprintf("%.2f", duration.Seconds()),
 		"-map", "0:v",
 		"-map", "1:a",
-		"-vcodec", "libx264",
-		"-preset", "medium",
-		"-crf", "23",
+	}
+
+	// Get encoder settings
+	encoderConfig := GetGlobalEncoderConfig()
+	codec, codecArgs := GetVideoCodec(encoderConfig)
+	args = append(args, "-vcodec", codec)
+	args = append(args, codecArgs...)
+	args = append(args,
 		"-pix_fmt", "yuv420p",
 		"-acodec", "aac",
 		"-b:a", "192k",
 		"-y",
 		outputPath,
-	}
+	)
+	return args
 }
 
 // buildWindowsCommand builds ffmpeg command for Windows using gdigrab
 func (r *Recorder) buildWindowsCommand(outputPath, audioPath string, duration time.Duration) []string {
 	// Output format optimized for YouTube/Udemy upload
-	return []string{
+	args := []string{
 		"-f", "gdigrab",
 		"-framerate", fmt.Sprintf("%d", r.config.FrameRate),
 		"-i", "desktop",
@@ -190,15 +202,21 @@ func (r *Recorder) buildWindowsCommand(outputPath, audioPath string, duration ti
 		"-t", fmt.Sprintf("%.2f", duration.Seconds()),
 		"-map", "0:v",
 		"-map", "1:a",
-		"-vcodec", "libx264",
-		"-preset", "medium",
-		"-crf", "23",
+	}
+
+	// Get encoder settings
+	encoderConfig := GetGlobalEncoderConfig()
+	codec, codecArgs := GetVideoCodec(encoderConfig)
+	args = append(args, "-vcodec", codec)
+	args = append(args, codecArgs...)
+	args = append(args,
 		"-pix_fmt", "yuv420p",
 		"-acodec", "aac",
 		"-b:a", "192k",
 		"-y",
 		outputPath,
-	}
+	)
+	return args
 }
 
 // CheckFFmpeg verifies that ffmpeg is installed

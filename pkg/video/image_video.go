@@ -47,23 +47,32 @@ func (c *ImageVideoConverter) CreateSlideVideo(ctx context.Context, slideIndex i
 
 	outputPath := filepath.Join(c.config.OutputDir, fmt.Sprintf("slide_%03d.mp4", slideIndex))
 
+	// Get encoder settings
+	encoderConfig := GetGlobalEncoderConfig()
+	codec, codecArgs := GetVideoCodec(encoderConfig)
+
 	// Build ffmpeg command to create video from static image with audio
 	// -loop 1: loop the image
-	// -tune stillimage: optimize encoding for still images
 	// -t: explicit duration matching audio length
 	args := []string{
 		"-loop", "1",
 		"-i", imagePath,
 		"-i", audioPath,
-		"-c:v", "libx264",
-		"-tune", "stillimage",
+		"-c:v", codec,
+	}
+	args = append(args, codecArgs...)
+	// Add stillimage tune only for libx264
+	if codec == "libx264" {
+		args = append(args, "-tune", "stillimage")
+	}
+	args = append(args,
 		"-c:a", "aac",
 		"-b:a", "192k",
 		"-pix_fmt", "yuv420p",
 		"-t", fmt.Sprintf("%.6f", audioDuration),
 		"-y",
 		outputPath,
-	}
+	)
 
 	cmd := exec.Command("ffmpeg", args...)
 
@@ -106,6 +115,10 @@ func (c *ImageVideoConverter) CreateSlideVideoWithSize(ctx context.Context, slid
 	scaleFilter := fmt.Sprintf("scale=%d:%d:force_original_aspect_ratio=decrease,pad=%d:%d:(ow-iw)/2:(oh-ih)/2",
 		width, height, width, height)
 
+	// Get encoder settings
+	encConfig := GetGlobalEncoderConfig()
+	encCodec, encCodecArgs := GetVideoCodec(encConfig)
+
 	// Use explicit -t with audio duration for precise video length
 	// -shortest doesn't work reliably with -loop 1 on images
 	args := []string{
@@ -113,15 +126,21 @@ func (c *ImageVideoConverter) CreateSlideVideoWithSize(ctx context.Context, slid
 		"-i", imagePath,
 		"-i", audioPath,
 		"-vf", scaleFilter,
-		"-c:v", "libx264",
-		"-tune", "stillimage",
+		"-c:v", encCodec,
+	}
+	args = append(args, encCodecArgs...)
+	// Add stillimage tune only for libx264
+	if encCodec == "libx264" {
+		args = append(args, "-tune", "stillimage")
+	}
+	args = append(args,
 		"-c:a", "aac",
 		"-b:a", "192k",
 		"-pix_fmt", "yuv420p",
 		"-t", fmt.Sprintf("%.6f", audioDuration),
 		"-y",
 		outputPath,
-	}
+	)
 
 	cmd := exec.Command("ffmpeg", args...)
 
