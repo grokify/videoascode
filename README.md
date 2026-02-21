@@ -22,7 +22,7 @@ Both providers offer TTS and STT capabilities. You can use either one for both f
 
 - 📝 **Parse Marp presentations** with voiceover in HTML comments
 - 🌐 **JSON transcript support** for multi-language voiceovers
-- 🎙️ **Text-to-speech** via OmniVoice (ElevenLabs, with more providers coming)
+- 🎙️ **Text-to-speech** via OmniVoice (ElevenLabs, Deepgram)
 - 🗣️ **Multi-language** support with per-slide voice configuration
 - 🖼️ **Image-based rendering** using Marp PNG export for reliable output
 - 🎬 **Video generation** with synchronized audio using ffmpeg
@@ -33,6 +33,9 @@ Both providers offer TTS and STT capabilities. You can use either one for both f
 - 🎓 **Udemy-ready** individual slide videos for course lectures
 - 🔄 **Decoupled workflow** - generate audio and video separately
 - 📜 **Subtitle generation** - SRT/VTT from audio via OmniVoice (Deepgram STT)
+- 🌐 **Browser demo recording** - automated browser interactions with voiceover
+- 🎯 **TTS audio caching** - reuse generated audio across runs
+- ⚡ **Hardware acceleration** - fast encoding with VideoToolbox (macOS)
 
 ## Installation
 
@@ -78,10 +81,21 @@ go build -o bin/marp2video ./cmd/marp2video
 
 ## Usage
 
-marp2video provides two subcommands for flexible workflows:
+marp2video provides two main command groups:
 
-- `marp2video video` - Full pipeline or video generation with pre-generated audio
-- `marp2video tts` - Generate audio from JSON transcript
+**Marp Slides:**
+
+- `marp2video slides video` - Full pipeline: parse slides, generate TTS, record, combine
+- `marp2video slides tts` - Generate audio from JSON transcript
+
+**Browser Recording:**
+
+- `marp2video browser video` - Record browser demo with TTS voiceover
+- `marp2video browser record` - Record browser demo (silent, no audio)
+
+**Utilities:**
+
+- `marp2video subtitle` - Generate subtitles from audio using STT
 
 ### Quick Start (Full Pipeline)
 
@@ -91,31 +105,31 @@ export ELEVENLABS_API_KEY="your-elevenlabs-key"  # For TTS
 export DEEPGRAM_API_KEY="your-deepgram-key"      # For subtitles (optional)
 
 # Using inline voiceover comments
-marp2video video --input slides.md --output video.mp4
+marp2video slides video --input slides.md --output video.mp4
 ```
 
 ### Two-Step Workflow (Recommended for Multi-Language)
 
 ```bash
 # Step 1: Generate audio from transcript
-marp2video tts --transcript transcript.json --output audio/en-US/ --lang en-US
+marp2video slides tts --transcript transcript.json --output audio/en-US/ --lang en-US
 
 # Step 2: Generate video with pre-generated audio
-marp2video video --input slides.md --manifest audio/en-US/manifest.json --output video/en-US.mp4
+marp2video slides video --input slides.md --manifest audio/en-US/manifest.json --output video/en-US.mp4
 ```
 
-### Command: `marp2video tts`
+### Command: `marp2video slides tts`
 
 Generate audio files from a JSON transcript.
 
 ```
-marp2video tts [flags]
+marp2video slides tts [flags]
 
 Flags:
   -t, --transcript string   Transcript JSON file (required)
   -o, --output string       Output directory for audio files (default "audio")
   -l, --lang string         Language/locale code (e.g., en-US, es-ES)
-  -k, --api-key string      ElevenLabs API key (or use ELEVENLABS_API_KEY env var)
+      --provider string     TTS provider: elevenlabs or deepgram
 ```
 
 **Output:**
@@ -127,20 +141,20 @@ Flags:
 
 ```bash
 # Generate audio for Spanish
-marp2video tts --transcript transcript.json --output audio/es-ES/ --lang es-ES
+marp2video slides tts --transcript transcript.json --output audio/es-ES/ --lang es-ES
 ```
 
-### Command: `marp2video video`
+### Command: `marp2video slides video`
 
 Generate video from Marp presentation.
 
 ```
-marp2video video [flags]
+marp2video slides video [flags]
 
 Flags:
   -i, --input string              Input Marp markdown file (required)
   -o, --output string             Output video file (default "output.mp4")
-  -m, --manifest string           Audio manifest file (from 'marp2video tts')
+  -m, --manifest string           Audio manifest file (from 'marp2video slides tts')
   -k, --api-key string            ElevenLabs API key (or use ELEVENLABS_API_KEY env var)
   -v, --voice string              ElevenLabs voice ID (default: Adam)
       --width int                 Video width (default 1920)
@@ -185,12 +199,162 @@ marp2video subtitle --audio audio/fr-FR/
 marp2video subtitle --audio audio/zh-Hans/ --lang zh-Hans --output subs/
 ```
 
+### Command: `marp2video browser video`
+
+Record browser-driven demos with AI-generated voiceover. This command automates browser interactions (navigation, clicks, scrolling) while generating synchronized narration.
+
+```
+marp2video browser video [flags]
+
+Flags:
+  -c, --config string           Configuration file (YAML/JSON) with browser segments (required)
+  -o, --output string           Output video file (default "output.mp4")
+  -a, --audio-dir string        Save/reuse audio tracks in this directory (per-language subdirs)
+  -p, --provider string         TTS provider: elevenlabs or deepgram (default: auto-detect)
+  -v, --voice string            TTS voice ID (default: from config or provider default)
+  -l, --lang string             Languages to generate, comma-separated (default "en-US")
+      --elevenlabs-api-key      ElevenLabs API key (or use ELEVENLABS_API_KEY env var)
+      --deepgram-api-key        Deepgram API key (or use DEEPGRAM_API_KEY env var)
+      --width int               Video width (default 1920)
+      --height int              Video height (default 1080)
+      --fps int                 Video frame rate (default 30)
+      --headless                Run browser in headless mode
+      --transition float        Transition duration between segments (seconds)
+      --subtitles               Generate subtitles from voiceover timing (no STT)
+      --subtitles-stt           Generate word-level subtitles using STT (requires API)
+      --subtitles-burn          Burn subtitles into video (permanent, requires FFmpeg with libass)
+      --no-audio                Generate video without audio (TTS still used for timing/subtitles)
+      --fast                    Use hardware-accelerated encoding (VideoToolbox on macOS)
+      --limit int               Limit to first N segments (for testing)
+      --limit-steps int         Limit browser segments to first N steps (for testing)
+      --workdir string          Working directory for temp files
+```
+
+### Command: `marp2video browser record`
+
+Record browser session without audio (silent recording).
+
+```
+marp2video browser record [flags]
+
+Flags:
+  -c, --config string     Configuration file (YAML/JSON) with segments
+  -s, --steps string      Steps file (JSON/YAML) defining browser actions
+  -u, --url string        Starting URL for the browser
+  -o, --output string     Output video file (default "recording.mp4")
+      --width int         Browser viewport width (default 1920)
+      --height int        Browser viewport height (default 1080)
+      --fps int           Video frame rate (default 30)
+      --headless          Run browser in headless mode
+  -t, --timing string     Output timing JSON file for transcript sync
+      --workdir string    Working directory for temp files
+```
+
+**Key Features:**
+
+- **Multi-language support**: Generate videos in multiple languages with `--lang en-US,fr-FR,zh-Hans`
+- **Audio caching**: Use `--audio-dir` to cache TTS audio and skip regeneration on subsequent runs
+- **Pace to longest language**: Video timing automatically matches the longest audio across all languages
+- **Per-voiceover timing**: Each browser step is paced to its corresponding voiceover duration
+- **Subtitle generation**: Create SRT/VTT subtitles from voiceover timing or word-level STT
+
+**Example Config (demo.yaml):**
+
+```yaml
+metadata:
+  title: "Product Demo"
+  defaultLanguage: "en-US"
+
+defaultVoice:
+  provider: "elevenlabs"
+  voiceId: "pNInz6obpgDQGcFmaJgB"
+
+segments:
+  - id: "segment_000"
+    type: "browser"
+    browser:
+      url: "https://example.com"
+      steps:
+        - action: "wait"
+          duration: 1000
+          voiceover:
+            en-US: "Welcome to our product demo."
+            fr-FR: "Bienvenue dans notre démonstration."
+        - action: "click"
+          selector: "#login-button"
+          voiceover:
+            en-US: "Click the login button to get started."
+            fr-FR: "Cliquez sur le bouton de connexion."
+        - action: "scroll"
+          scrollY: 500
+          voiceover:
+            en-US: "Scroll down to see more features."
+            fr-FR: "Faites défiler pour voir plus de fonctionnalités."
+```
+
+**Example Usage:**
+
+```bash
+# Basic browser demo recording
+marp2video browser video --config demo.yaml --output demo.mp4
+
+# Multi-language with audio caching
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --audio-dir ./audio --lang en-US,fr-FR,zh-Hans
+
+# With subtitles burned into video (requires FFmpeg with libass)
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --subtitles --subtitles-burn
+
+# Video with burned subtitles but no audio (for silent demos)
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --subtitles --subtitles-burn --no-audio
+
+# Using Deepgram instead of ElevenLabs
+marp2video browser video --config demo.yaml --output demo.mp4 \
+  --provider deepgram
+
+# Silent browser recording (no audio)
+marp2video browser record --url https://example.com --steps demo.json --output demo.mp4
+
+# Fast encoding with hardware acceleration (macOS VideoToolbox)
+marp2video browser video --config demo.yaml --output demo.mp4 --fast
+
+# Test first 2 segments only (faster iteration)
+marp2video browser video --config demo.yaml --output demo.mp4 --limit 2
+
+# Test first 3 steps of browser segment (faster iteration)
+marp2video browser video --config demo.yaml --output demo.mp4 --limit-steps 3
+```
+
+**Output Structure:**
+
+When using `--audio-dir` and multiple languages:
+
+```
+project/
+├── demo.yaml
+├── demo.mp4              # Primary language video
+├── demo_fr-FR.mp4        # French version
+├── demo_zh-Hans.mp4      # Chinese version
+├── demo.srt              # Subtitles (if --subtitles)
+└── audio/
+    ├── en-US/
+    │   ├── segment_000.mp3
+    │   ├── segment_000.json    # Cached timing metadata
+    │   └── combined.mp3
+    ├── fr-FR/
+    │   └── ...
+    └── zh-Hans/
+        └── ...
+```
+
 ### Examples
 
 **Full pipeline with inline voiceovers:**
 
 ```bash
-marp2video video \
+marp2video slides video \
   --input presentation.md \
   --output youtube_video.mp4 \
   --transition 0.5
@@ -200,9 +364,9 @@ marp2video video \
 
 ```bash
 # Step 1: Generate audio for each language (directory matches locale code)
-marp2video tts --transcript transcript.json --output audio/en-US/ --lang en-US
-marp2video tts --transcript transcript.json --output audio/es-ES/ --lang es-ES
-marp2video tts --transcript transcript.json --output audio/zh-Hans/ --lang zh-Hans
+marp2video slides tts --transcript transcript.json --output audio/en-US/ --lang en-US
+marp2video slides tts --transcript transcript.json --output audio/es-ES/ --lang es-ES
+marp2video slides tts --transcript transcript.json --output audio/zh-Hans/ --lang zh-Hans
 
 # Step 2: Generate subtitles for each language (uses Deepgram STT)
 marp2video subtitle --audio audio/en-US/
@@ -210,11 +374,11 @@ marp2video subtitle --audio audio/es-ES/
 marp2video subtitle --audio audio/zh-Hans/
 
 # Step 3: Generate videos with embedded subtitles
-marp2video video --input slides.md --manifest audio/en-US/manifest.json \
+marp2video slides video --input slides.md --manifest audio/en-US/manifest.json \
   --output video/en-US.mp4 --subtitles subtitles/en-US.srt
-marp2video video --input slides.md --manifest audio/es-ES/manifest.json \
+marp2video slides video --input slides.md --manifest audio/es-ES/manifest.json \
   --output video/es-ES.mp4 --subtitles subtitles/es-ES.srt
-marp2video video --input slides.md --manifest audio/zh-Hans/manifest.json \
+marp2video slides video --input slides.md --manifest audio/zh-Hans/manifest.json \
   --output video/zh-Hans.mp4 --subtitles subtitles/zh-Hans.srt
 ```
 
@@ -250,7 +414,7 @@ project/
 **Generate individual videos for Udemy:**
 
 ```bash
-marp2video video \
+marp2video slides video \
   --input presentation.md \
   --output combined.mp4 \
   --output-individual ./udemy_videos/
@@ -259,7 +423,7 @@ marp2video video \
 ### Check Dependencies
 
 ```bash
-marp2video video --check
+marp2video slides video --check
 ```
 
 This will verify that all required tools (ffmpeg, marp) are installed.
@@ -404,15 +568,20 @@ This manifest is used by `marp2video video --manifest` for precise slide timing.
 
 marp2video supports two workflows:
 
-**Workflow A: Full Pipeline (inline voiceovers)**
+**Workflow A: Marp Slides - Full Pipeline (inline voiceovers)**
 ```
 presentation.md → Parse → TTS → Render → Record → Combine → video.mp4
 ```
 
-**Workflow B: Two-Step (JSON transcript)**
+**Workflow B: Marp Slides - Two-Step (JSON transcript)**
 ```
-Step 1: transcript.json → marp2video tts → audio/{lang}/*.mp3 + manifest.json
-Step 2: presentation.md + manifest.json → marp2video video → video/{lang}.mp4
+Step 1: transcript.json → marp2video slides tts → audio/{lang}/*.mp3 + manifest.json
+Step 2: presentation.md + manifest.json → marp2video slides video → video/{lang}.mp4
+```
+
+**Workflow C: Browser Demo with Voiceover**
+```
+config.yaml → marp2video browser video → TTS + Record + Combine → demo.mp4
 ```
 
 ### Detailed Pipeline
@@ -618,7 +787,7 @@ examples/
 **Option A: Full pipeline (inline voiceovers)**
 
 ```bash
-marp2video video \
+marp2video slides video \
   --input examples/intro/presentation.md \
   --output examples/intro/output.mp4
 ```
@@ -627,24 +796,24 @@ marp2video video \
 
 ```bash
 # Generate audio for English
-marp2video tts \
+marp2video slides tts \
   --transcript examples/intro/transcript.json \
   --output examples/intro/audio/en-US/ \
   --lang en-US
 
 # Generate video
-marp2video video \
+marp2video slides video \
   --input examples/intro/presentation.md \
   --manifest examples/intro/audio/en-US/manifest.json \
   --output examples/intro/video/en-US.mp4
 
 # Generate Spanish version
-marp2video tts \
+marp2video slides tts \
   --transcript examples/intro/transcript.json \
   --output examples/intro/audio/es-ES/ \
   --lang es-ES
 
-marp2video video \
+marp2video slides video \
   --input examples/intro/presentation.md \
   --manifest examples/intro/audio/es-ES/manifest.json \
   --output examples/intro/video/es-ES.mp4
@@ -672,6 +841,33 @@ Install Marp CLI: `npm install -g @marp-team/marp-cli`
 - Verify your API key is correct
 - Check your ElevenLabs account has sufficient credits
 - Ensure you have access to the voice ID you specified
+
+### Subtitle burning fails (--subtitles-burn)
+
+The `--subtitles-burn` flag requires FFmpeg compiled with libass support. If you see an error like "FFmpeg subtitles filter not available", your FFmpeg installation needs to be updated.
+
+**Check if your FFmpeg has subtitle support:**
+```bash
+ffmpeg -filters 2>&1 | grep subtitles
+```
+
+If nothing is returned, install FFmpeg with libass:
+
+```bash
+# macOS: Use homebrew-ffmpeg tap (includes libass by default)
+brew uninstall ffmpeg
+brew tap homebrew-ffmpeg/ffmpeg
+brew install homebrew-ffmpeg/ffmpeg/ffmpeg
+
+# Linux (Ubuntu/Debian)
+sudo apt install ffmpeg libass-dev
+
+# Verify installation
+ffmpeg -filters 2>&1 | grep subtitles
+# Should show: subtitles V->V Render text subtitles...
+```
+
+**Alternative:** Use `--subtitles` without `--subtitles-burn` to generate a separate `.srt` file that video players can load.
 
 ### Recording issues on macOS
 
@@ -742,11 +938,14 @@ MIT License - see LICENSE file for details
 - [x] Decoupled TTS workflow (separate audio generation)
 - [x] Audio manifest with timing information
 - [x] Progress bar during conversion
+- [x] Add subtitle/caption generation
+- [x] Browser demo recording with voiceover
+- [x] Multi-language video generation
+- [x] TTS audio caching for faster iterations
 - [ ] Support for background music
 - [ ] Batch processing of multiple presentations
 - [ ] Web UI for easier configuration
 - [ ] Export to different video formats
-- [x] Add subtitle/caption generation
 - [ ] Avatar integration (HeyGen, Synthesia)
 
  [build-status-svg]: https://github.com/grokify/marp2video/actions/workflows/ci.yaml/badge.svg?branch=main
