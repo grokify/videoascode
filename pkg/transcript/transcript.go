@@ -39,13 +39,77 @@ type VoiceConfig struct {
 	Style           float64 `json:"style,omitempty"`           // Style exaggeration (0.0 to 1.0)
 }
 
+// SourceType identifies the segment content source
+type SourceType string
+
+const (
+	// SourceTypeSlide indicates a Marp slide segment
+	SourceTypeSlide SourceType = "slide"
+	// SourceTypeBrowser indicates a browser-driven demo segment
+	SourceTypeBrowser SourceType = "browser"
+)
+
 // Slide represents a single slide's transcript data
 type Slide struct {
 	Index       int                        `json:"index"`
-	Title       string                     `json:"title,omitempty"`  // Optional slide title for reference
-	Transcripts map[string]LanguageContent `json:"transcripts"`      // Keyed by language code
-	Avatar      *AvatarConfig              `json:"avatar,omitempty"` // Optional avatar/speaker config
-	Notes       string                     `json:"notes,omitempty"`  // Internal notes (not spoken)
+	Title       string                     `json:"title,omitempty"`      // Optional slide title for reference
+	SourceType  SourceType                 `json:"sourceType,omitempty"` // slide or browser (defaults to slide)
+	Transcripts map[string]LanguageContent `json:"transcripts"`          // Keyed by language code
+	Avatar      *AvatarConfig              `json:"avatar,omitempty"`     // Optional avatar/speaker config
+	Notes       string                     `json:"notes,omitempty"`      // Internal notes (not spoken)
+
+	// Browser-specific fields (only used when SourceType is "browser")
+	BrowserURL   string        `json:"browserUrl,omitempty"`   // Starting URL for browser segment
+	BrowserSteps []BrowserStep `json:"browserSteps,omitempty"` // Browser automation steps
+}
+
+// BrowserStep represents a single browser automation step in the transcript
+type BrowserStep struct {
+	// Action is the type of action (navigate, click, input, wait, etc.)
+	Action string `json:"action"`
+
+	// Selector is the CSS selector for element actions
+	Selector string `json:"selector,omitempty"`
+
+	// Value is used for input actions
+	Value string `json:"value,omitempty"`
+
+	// URL is used for navigate actions
+	URL string `json:"url,omitempty"`
+
+	// Duration is used for wait actions (milliseconds)
+	Duration int `json:"duration,omitempty"`
+
+	// Script is JavaScript code for evaluate actions
+	Script string `json:"script,omitempty"`
+
+	// Voiceover is the text to speak during this step
+	Voiceover string `json:"voiceover,omitempty"`
+
+	// Description provides context for the step
+	Description string `json:"description,omitempty"`
+
+	// ScrollX and ScrollY are pixel amounts for scroll actions
+	ScrollX int `json:"scrollX,omitempty"`
+	ScrollY int `json:"scrollY,omitempty"`
+
+	// ScrollMode determines if scroll is relative (delta) or absolute (position)
+	// Valid values: "relative" (default), "absolute"
+	ScrollMode string `json:"scrollMode,omitempty"`
+
+	// ScrollBehavior determines if scroll is instant or animated
+	// Valid values: "auto" (instant, default), "smooth" (animated)
+	ScrollBehavior string `json:"scrollBehavior,omitempty"`
+
+	// Timing contains timing data after recording
+	Timing *StepTimingInfo `json:"timing,omitempty"`
+}
+
+// StepTimingInfo contains timing data for a browser step
+type StepTimingInfo struct {
+	StartMs    int `json:"startMs"`    // Start time relative to segment start
+	EndMs      int `json:"endMs"`      // End time relative to segment start
+	DurationMs int `json:"durationMs"` // Actual step duration
 }
 
 // LanguageContent contains the transcript for one language
@@ -164,4 +228,58 @@ func (lc *LanguageContent) GetTotalPauseDuration() int {
 		total += seg.Pause
 	}
 	return total
+}
+
+// GetEffectiveSourceType returns the source type, defaulting to slide for backward compatibility
+func (s *Slide) GetEffectiveSourceType() SourceType {
+	if s.SourceType == "" {
+		return SourceTypeSlide
+	}
+	return s.SourceType
+}
+
+// IsSlideSegment returns true if this is a slide segment
+func (s *Slide) IsSlideSegment() bool {
+	return s.GetEffectiveSourceType() == SourceTypeSlide
+}
+
+// IsBrowserSegment returns true if this is a browser segment
+func (s *Slide) IsBrowserSegment() bool {
+	return s.GetEffectiveSourceType() == SourceTypeBrowser
+}
+
+// GetBrowserVoiceovers returns all voiceover texts from browser steps
+func (s *Slide) GetBrowserVoiceovers() []string {
+	if !s.IsBrowserSegment() {
+		return nil
+	}
+	voiceovers := make([]string, 0, len(s.BrowserSteps))
+	for _, step := range s.BrowserSteps {
+		if step.Voiceover != "" {
+			voiceovers = append(voiceovers, step.Voiceover)
+		}
+	}
+	return voiceovers
+}
+
+// GetBrowserSlides returns only browser-type slides from the transcript
+func (t *Transcript) GetBrowserSlides() []Slide {
+	slides := make([]Slide, 0)
+	for _, slide := range t.Slides {
+		if slide.IsBrowserSegment() {
+			slides = append(slides, slide)
+		}
+	}
+	return slides
+}
+
+// GetSlideSlides returns only slide-type slides from the transcript
+func (t *Transcript) GetSlideSlides() []Slide {
+	slides := make([]Slide, 0)
+	for _, slide := range t.Slides {
+		if slide.IsSlideSegment() {
+			slides = append(slides, slide)
+		}
+	}
+	return slides
 }

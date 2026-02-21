@@ -131,6 +131,12 @@
           "type": "string",
           "description": "Slide title for reference"
         },
+        "sourceType": {
+          "type": "string",
+          "enum": ["slide", "browser"],
+          "default": "slide",
+          "description": "Type of content source (slide for Marp, browser for web automation)"
+        },
         "transcripts": {
           "type": "object",
           "description": "Language code to content mapping",
@@ -144,6 +150,113 @@
         "notes": {
           "type": "string",
           "description": "Internal notes (not spoken)"
+        },
+        "browserUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Starting URL for browser segment (only for sourceType: browser)"
+        },
+        "browserSteps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BrowserStep"
+          },
+          "description": "Browser automation steps (only for sourceType: browser)"
+        }
+      }
+    },
+    "BrowserStep": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["navigate", "click", "input", "scroll", "wait", "waitFor", "screenshot", "evaluate", "hover", "select", "keypress"],
+          "description": "Type of browser action"
+        },
+        "selector": {
+          "type": "string",
+          "description": "CSS selector or XPath for element targeting"
+        },
+        "value": {
+          "type": "string",
+          "description": "Input value for input/select actions"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for navigate actions"
+        },
+        "duration": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Duration in milliseconds for wait actions"
+        },
+        "script": {
+          "type": "string",
+          "description": "JavaScript code for evaluate actions"
+        },
+        "scrollX": {
+          "type": "integer",
+          "description": "Horizontal scroll amount in pixels"
+        },
+        "scrollY": {
+          "type": "integer",
+          "description": "Vertical scroll amount in pixels"
+        },
+        "scrollMode": {
+          "type": "string",
+          "enum": ["relative", "absolute"],
+          "default": "relative",
+          "description": "Scroll positioning mode: 'relative' (delta) or 'absolute' (position)"
+        },
+        "scrollBehavior": {
+          "type": "string",
+          "enum": ["auto", "smooth"],
+          "default": "auto",
+          "description": "Scroll animation: 'auto' (instant) or 'smooth' (animated with auto-wait)"
+        },
+        "text": {
+          "type": "string",
+          "description": "Click by text content instead of selector"
+        },
+        "textScope": {
+          "type": "string",
+          "description": "CSS selector to scope text search"
+        },
+        "textMatch": {
+          "type": "string",
+          "enum": ["contains", "exact", "regex"],
+          "default": "contains",
+          "description": "Text matching mode"
+        },
+        "voiceover": {
+          "type": "string",
+          "description": "Text to speak during this step"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the step"
+        },
+        "timing": {
+          "$ref": "#/$defs/StepTimingInfo"
+        }
+      }
+    },
+    "StepTimingInfo": {
+      "type": "object",
+      "properties": {
+        "startMs": {
+          "type": "integer",
+          "description": "Start time relative to segment start (milliseconds)"
+        },
+        "endMs": {
+          "type": "integer",
+          "description": "End time relative to segment start (milliseconds)"
+        },
+        "durationMs": {
+          "type": "integer",
+          "description": "Actual step duration (milliseconds)"
         }
       }
     },
