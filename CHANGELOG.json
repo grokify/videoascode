@@ -7,6 +7,52 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.3.0",
+      "date": "2026-02-21",
+      "highlights": [
+        { "description": "Browser video recording with automated browser interactions and synchronized voiceover" },
+        { "description": "Hardware-accelerated encoding via VideoToolbox on macOS" },
+        { "description": "Subtitle burning with --subtitles-burn flag" },
+        { "description": "Multi-language pace-to-longest for synchronized video output" }
+      ],
+      "added": [
+        { "description": "Browser automation package (`pkg/browser`) with Rod-based recording", "commit": "387d262" },
+        { "description": "Segment abstraction layer (`pkg/segment`) for unified content handling", "commit": "c0c4c5f" },
+        { "description": "Source loading package (`pkg/source`) for config and transcript files", "commit": "1875d5c" },
+        { "description": "Unified configuration package (`pkg/config`) with YAML support", "commit": "6fb9899" },
+        { "description": "Video provider pattern (`pkg/video/provider.go`) for extensible video generation", "commit": "f59c595" },
+        { "description": "Media duration utilities (`pkg/media`) for audio/video duration detection", "commit": "650ec47" },
+        { "description": "Segment orchestrator for coordinating TTS, video, and audio combination", "commit": "8f25d51" },
+        { "description": "TTS support for browser segments with per-step voiceovers", "commit": "ffca154" },
+        { "description": "Browser step types: navigate, click, input, scroll, wait, hover, keypress, evaluate", "commit": "387d262" },
+        { "description": "Click-by-text-content with textMatch modes (contains, exact, regex)", "commit": "387d262" },
+        { "description": "Scroll modes: relative (delta) and absolute (position)", "commit": "289960b" },
+        { "description": "Scroll behavior: auto (instant) and smooth (animated with auto-wait)", "commit": "289960b" },
+        { "description": "Hardware-accelerated encoding via `--fast` flag (VideoToolbox on macOS)", "commit": "53512f4" },
+        { "description": "Subtitle burning via `--subtitles-burn` flag", "commit": "7950ac8" },
+        { "description": "Silent video generation via `--no-audio` flag", "commit": "7950ac8" },
+        { "description": "Testing flags `--limit` and `--limit-steps` for partial content generation", "commit": "7950ac8" },
+        { "description": "Multi-language pace-to-longest for synchronized video timing", "commit": "8f25d51" },
+        { "description": "Browser video guide with complete documentation", "commit": "00189c6" },
+        { "description": "Example browser demo configs in `examples/browser-demo/`", "commit": "00189c6" }
+      ],
+      "changed": [
+        { "description": "CLI refactored with `browser video` subcommand", "commit": "7950ac8" },
+        { "description": "Transcript schema extended with BrowserStep and SourceType fields", "commit": "289960b" }
+      ],
+      "documentation": [
+        { "description": "Added browser video recording guide", "commit": "00189c6" },
+        { "description": "Added language duration comparison table to multi-language guide", "commit": "7fa2885" },
+        { "description": "Added step duration guidelines to browser video guide", "commit": "7fa2885" },
+        { "description": "Updated CLI reference with browser commands and new flags", "commit": "745b9ca" },
+        { "description": "Updated README with browser video features", "commit": "de162c7" }
+      ],
+      "dependencies": [
+        { "description": "Add `google/uuid` as direct dependency", "commit": "8c4fc83" },
+        { "description": "Add `gopkg.in/yaml.v3` for YAML config parsing", "commit": "8c4fc83" }
+      ]
+    },
+    {
       "version": "v0.2.1",
       "date": "2026-02-15",
       "highlights": [
