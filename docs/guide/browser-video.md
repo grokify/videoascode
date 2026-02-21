@@ -128,6 +128,9 @@ segments:
 | `scrollMode` | `relative` (default), `absolute` | Relative scrolls by delta; absolute scrolls to position |
 | `scrollBehavior` | `auto` (default), `smooth` | Auto is instant; smooth animates the scroll |
 
+!!! note "Scroll Animation Limitation"
+    Browser recordings capture 1 frame per step. Smooth scroll animations will appear as jump cuts in the final video. For smoother results, use multiple smaller scroll steps instead of one large scroll.
+
 ## Multi-Language Support
 
 Generate videos in multiple languages with a single command:
