@@ -3,7 +3,7 @@ module github.com/grokify/videoascode
 go 1.25.5
 
 require (
-	github.com/agentplexus/go-elevenlabs v0.8.1
+	github.com/agentplexus/go-elevenlabs v0.8.2
 	github.com/agentplexus/omnivoice v0.4.3
 	github.com/agentplexus/omnivoice-deepgram v0.3.0
 	github.com/go-rod/rod v0.116.2
@@ -34,7 +34,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/ogen-go/ogen v1.18.0 // indirect
+	github.com/ogen-go/ogen v1.19.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
@@ -49,7 +49,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.40.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.1 // indirect
-	golang.org/x/exp v0.0.0-20260212183809-81e46e3db34a // indirect
+	golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa // indirect
 	golang.org/x/net v0.50.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
