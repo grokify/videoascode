@@ -5,7 +5,7 @@ go 1.25.5
 require (
 	github.com/agentplexus/go-elevenlabs v0.8.2
 	github.com/agentplexus/omnivoice v0.4.3
-	github.com/agentplexus/omnivoice-deepgram v0.3.0
+	github.com/agentplexus/omnivoice-deepgram v0.3.1
 	github.com/go-rod/rod v0.116.2
 	github.com/google/uuid v1.6.0
 	github.com/grokify/ffutil v0.1.0
