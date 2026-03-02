@@ -12,7 +12,7 @@ See Jason's [original LinkedIn post](https://www.linkedin.com/posts/imjasonh_i-f
 
 ### vac
 
-vac grew from production needs at [AgentPlexus](https://github.com/agentplexus), which publishes many Marp presentations and wanted to turn them into narrated videos. The project also served as a way to exercise the [OmniVoice](https://github.com/agentplexus/omnivoice) libraries for multi-language and multi-provider TTS/STT workflows. Rather than being locked into a single provider, vac uses OmniVoice as a unified abstraction layer—allowing different providers for different languages or slides. A Chinese slide might use Deepgram while English slides use ElevenLabs, all in the same video. The tool also generates subtitles from actual audio transcription (STT) rather than estimating from word count, producing word-level timestamps and proper capitalization via dictionary-based correction.
+vac grew from production needs at [PlexusOne](https://github.com/plexusone), which publishes many Marp presentations and wanted to turn them into narrated videos. The project also served as a way to exercise the [OmniVoice](https://github.com/plexusone/omnivoice) libraries for multi-language and multi-provider TTS/STT workflows. Rather than being locked into a single provider, vac uses OmniVoice as a unified abstraction layer—allowing different providers for different languages or slides. A Chinese slide might use Deepgram while English slides use ElevenLabs, all in the same video. The tool also generates subtitles from actual audio transcription (STT) rather than estimating from word count, producing word-level timestamps and proper capitalization via dictionary-based correction.
 
 ## Philosophy
 
@@ -176,5 +176,5 @@ Both tools demonstrate that with modern AI voice services, the gap between "slid
 
 - [vac on GitHub](https://github.com/grokify/videoascode)
 - [marptalk on GitHub](https://github.com/imjasonh/marptalk)
-- [OmniVoice - TTS/STT abstraction layer](https://github.com/agentplexus/omnivoice)
+- [OmniVoice - TTS/STT abstraction layer](https://github.com/plexusone/omnivoice)
 - [Marp - Markdown Presentation Ecosystem](https://marp.app/)

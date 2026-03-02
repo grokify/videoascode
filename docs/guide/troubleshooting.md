@@ -83,7 +83,7 @@ Tips for faster generation:
 **Solution**: This was fixed in omnivoice v0.4.2. Ensure you have the latest dependencies:
 
 ```bash
-go get -u github.com/agentplexus/omnivoice@latest
+go get -u github.com/plexusone/omnivoice@latest
 go install github.com/grokify/videoascode/cmd/vac@latest
 ```
 

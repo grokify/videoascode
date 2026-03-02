@@ -11,7 +11,7 @@ Convert Marp presentations with voiceovers to video files.
 
 This tool takes a Marp markdown presentation with voiceover text (inline comments or JSON transcript), generates speech using text-to-speech (TTS), and creates a synchronized video recording of the presentation with optional subtitles.
 
-**Powered by [OmniVoice](https://github.com/agentplexus/omnivoice)** - a unified interface for TTS/STT providers. Tested with:
+**Powered by [OmniVoice](https://github.com/plexusone/omnivoice)** - a unified interface for TTS/STT providers. Tested with:
 
 - **[ElevenLabs](https://elevenlabs.io/)** - Known for high-quality AI voices (TTS and STT available)
 - **[Deepgram](https://deepgram.com/)** - Known for fast, accurate transcription (STT and TTS available)
@@ -919,7 +919,7 @@ MIT License - see LICENSE file for details
 ## Acknowledgments
 
 - [Marp](https://marp.app/) - Markdown presentation ecosystem
-- [OmniVoice](https://github.com/agentplexus/omnivoice) - Unified TTS/STT provider interface
+- [OmniVoice](https://github.com/plexusone/omnivoice) - Unified TTS/STT provider interface
 - [ElevenLabs](https://elevenlabs.io/) - AI voice generation (TTS)
 - [Deepgram](https://deepgram.com/) - Speech-to-text (STT) for subtitles
 - [Rod](https://github.com/go-rod/rod) - Browser automation framework

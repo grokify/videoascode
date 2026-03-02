@@ -93,7 +93,7 @@ type ElevenLabsClient struct {
 func (c *ElevenLabsClient) Synthesize(ctx context.Context, text string) ([]byte, error)
 ```
 
-Uses `github.com/agentplexus/go-elevenlabs` with OmniVoice compatibility.
+Uses `github.com/plexusone/go-elevenlabs` with OmniVoice compatibility.
 
 ### Video Recorder
 
@@ -208,7 +208,7 @@ slides.md + transcript.json
 
 | Module | Purpose |
 |--------|---------|
-| `github.com/agentplexus/go-elevenlabs` | ElevenLabs API client |
+| `github.com/plexusone/go-elevenlabs` | ElevenLabs API client |
 | `github.com/grokify/mogo` | Utilities (slog context) |
 | `github.com/spf13/cobra` | CLI framework |
 

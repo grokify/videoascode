@@ -7,6 +7,24 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.5.0",
+      "date": "2026-03-01",
+      "highlights": [
+        { "description": "Migrate to batteries-included plexusone/omnivoice with provider registry pattern" }
+      ],
+      "changed": [
+        { "description": "Use omnivoice registry pattern (`GetSTTProvider`, `GetTTSProvider`) instead of direct provider imports", "commit": "35210ce" },
+        { "description": "Providers auto-registered via `_ \"github.com/plexusone/omnivoice/providers/all\"`", "commit": "35210ce" }
+      ],
+      "dependencies": [
+        { "description": "Upgrade `github.com/plexusone/omnivoice` from v0.1.0 to v0.5.1 (batteries-included)", "commit": "35210ce" },
+        { "description": "Remove direct imports of `go-elevenlabs` and `omnivoice-deepgram` (now indirect via omnivoice)", "commit": "35210ce" }
+      ],
+      "documentation": [
+        { "description": "Update README to reference `plexusone/omnivoice` instead of `agentplexus/omnivoice`", "commit": "35210ce" }
+      ]
+    },
+    {
       "version": "v0.4.0",
       "date": "2026-02-21",
       "highlights": [
@@ -100,7 +118,7 @@
         { "description": "Updated architecture docs with mixed audio sample rate handling details", "commit": "fa5fe3f" }
       ],
       "dependencies": [
-        { "description": "Upgrade `github.com/agentplexus/omnivoice` to v0.4.3 for subtitle line count fix and Chinese/English subtitle tests", "commit": "c852036" }
+        { "description": "Upgrade `github.com/plexusone/omnivoice` to v0.4.3 for subtitle line count fix and Chinese/English subtitle tests", "commit": "c852036" }
       ]
     },
     {
@@ -137,8 +155,8 @@
       ],
       "dependencies": [
         { "description": "Bump `github.com/grokify/mogo` to v0.73.2 for `SanitizePath` support", "commit": "35aef8d" },
-        { "description": "Add `github.com/agentplexus/omnivoice` for unified TTS/STT abstraction", "commit": "7c1b9cd" },
-        { "description": "Add `github.com/agentplexus/omnivoice-deepgram` for Deepgram STT", "commit": "7c1b9cd" }
+        { "description": "Add `github.com/plexusone/omnivoice` for unified TTS/STT abstraction", "commit": "7c1b9cd" },
+        { "description": "Add `github.com/plexusone/omnivoice-deepgram` for Deepgram STT", "commit": "7c1b9cd" }
       ],
       "chore": [
         { "description": "Update Go versions in CI", "commit": "171ab0b" },
