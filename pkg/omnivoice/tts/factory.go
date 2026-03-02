@@ -3,8 +3,8 @@ package tts
 import (
 	"fmt"
 
-	elevenlabstts "github.com/agentplexus/go-elevenlabs/omnivoice/tts"
-	deepgramtts "github.com/agentplexus/omnivoice-deepgram/omnivoice/tts"
+	"github.com/plexusone/omnivoice"
+	_ "github.com/plexusone/omnivoice/providers/all" // Register all providers
 )
 
 // ProviderConfig holds configuration for creating TTS providers.
@@ -72,32 +72,31 @@ func (f *Factory) SetFallback(name string) {
 	f.fallback = name
 }
 
-// createProvider creates a new provider instance.
+// createProvider creates a new provider instance using the omnivoice registry.
 func (f *Factory) createProvider(name string) (*Provider, error) {
+	var apiKey string
 	switch name {
 	case "elevenlabs":
 		if f.config.ElevenLabsAPIKey == "" {
 			return nil, fmt.Errorf("ElevenLabs API key not configured")
 		}
-		provider, err := elevenlabstts.New(elevenlabstts.WithAPIKey(f.config.ElevenLabsAPIKey))
-		if err != nil {
-			return nil, fmt.Errorf("failed to create ElevenLabs provider: %w", err)
-		}
-		return New(provider), nil
-
+		apiKey = f.config.ElevenLabsAPIKey
 	case "deepgram":
 		if f.config.DeepgramAPIKey == "" {
 			return nil, fmt.Errorf("Deepgram API key not configured")
 		}
-		provider, err := deepgramtts.New(deepgramtts.WithAPIKey(f.config.DeepgramAPIKey))
-		if err != nil {
-			return nil, fmt.Errorf("failed to create Deepgram provider: %w", err)
-		}
-		return New(provider), nil
-
+		apiKey = f.config.DeepgramAPIKey
 	default:
 		return nil, fmt.Errorf("unknown provider: %s", name)
 	}
+
+	// Use the omnivoice registry to create the provider
+	provider, err := omnivoice.GetTTSProvider(name, omnivoice.WithAPIKey(apiKey))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create %s provider: %w", name, err)
+	}
+
+	return New(provider), nil
 }
 
 // Available returns a list of available provider names based on configured API keys.

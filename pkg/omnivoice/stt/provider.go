@@ -5,17 +5,17 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/agentplexus/omnivoice/stt"
+	"github.com/plexusone/omnivoice"
 )
 
 // Provider wraps an OmniVoice STT provider for use with marp2video.
 type Provider struct {
-	provider stt.Provider
+	provider omnivoice.STTProvider
 	name     string
 }
 
 // New creates a new OmniVoice STT provider wrapper.
-func New(provider stt.Provider) *Provider {
+func New(provider omnivoice.STTProvider) *Provider {
 	return &Provider{
 		provider: provider,
 		name:     provider.Name(),
@@ -64,13 +64,13 @@ func (p *Provider) Transcribe(ctx context.Context, audio []byte, config Transcri
 }
 
 // UnderlyingProvider returns the wrapped OmniVoice provider for advanced operations.
-func (p *Provider) UnderlyingProvider() stt.Provider {
+func (p *Provider) UnderlyingProvider() omnivoice.STTProvider {
 	return p.provider
 }
 
 // configToOmniVoice converts marp2video config to OmniVoice config.
-func configToOmniVoice(config TranscriptionConfig) stt.TranscriptionConfig {
-	return stt.TranscriptionConfig{
+func configToOmniVoice(config TranscriptionConfig) omnivoice.TranscriptionConfig {
+	return omnivoice.TranscriptionConfig{
 		Language:                 config.Language,
 		Model:                    config.Model,
 		EnablePunctuation:        config.EnablePunctuation,
@@ -81,7 +81,7 @@ func configToOmniVoice(config TranscriptionConfig) stt.TranscriptionConfig {
 }
 
 // resultFromOmniVoice converts OmniVoice result to marp2video result.
-func resultFromOmniVoice(result *stt.TranscriptionResult) *TranscriptionResult {
+func resultFromOmniVoice(result *omnivoice.TranscriptionResult) *TranscriptionResult {
 	r := &TranscriptionResult{
 		Text:     result.Text,
 		Language: result.Language,

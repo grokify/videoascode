@@ -7,18 +7,17 @@ import (
 	"time"
 
 	"github.com/grokify/videoascode/pkg/transcript"
-
-	"github.com/agentplexus/omnivoice/tts"
+	"github.com/plexusone/omnivoice"
 )
 
 // Provider wraps an OmniVoice TTS provider for use with marp2video.
 type Provider struct {
-	provider tts.Provider
+	provider omnivoice.TTSProvider
 	name     string
 }
 
 // New creates a new OmniVoice TTS provider wrapper.
-func New(provider tts.Provider) *Provider {
+func New(provider omnivoice.TTSProvider) *Provider {
 	return &Provider{
 		provider: provider,
 		name:     provider.Name(),
@@ -58,8 +57,8 @@ func (p *Provider) SynthesizeWithDuration(ctx context.Context, text string, voic
 }
 
 // VoiceConfigToSynthesisConfig converts marp2video VoiceConfig to OmniVoice SynthesisConfig.
-func VoiceConfigToSynthesisConfig(voice transcript.VoiceConfig) tts.SynthesisConfig {
-	config := tts.SynthesisConfig{
+func VoiceConfigToSynthesisConfig(voice transcript.VoiceConfig) omnivoice.SynthesisConfig {
+	config := omnivoice.SynthesisConfig{
 		VoiceID:         voice.VoiceID,
 		Model:           voice.Model,
 		OutputFormat:    voice.OutputFormat,
@@ -81,6 +80,6 @@ func VoiceConfigToSynthesisConfig(voice transcript.VoiceConfig) tts.SynthesisCon
 }
 
 // UnderlyingProvider returns the wrapped OmniVoice provider for advanced operations.
-func (p *Provider) UnderlyingProvider() tts.Provider {
+func (p *Provider) UnderlyingProvider() omnivoice.TTSProvider {
 	return p.provider
 }
