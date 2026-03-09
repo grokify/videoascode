@@ -36,8 +36,8 @@ github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aN
 github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/grokify/ffutil v0.1.0 h1:jpyNUTlYF8X+qzyYTAqsZXyUTsYNHXofW3HUW/MseDU=
 github.com/grokify/ffutil v0.1.0/go.mod h1:6UPODtYzb9Xx+mFFrW0qZdzt/qLS00gU7BY63tmtaZg=
-github.com/grokify/mogo v0.73.3 h1:icEi2mTd5MyWKG1osinpkFmjr1dFuyOBzdSKLyeq4DQ=
-github.com/grokify/mogo v0.73.3/go.mod h1:dq1YdL7IkcA6B8uAFGbKsReX9GWAunIyjl+cTNAenc0=
+github.com/grokify/mogo v0.73.4 h1:Todlr6dipsFD3zWy8Djod9j6iswN77pe7Q9AOFGdg3E=
+github.com/grokify/mogo v0.73.4/go.mod h1:dq1YdL7IkcA6B8uAFGbKsReX9GWAunIyjl+cTNAenc0=
 github.com/hokaccha/go-prettyjson v0.0.0-20211117102719-0474bc63780f h1:7LYC+Yfkj3CTRcShK0KOL/w6iTiKyqqBA9a41Wnggw8=
 github.com/hokaccha/go-prettyjson v0.0.0-20211117102719-0474bc63780f/go.mod h1:pFlLw2CfqZiIBOx6BuCeRLCrfxBJipTY0nIOF/VbGcI=
 github.com/huandu/xstrings v1.5.0 h1:2ag3IFq9ZDANvthTwTiqSSZLjDc+BedvHPAp5tJy2TI=
