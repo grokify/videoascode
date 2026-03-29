@@ -512,7 +512,7 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(dst, data, 0600)
+	return writeFileSecure(dst, data, 0600)
 }
 
 // totalStages returns the number of stages
@@ -863,7 +863,7 @@ func combineAudioFiles(ctx context.Context, inputFiles []string, outputPath stri
 		if err != nil {
 			return err
 		}
-		return os.WriteFile(outputPath, data, 0600)
+		return writeFileSecure(outputPath, data, 0600)
 	}
 
 	// Create concat file

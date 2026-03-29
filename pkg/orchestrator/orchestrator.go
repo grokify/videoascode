@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/grokify/mogo/fmt/progress"
@@ -17,6 +18,17 @@ import (
 	"github.com/grokify/videoascode/pkg/tts"
 	"github.com/grokify/videoascode/pkg/video"
 )
+
+// writeFileSecure validates that path contains no ".." traversal sequences,
+// then writes data to the cleaned path. Library code should use this instead
+// of os.WriteFile to ensure callers provide safe paths.
+func writeFileSecure(path string, data []byte, perm os.FileMode) error {
+	if strings.Contains(path, "..") {
+		return fmt.Errorf("invalid path: contains '..' traversal sequence: %s", path)
+	}
+	cleanPath := filepath.Clean(path)
+	return os.WriteFile(cleanPath, data, perm) //nolint:gosec // G703: Path validated above - no '..' allowed
+}
 
 // Config holds orchestrator configuration
 type Config struct {
@@ -315,7 +327,7 @@ func (o *Orchestrator) Process(ctx context.Context) error {
 			if err != nil {
 				return fmt.Errorf("failed to read video %d: %w", i, err)
 			}
-			if err := os.WriteFile(destPath, data, 0600); err != nil {
+			if err := writeFileSecure(destPath, data, 0600); err != nil {
 				return fmt.Errorf("failed to write video %d: %w", i, err)
 			}
 		}
