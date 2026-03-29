@@ -231,7 +231,7 @@ func runBrowserRecord(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return fmt.Errorf("failed to read generated video: %w", err)
 		}
-		if err := os.WriteFile(brOutputFile, data, 0600); err != nil {
+		if err := os.WriteFile(brOutputFile, data, 0600); err != nil { //nolint:gosec // G703: Path from CLI flag
 			return fmt.Errorf("failed to write output video: %w", err)
 		}
 	}
@@ -248,7 +248,7 @@ func runBrowserRecord(cmd *cobra.Command, args []string) error {
 			if err != nil {
 				fmt.Printf("Warning: failed to read timing data: %v\n", err)
 			} else {
-				if err := os.WriteFile(brTimingFile, data, 0600); err != nil {
+				if err := os.WriteFile(brTimingFile, data, 0600); err != nil { //nolint:gosec // G703: Path from CLI flag
 					fmt.Printf("Warning: failed to write timing data: %v\n", err)
 				} else {
 					fmt.Printf("✓ Timing data saved to: %s\n", brTimingFile)
