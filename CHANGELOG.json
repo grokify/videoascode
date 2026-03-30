@@ -7,6 +7,30 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "Unreleased",
+      "fixed": [
+        { "description": "Add path traversal validation for G703 lint in library code", "commit": "e9429da" },
+        { "description": "Add nolint for G703 on CLI-provided paths (intentional user input)", "commit": "70798a7" }
+      ],
+      "changed": [
+        { "description": "Simplify `writeFileSecure` to use fixed 0600 mode", "commit": "d291fde" }
+      ],
+      "tests": [
+        { "description": "Add unit tests for `pkg/config`, `pkg/segment`, `pkg/transcript` (0% -> 63-94% coverage)", "commit": "fa6ead6" },
+        { "description": "Add unit tests for `pkg/omnivoice/tts` and `pkg/omnivoice/stt` using omnivoice-core mocks", "commit": "b95fa69" }
+      ],
+      "documentation": [
+        { "description": "Add `.claude/CLAUDE.md` with project-specific instructions", "commit": "f1e9662" },
+        { "description": "Add `TASKS.md` tracking testing gaps and coverage improvements", "commit": "57e04b4" }
+      ],
+      "dependencies": [
+        { "description": "Update `omnivoice` to v0.7.0", "commit": "fbc2e72" },
+        { "description": "Update `omnivoice-core` to v0.7.0 (TTS mock fixtures)", "commit": "e61f514" },
+        { "description": "Update `mogo` to v0.74.0", "commit": "d4efaaf" },
+        { "description": "Update GitHub Actions workflows to v0.3.0", "commit": "51e7001" }
+      ]
+    },
+    {
       "version": "v0.5.0",
       "date": "2026-03-01",
       "highlights": [
