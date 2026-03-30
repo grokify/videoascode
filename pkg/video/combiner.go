@@ -185,5 +185,5 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	return writeFileSecure(dst, data, 0600)
+	return writeFileSecure(dst, data)
 }
