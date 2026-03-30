@@ -38,7 +38,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plexusone/elevenlabs-go v0.9.1 // indirect
 	github.com/plexusone/ogen-tools v0.2.1 // indirect
-	github.com/plexusone/omnivoice-core v0.6.0 // indirect
+	github.com/plexusone/omnivoice-core v0.7.0 // indirect
 	github.com/plexusone/omnivoice-deepgram v0.4.1 // indirect
 	github.com/plexusone/omnivoice-openai v0.1.1 // indirect
 	github.com/plexusone/omnivoice-telnyx v0.1.0 // indirect

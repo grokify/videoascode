@@ -70,8 +70,8 @@ github.com/plexusone/ogen-tools v0.2.1 h1:S9QAKhWzjlJD1t5GbRhoxQziORiQZKBo/W0/49
 github.com/plexusone/ogen-tools v0.2.1/go.mod h1:vVWHWJbGjYjowi7aZu3DoZTDK4MVf9x05pk4p+cYnAI=
 github.com/plexusone/omnivoice v0.7.0 h1:m9qY9gVHMQpicpMdT0P/JL4pKlNN4jlB+TILNUe7OA4=
 github.com/plexusone/omnivoice v0.7.0/go.mod h1:gPDe9POQV+Ibx0w0gcEJGPFzUrvpiwbYjldv4KzUM8w=
-github.com/plexusone/omnivoice-core v0.6.0 h1:3Iy+tHsplFX5DlCi4ZrhEiesPptb7mF/uzT1DTD53BI=
-github.com/plexusone/omnivoice-core v0.6.0/go.mod h1:oFa3AOIKDv9lMd7M0cG1HBZOBKK6H9GAVhi7aiR9nYA=
+github.com/plexusone/omnivoice-core v0.7.0 h1:FlCabWLokAsjiRjTWdADoYauSVZ2X0SNbXpDMPX3aIY=
+github.com/plexusone/omnivoice-core v0.7.0/go.mod h1:oFa3AOIKDv9lMd7M0cG1HBZOBKK6H9GAVhi7aiR9nYA=
 github.com/plexusone/omnivoice-deepgram v0.4.1 h1:I895vdwYEQ+AnEuns6wLfR5Pkimp4AWbTwuXFJAEEog=
 github.com/plexusone/omnivoice-deepgram v0.4.1/go.mod h1:KTDnN6pD7XCP9I04JWXdMdNEL/a72N8mO5NIXALECEU=
 github.com/plexusone/omnivoice-openai v0.1.1 h1:Tm3oqIogATDwCRHAvsxeinCp95JBWy+KGy/crcHp69o=
