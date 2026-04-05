@@ -8,6 +8,23 @@
 [![Visualization][viz-svg]][viz-url]
 [![License][license-svg]][license-url]
 
+ [go-ci-svg]: https://github.com/grokify/videoascode/actions/workflows/go-ci.yaml/badge.svg?branch=main
+ [go-ci-url]: https://github.com/grokify/videoascode/actions/workflows/go-ci.yaml
+ [go-lint-svg]: https://github.com/grokify/videoascode/actions/workflows/go-lint.yaml/badge.svg?branch=main
+ [go-lint-url]: https://github.com/grokify/videoascode/actions/workflows/go-lint.yaml
+ [go-sast-svg]: https://github.com/grokify/videoascode/actions/workflows/go-sast-codeql.yaml/badge.svg?branch=main
+ [go-sast-url]: https://github.com/grokify/videoascode/actions/workflows/go-sast-codeql.yaml
+ [goreport-svg]: https://goreportcard.com/badge/github.com/grokify/videoascode
+ [goreport-url]: https://goreportcard.com/report/github.com/grokify/videoascode
+ [docs-godoc-svg]: https://pkg.go.dev/badge/github.com/grokify/videoascode
+ [docs-godoc-url]: https://pkg.go.dev/github.com/grokify/videoascode
+ [viz-svg]: https://img.shields.io/badge/visualizaton-Go-blue.svg
+ [viz-url]: https://mango-dune-07a8b7110.1.azurestaticapps.net/?repo=grokify%2Fvideoascode
+ [loc-svg]: https://tokei.rs/b1/github/grokify/videoascode
+ [repo-url]: https://github.com/grokify/videoascode
+ [license-svg]: https://img.shields.io/badge/license-MIT-blue.svg
+ [license-url]: https://github.com/grokify/videoascode/blob/master/LICENSE
+
 Convert Marp presentations with voiceovers to video files.
 
 This tool takes a Marp markdown presentation with voiceover text (inline comments or JSON transcript), generates speech using text-to-speech (TTS), and creates a synchronized video recording of the presentation with optional subtitles.
@@ -948,20 +965,3 @@ MIT License - see LICENSE file for details
 - [ ] Web UI for easier configuration
 - [ ] Export to different video formats
 - [ ] Avatar integration (HeyGen, Synthesia)
-
- [go-ci-svg]: https://github.com/grokify/videoascode/actions/workflows/go-ci.yaml/badge.svg?branch=main
- [go-ci-url]: https://github.com/grokify/videoascode/actions/workflows/go-ci.yaml
- [go-lint-svg]: https://github.com/grokify/videoascode/actions/workflows/go-lint.yaml/badge.svg?branch=main
- [go-lint-url]: https://github.com/grokify/videoascode/actions/workflows/go-lint.yaml
- [go-sast-svg]: https://github.com/grokify/videoascode/actions/workflows/go-sast-codeql.yaml/badge.svg?branch=main
- [go-sast-url]: https://github.com/grokify/videoascode/actions/workflows/go-sast-codeql.yaml
- [goreport-svg]: https://goreportcard.com/badge/github.com/grokify/videoascode
- [goreport-url]: https://goreportcard.com/report/github.com/grokify/videoascode
- [docs-godoc-svg]: https://pkg.go.dev/badge/github.com/grokify/videoascode
- [docs-godoc-url]: https://pkg.go.dev/github.com/grokify/videoascode
- [viz-svg]: https://img.shields.io/badge/visualizaton-Go-blue.svg
- [viz-url]: https://mango-dune-07a8b7110.1.azurestaticapps.net/?repo=grokify%2Fvideoascode
- [loc-svg]: https://tokei.rs/b1/github/grokify/videoascode
- [repo-url]: https://github.com/grokify/videoascode
- [license-svg]: https://img.shields.io/badge/license-MIT-blue.svg
- [license-url]: https://github.com/grokify/videoascode/blob/master/LICENSE
