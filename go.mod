@@ -1,13 +1,14 @@
 module github.com/grokify/videoascode
 
-go 1.25.5
+go 1.26.0
 
 require (
 	github.com/go-rod/rod v0.116.2
 	github.com/google/uuid v1.6.0
 	github.com/grokify/ffutil v0.1.0
-	github.com/grokify/mogo v0.74.0
+	github.com/grokify/mogo v0.74.1
 	github.com/plexusone/omnivoice v0.7.0
+	github.com/plexusone/omnivoice-core v0.7.0
 	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -38,7 +39,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plexusone/elevenlabs-go v0.9.1 // indirect
 	github.com/plexusone/ogen-tools v0.2.1 // indirect
-	github.com/plexusone/omnivoice-core v0.7.0 // indirect
 	github.com/plexusone/omnivoice-deepgram v0.4.1 // indirect
 	github.com/plexusone/omnivoice-openai v0.1.1 // indirect
 	github.com/plexusone/omnivoice-telnyx v0.1.0 // indirect
