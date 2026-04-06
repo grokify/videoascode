@@ -1,13 +1,14 @@
 module github.com/grokify/videoascode
 
-go 1.25.5
+go 1.26.0
 
 require (
 	github.com/go-rod/rod v0.116.2
 	github.com/google/uuid v1.6.0
 	github.com/grokify/ffutil v0.1.0
-	github.com/grokify/mogo v0.74.0
-	github.com/plexusone/omnivoice v0.7.0
+	github.com/grokify/mogo v0.74.1
+	github.com/plexusone/omnivoice v0.7.1
+	github.com/plexusone/omnivoice-core v0.8.0
 	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -36,17 +37,16 @@ require (
 	github.com/ogen-go/ogen v1.20.2 // indirect
 	github.com/openai/openai-go v1.12.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/plexusone/elevenlabs-go v0.9.1 // indirect
+	github.com/plexusone/elevenlabs-go v0.10.0 // indirect
 	github.com/plexusone/ogen-tools v0.2.1 // indirect
-	github.com/plexusone/omnivoice-core v0.7.0 // indirect
-	github.com/plexusone/omnivoice-deepgram v0.4.1 // indirect
-	github.com/plexusone/omnivoice-openai v0.1.1 // indirect
-	github.com/plexusone/omnivoice-telnyx v0.1.0 // indirect
-	github.com/plexusone/omnivoice-twilio v0.3.0 // indirect
+	github.com/plexusone/omnivoice-deepgram v0.5.0 // indirect
+	github.com/plexusone/omnivoice-openai v0.1.2 // indirect
+	github.com/plexusone/omnivoice-telnyx v0.1.1 // indirect
+	github.com/plexusone/omnivoice-twilio v0.3.1 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
-	github.com/team-telnyx/telnyx-go/v4 v4.55.0 // indirect
+	github.com/team-telnyx/telnyx-go/v4 v4.55.2 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
@@ -58,9 +58,9 @@ require (
 	github.com/ysmood/gson v0.7.3 // indirect
 	github.com/ysmood/leakless v0.9.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel v1.42.0 // indirect
-	go.opentelemetry.io/otel/metric v1.42.0 // indirect
-	go.opentelemetry.io/otel/trace v1.42.0 // indirect
+	go.opentelemetry.io/otel v1.43.0 // indirect
+	go.opentelemetry.io/otel/metric v1.43.0 // indirect
+	go.opentelemetry.io/otel/trace v1.43.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.1 // indirect
 	golang.org/x/exp v0.0.0-20260312153236-7ab1446f8b90 // indirect
