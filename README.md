@@ -26,7 +26,7 @@
  [loc-svg]: https://tokei.rs/b1/github/grokify/videoascode
  [repo-url]: https://github.com/grokify/videoascode
  [license-svg]: https://img.shields.io/badge/license-MIT-blue.svg
- [license-url]: https://github.com/grokify/videoascode/blob/master/LICENSE
+ [license-url]: https://github.com/grokify/videoascode/blob/main/LICENSE
 
 Convert Marp presentations with voiceovers to video files.
 
