@@ -7,7 +7,8 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
-      "version": "Unreleased",
+      "version": "v0.5.1",
+      "date": "2026-04-27",
       "fixed": [
         { "description": "Add path traversal validation for G703 lint in library code", "commit": "e9429da" },
         { "description": "Add nolint for G703 on CLI-provided paths (intentional user input)", "commit": "70798a7" }
@@ -24,10 +25,10 @@
         { "description": "Add `TASKS.md` tracking testing gaps and coverage improvements", "commit": "57e04b4" }
       ],
       "dependencies": [
-        { "description": "Update `omnivoice` to v0.7.0", "commit": "fbc2e72" },
+        { "description": "Update `omnivoice` to v0.7.2", "commit": "9b52f43" },
         { "description": "Update `omnivoice-core` to v0.7.0 (TTS mock fixtures)", "commit": "e61f514" },
-        { "description": "Update `mogo` to v0.74.0", "commit": "d4efaaf" },
-        { "description": "Update GitHub Actions workflows to v0.3.0", "commit": "51e7001" }
+        { "description": "Update `mogo` to v0.74.2", "commit": "a4a432a" },
+        { "description": "Update GitHub Actions workflows to v0.4.0", "commit": "60f5afa" }
       ]
     },
     {
