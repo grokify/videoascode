@@ -7,6 +7,19 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.5.2",
+      "date": "2026-05-02",
+      "changed": [
+        { "description": "Refactor `pkg/omnivoice/stt` to use `omnivoice-core/stt` types directly via type aliases", "commit": "a3c049d" },
+        { "description": "Expose canonical transcript types: `Transcript`, `TranscriptSegment`, `TranscriptWord`, `TranscriptMetadata`, `TranscriptOptions`", "commit": "a3c049d" },
+        { "description": "Re-export `NewTranscript` and `LoadTranscript` functions from omnivoice-core", "commit": "a3c049d" }
+      ],
+      "dependencies": [
+        { "description": "Update `omnivoice` to v0.8.0", "commit": "a3c049d" },
+        { "description": "Update `omnivoice-core` to v0.9.0 (canonical transcript types)", "commit": "a3c049d" }
+      ]
+    },
+    {
       "version": "v0.5.1",
       "date": "2026-04-27",
       "fixed": [
