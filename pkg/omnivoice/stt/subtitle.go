@@ -1,13 +1,14 @@
-// Package stt provides OmniVoice-based speech-to-text for marp2video.
+// Package stt provides OmniVoice-based speech-to-text for videoascode.
 // This file re-exports the omnivoice subtitle package for convenience.
 package stt
 
 import (
 	"github.com/plexusone/omnivoice"
+	"github.com/plexusone/omnivoice-core/stt"
 )
 
 // Re-export types and functions from omnivoice subtitle for convenience.
-// This allows marp2video users to access subtitle functionality through this package.
+// This allows videoascode users to access subtitle functionality through this package.
 
 // SubtitleOptions is an alias for omnivoice.SubtitleOptions.
 type SubtitleOptions = omnivoice.SubtitleOptions
@@ -26,62 +27,22 @@ func DefaultSubtitleOptions() SubtitleOptions {
 	return omnivoice.DefaultSubtitleOptions()
 }
 
-// GenerateSRTFromResult generates SRT from a local TranscriptionResult.
-// For direct omnivoice results, use omnivoice.GenerateSRT instead.
-func GenerateSRTFromResult(result *TranscriptionResult, opts SubtitleOptions) string {
-	// Convert local result to omnivoice result
-	omniResult := resultToOmniVoice(result)
-	return omnivoice.GenerateSRT(omniResult, opts)
+// GenerateSRTFromResult generates SRT from a TranscriptionResult.
+func GenerateSRTFromResult(result *stt.TranscriptionResult, opts SubtitleOptions) string {
+	return omnivoice.GenerateSRT(result, opts)
 }
 
-// GenerateVTTFromResult generates VTT from a local TranscriptionResult.
-// For direct omnivoice results, use omnivoice.GenerateVTT instead.
-func GenerateVTTFromResult(result *TranscriptionResult, opts SubtitleOptions) string {
-	omniResult := resultToOmniVoice(result)
-	return omnivoice.GenerateVTT(omniResult, opts)
+// GenerateVTTFromResult generates VTT from a TranscriptionResult.
+func GenerateVTTFromResult(result *stt.TranscriptionResult, opts SubtitleOptions) string {
+	return omnivoice.GenerateVTT(result, opts)
 }
 
-// SaveSRTFromResult saves SRT from a local TranscriptionResult.
-func SaveSRTFromResult(result *TranscriptionResult, filePath string, opts SubtitleOptions) error {
-	omniResult := resultToOmniVoice(result)
-	return omnivoice.SaveSRT(omniResult, filePath, opts)
+// SaveSRTFromResult saves SRT from a TranscriptionResult.
+func SaveSRTFromResult(result *stt.TranscriptionResult, filePath string, opts SubtitleOptions) error {
+	return omnivoice.SaveSRT(result, filePath, opts)
 }
 
-// SaveVTTFromResult saves VTT from a local TranscriptionResult.
-func SaveVTTFromResult(result *TranscriptionResult, filePath string, opts SubtitleOptions) error {
-	omniResult := resultToOmniVoice(result)
-	return omnivoice.SaveVTT(omniResult, filePath, opts)
-}
-
-// resultToOmniVoice converts local TranscriptionResult to omnivoice TranscriptionResult.
-func resultToOmniVoice(result *TranscriptionResult) *omnivoice.TranscriptionResult {
-	r := &omnivoice.TranscriptionResult{
-		Text:     result.Text,
-		Language: result.Language,
-		Duration: result.Duration,
-	}
-
-	for _, seg := range result.Segments {
-		omniSeg := omnivoice.Segment{
-			Text:       seg.Text,
-			StartTime:  seg.StartTime,
-			EndTime:    seg.EndTime,
-			Confidence: seg.Confidence,
-			Speaker:    seg.Speaker,
-		}
-
-		for _, w := range seg.Words {
-			omniSeg.Words = append(omniSeg.Words, omnivoice.Word{
-				Text:       w.Text,
-				StartTime:  w.StartTime,
-				EndTime:    w.EndTime,
-				Confidence: w.Confidence,
-				Speaker:    w.Speaker,
-			})
-		}
-
-		r.Segments = append(r.Segments, omniSeg)
-	}
-
-	return r
+// SaveVTTFromResult saves VTT from a TranscriptionResult.
+func SaveVTTFromResult(result *stt.TranscriptionResult, filePath string, opts SubtitleOptions) error {
+	return omnivoice.SaveVTT(result, filePath, opts)
 }
