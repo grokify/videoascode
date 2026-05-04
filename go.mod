@@ -6,7 +6,7 @@ require (
 	github.com/go-rod/rod v0.116.2
 	github.com/google/uuid v1.6.0
 	github.com/grokify/ffutil v0.1.0
-	github.com/grokify/mogo v0.74.3
+	github.com/grokify/mogo v0.74.4
 	github.com/plexusone/omnivoice v0.8.0
 	github.com/plexusone/omnivoice-core v0.9.0
 	github.com/spf13/cobra v1.10.2
