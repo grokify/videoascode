@@ -7,6 +7,28 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.6.0",
+      "date": "2026-06-28",
+      "highlights": [
+        { "description": "F5-TTS local provider support for offline text-to-speech generation" }
+      ],
+      "added": [
+        { "description": "F5-TTS local TTS provider via `omnivoice-core/providers/f5tts`", "commit": "2c85b71" },
+        { "description": "`F5TTSEndpoint` config field for custom gRPC endpoint", "commit": "2c85b71" },
+        { "description": "`EnableLocalProviders` config field to enable local TTS providers", "commit": "2c85b71" },
+        { "description": "F5-TTS included in provider fallback chain after cloud providers", "commit": "2c85b71" }
+      ],
+      "changed": [
+        { "description": "Refactor `createProvider` to use provider options pattern instead of API key only", "commit": "2c85b71" },
+        { "description": "Update provider selection fallback to include local providers when enabled", "commit": "2c85b71" }
+      ],
+      "dependencies": [
+        { "description": "Update `omnivoice` to v0.11.0", "commit": "79c3417" },
+        { "description": "Add `omnivoice-core` F5-TTS provider registration", "commit": "2c85b71" },
+        { "description": "Update `mogo` to v0.74.5", "commit": "3d72e3e" }
+      ]
+    },
+    {
       "version": "v0.5.2",
       "date": "2026-05-02",
       "changed": [
