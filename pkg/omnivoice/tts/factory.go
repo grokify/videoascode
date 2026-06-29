@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/plexusone/omnivoice"
-	_ "github.com/plexusone/omnivoice/providers/all" // Register all providers
+	_ "github.com/plexusone/omnivoice-core/providers/f5tts" // Register F5-TTS local provider
+	_ "github.com/plexusone/omnivoice/providers/all"        // Register all cloud providers
 )
 
 // ProviderConfig holds configuration for creating TTS providers.
@@ -14,6 +15,13 @@ type ProviderConfig struct {
 
 	// DeepgramAPIKey is the API key for Deepgram.
 	DeepgramAPIKey string
+
+	// F5TTSEndpoint is the gRPC endpoint for F5-TTS local server.
+	// Default: "unix:///tmp/omnivoice-f5tts.sock"
+	F5TTSEndpoint string
+
+	// EnableLocalProviders enables local TTS providers (F5-TTS, etc).
+	EnableLocalProviders bool
 }
 
 // Factory creates TTS providers based on configuration.
@@ -38,13 +46,15 @@ func (f *Factory) Get(name string) (*Provider, error) {
 		name = f.fallback
 	}
 	if name == "" {
-		// Default to elevenlabs if available
+		// Default to elevenlabs if available, then other cloud providers, then local
 		if f.config.ElevenLabsAPIKey != "" {
 			name = "elevenlabs"
 		} else if f.config.DeepgramAPIKey != "" {
 			name = "deepgram"
+		} else if f.config.EnableLocalProviders {
+			name = "f5tts"
 		} else {
-			return nil, fmt.Errorf("no provider specified and no API keys configured")
+			return nil, fmt.Errorf("no provider specified and no API keys or local providers configured")
 		}
 	}
 
@@ -74,24 +84,35 @@ func (f *Factory) SetFallback(name string) {
 
 // createProvider creates a new provider instance using the omnivoice registry.
 func (f *Factory) createProvider(name string) (*Provider, error) {
-	var apiKey string
+	var opts []omnivoice.ProviderOption
+
 	switch name {
 	case "elevenlabs":
 		if f.config.ElevenLabsAPIKey == "" {
 			return nil, fmt.Errorf("ElevenLabs API key not configured")
 		}
-		apiKey = f.config.ElevenLabsAPIKey
+		opts = append(opts, omnivoice.WithAPIKey(f.config.ElevenLabsAPIKey))
+
 	case "deepgram":
 		if f.config.DeepgramAPIKey == "" {
 			return nil, fmt.Errorf("Deepgram API key not configured")
 		}
-		apiKey = f.config.DeepgramAPIKey
+		opts = append(opts, omnivoice.WithAPIKey(f.config.DeepgramAPIKey))
+
+	case "f5tts":
+		if !f.config.EnableLocalProviders {
+			return nil, fmt.Errorf("local providers not enabled")
+		}
+		if f.config.F5TTSEndpoint != "" {
+			opts = append(opts, omnivoice.WithEndpoint(f.config.F5TTSEndpoint))
+		}
+
 	default:
 		return nil, fmt.Errorf("unknown provider: %s", name)
 	}
 
 	// Use the omnivoice registry to create the provider
-	provider, err := omnivoice.GetTTSProvider(name, omnivoice.WithAPIKey(apiKey))
+	provider, err := omnivoice.GetTTSProvider(name, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create %s provider: %w", name, err)
 	}
@@ -99,7 +120,7 @@ func (f *Factory) createProvider(name string) (*Provider, error) {
 	return New(provider), nil
 }
 
-// Available returns a list of available provider names based on configured API keys.
+// Available returns a list of available provider names based on configuration.
 func (f *Factory) Available() []string {
 	var names []string
 	if f.config.ElevenLabsAPIKey != "" {
@@ -107,6 +128,9 @@ func (f *Factory) Available() []string {
 	}
 	if f.config.DeepgramAPIKey != "" {
 		names = append(names, "deepgram")
+	}
+	if f.config.EnableLocalProviders {
+		names = append(names, "f5tts")
 	}
 	return names
 }
