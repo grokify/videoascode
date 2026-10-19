@@ -168,8 +168,8 @@ func TestEscapeFFmpegFilterPath(t *testing.T) {
 		},
 		{
 			name:     "path with backslash converted to forward slash",
-			input:    "C:\\Users\\test\\file.srt",
-			expected: "C\\:/Users/test/file.srt", // Colon is also escaped (Windows paths need special handling)
+			input:    "C:\\Users\\testuser\\file.srt",
+			expected: "C\\:/Users/testuser/file.srt", // Colon is also escaped (Windows paths need special handling)
 		},
 		{
 			name:     "complex path",
