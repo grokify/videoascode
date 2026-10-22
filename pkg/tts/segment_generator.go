@@ -2,6 +2,8 @@ package tts
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -14,12 +16,36 @@ import (
 	"github.com/grokify/videoascode/pkg/transcript"
 )
 
-// segmentMetadata stores per-voiceover duration info for caching
+// segmentMetadata records a segment's assembled audio so a later run can
+// reuse it. Fingerprint identifies the clips and pauses it was built from.
 type segmentMetadata struct {
 	SegmentID          string         `json:"segmentId"`
+	Fingerprint        string         `json:"fingerprint,omitempty"`
 	TotalDuration      int            `json:"totalDuration"`
 	VoiceoverDurations map[int]int    `json:"voiceoverDurations"`
 	VoiceoverFiles     map[int]string `json:"voiceoverFiles"`
+}
+
+// ClipDir is the subdirectory of a language's audio directory that holds
+// voiceover clips.
+const ClipDir = "clips"
+
+// ClipKey names the audio clip for one voiceover. It is a hash of the text
+// sent to the TTS provider (after pronunciation substitutions), the
+// language, and the voice settings, so a clip is reused only when all of
+// them are unchanged: editing narration, a pronunciation, or the voice
+// produces a new clip, and unchanged voiceovers are never synthesized twice.
+func ClipKey(spokenText, language string, voice transcript.VoiceConfig) string {
+	b, err := json.Marshal(struct {
+		Text     string                 `json:"text"`
+		Language string                 `json:"language"`
+		Voice    transcript.VoiceConfig `json:"voice"`
+	}{spokenText, language, voice})
+	if err != nil {
+		panic(fmt.Sprintf("marshal clip key: %v", err)) // plain strings and numbers always marshal
+	}
+	sum := sha256.Sum256(b)
+	return hex.EncodeToString(sum[:8])
 }
 
 // SegmentTTSGenerator generates TTS audio for segments.
@@ -30,6 +56,9 @@ type SegmentTTSGenerator struct {
 	defaultVoice transcript.VoiceConfig
 	progressFunc ProgressFunc
 	pronouncer   *Pronouncer
+
+	// synth replaces the provider when set; tests use it to count calls.
+	synth func(ctx context.Context, text string, voice transcript.VoiceConfig) ([]byte, error)
 }
 
 // NewSegmentTTSGenerator creates a new segment-aware TTS generator.
@@ -79,21 +108,81 @@ type SegmentAudioResult struct {
 }
 
 // GenerateForSegment generates TTS audio for a single segment.
-// Audio files are stored as {outputDir}/{segmentID}.mp3 for easy caching and reuse.
+//
+// Each voiceover is synthesized once into {outputDir}/clips/{ClipKey}.mp3
+// and reused on later runs while its text and voice are unchanged. The
+// segment's clips and pauses are assembled into {outputDir}/{segmentID}.mp3,
+// which is rebuilt whenever any of them changes.
 func (g *SegmentTTSGenerator) GenerateForSegment(
 	ctx context.Context,
 	seg segment.Segment,
 	language string,
 	outputDir string,
 ) (*SegmentAudioResult, error) {
+	return g.generate(ctx, seg, language, outputDir, func(int, string) {})
+}
+
+// generate implements GenerateForSegment. tick is called with the number of
+// voiceovers just handled and a description, for progress reporting.
+func (g *SegmentTTSGenerator) generate(
+	ctx context.Context,
+	seg segment.Segment,
+	language string,
+	outputDir string,
+	tick func(n int, desc string),
+) (*SegmentAudioResult, error) {
 	voiceovers := seg.GetVoiceovers(language)
 	if len(voiceovers) == 0 {
 		return nil, fmt.Errorf("segment %s has no voiceovers for language %s", seg.GetID(), language)
 	}
 
-	// Ensure output directory exists
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
+	clipDir := filepath.Join(outputDir, ClipDir)
+	if err := os.MkdirAll(clipDir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create output directory: %w", err)
+	}
+
+	// Work out each voiceover's spoken text, voice, and clip before touching
+	// the provider, so the segment's fingerprint is known up front.
+	type clip struct {
+		vo     segment.Voiceover
+		spoken string
+		voice  transcript.VoiceConfig
+		path   string
+	}
+	clips := make([]clip, len(voiceovers))
+	fp := sha256.New()
+	for i, vo := range voiceovers {
+		voice := g.defaultVoice
+		if vo.Voice != nil {
+			voice = *vo.Voice
+		}
+		// Pronunciation substitutions affect only what's sent to TTS;
+		// vo.Text itself (used for subtitles/manifests) is untouched.
+		spoken := g.pronouncer.Apply(vo.Text, language)
+		key := ClipKey(spoken, language, voice)
+		clips[i] = clip{vo: vo, spoken: spoken, voice: voice, path: filepath.Join(clipDir, key+".mp3")}
+		fmt.Fprintf(fp, "%d:%s:%d\n", vo.Index, key, vo.Pause)
+	}
+	fingerprint := hex.EncodeToString(fp.Sum(nil)[:8])
+
+	combinedPath := filepath.Join(outputDir, seg.GetID()+".mp3")
+	metadataPath := filepath.Join(outputDir, seg.GetID()+".json")
+
+	if meta, err := loadSegmentMetadata(metadataPath); err == nil && meta.Fingerprint == fingerprint {
+		audio := combinedPath
+		if len(clips) == 1 {
+			audio = clips[0].path
+		}
+		if info, err := os.Stat(audio); err == nil && info.Size() > 0 {
+			tick(len(clips), seg.GetID()+" (cached)")
+			return &SegmentAudioResult{
+				SegmentID:           seg.GetID(),
+				AudioFile:           audio,
+				Duration:            meta.TotalDuration,
+				VoiceoverDurations:  meta.VoiceoverDurations,
+				VoiceoverAudioFiles: meta.VoiceoverFiles,
+			}, nil
+		}
 	}
 
 	result := &SegmentAudioResult{
@@ -101,116 +190,68 @@ func (g *SegmentTTSGenerator) GenerateForSegment(
 		VoiceoverAudioFiles: make(map[int]string),
 		VoiceoverDurations:  make(map[int]int),
 	}
-
-	// Final combined audio path: {outputDir}/{segmentID}.mp3
-	combinedPath := filepath.Join(outputDir, seg.GetID()+".mp3")
-	metadataPath := filepath.Join(outputDir, seg.GetID()+".json")
-
-	// Check for cached metadata with voiceover durations
-	if meta, err := loadSegmentMetadata(metadataPath); err == nil {
-		// Verify the combined audio file exists
-		if info, err := os.Stat(combinedPath); err == nil && info.Size() > 0 {
-			// Cache hit - use existing audio with metadata
-			result.AudioFile = combinedPath
-			result.Duration = meta.TotalDuration
-			result.VoiceoverDurations = meta.VoiceoverDurations
-			result.VoiceoverAudioFiles = meta.VoiceoverFiles
-			return result, nil
+	for _, c := range clips {
+		tick(1, fmt.Sprintf("%s vo%d", seg.GetID(), c.vo.Index))
+		duration, err := g.ensureClip(ctx, c.path, c.spoken, c.voice)
+		if err != nil {
+			return nil, fmt.Errorf("voiceover %d: %w", c.vo.Index, err)
 		}
+		result.VoiceoverAudioFiles[c.vo.Index] = c.path
+		result.VoiceoverDurations[c.vo.Index] = duration
+		result.Duration += duration + c.vo.Pause
 	}
 
-	// For multiple voiceovers, use a subdirectory for intermediate files
-	segDir := outputDir
-	if len(voiceovers) > 1 {
-		segDir = filepath.Join(outputDir, seg.GetID())
-		if err := os.MkdirAll(segDir, 0755); err != nil {
-			return nil, fmt.Errorf("failed to create segment directory: %w", err)
-		}
-	}
-
-	// Generate audio for each voiceover
-	for _, vo := range voiceovers {
-		var audioPath string
-		if len(voiceovers) == 1 {
-			// Single voiceover: write directly to final path
-			audioPath = combinedPath
-		} else {
-			// Multiple voiceovers: write to subdirectory
-			audioPath = filepath.Join(segDir, fmt.Sprintf("voiceover_%03d.mp3", vo.Index))
-		}
-
-		var duration int
-		var needsGeneration bool
-
-		// Check if this voiceover audio already exists
-		if info, err := os.Stat(audioPath); err == nil && info.Size() > 0 {
-			if d, err := media.GetAudioDurationMs(audioPath); err == nil {
-				duration = d
-			} else {
-				needsGeneration = true
-			}
-		} else {
-			needsGeneration = true
-		}
-
-		if needsGeneration {
-			voice := g.defaultVoice
-			if vo.Voice != nil {
-				voice = *vo.Voice
-			}
-
-			// Pronunciation substitutions affect only what's sent to TTS;
-			// vo.Text itself (used for subtitles/manifests) is untouched.
-			spokenText := g.pronouncer.Apply(vo.Text, language)
-			audioData, err := g.synthesize(ctx, spokenText, voice)
-			if err != nil {
-				return nil, fmt.Errorf("TTS failed for voiceover %d: %w", vo.Index, err)
-			}
-
-			if err := os.WriteFile(audioPath, audioData, 0600); err != nil {
-				return nil, fmt.Errorf("failed to write audio file: %w", err)
-			}
-
-			duration, err = media.GetAudioDurationMs(audioPath)
-			if err != nil {
-				return nil, fmt.Errorf("failed to get audio duration: %w", err)
-			}
-		}
-
-		result.VoiceoverAudioFiles[vo.Index] = audioPath
-		result.VoiceoverDurations[vo.Index] = duration
-		result.Duration += duration
-
-		if vo.Pause > 0 {
-			result.Duration += vo.Pause
-		}
-	}
-
-	// Set the final audio file path
-	if len(voiceovers) == 1 {
-		// Single voiceover was written directly to combinedPath
-		result.AudioFile = combinedPath
+	if len(clips) == 1 {
+		result.AudioFile = clips[0].path
 	} else {
-		// Combine multiple voiceovers into the final combined path
 		if err := g.combineAudioFiles(ctx, result.VoiceoverAudioFiles, voiceovers, combinedPath); err != nil {
 			return nil, fmt.Errorf("failed to combine audio files: %w", err)
 		}
 		result.AudioFile = combinedPath
 	}
 
-	// Save metadata for future cache hits
 	meta := segmentMetadata{
 		SegmentID:          seg.GetID(),
+		Fingerprint:        fingerprint,
 		TotalDuration:      result.Duration,
 		VoiceoverDurations: result.VoiceoverDurations,
 		VoiceoverFiles:     result.VoiceoverAudioFiles,
 	}
 	if err := saveSegmentMetadata(metadataPath, meta); err != nil {
-		// Log but don't fail - caching is optional
+		// The audio is complete; without metadata the next run reassembles
+		// it from the cached clips instead of reusing it.
 		fmt.Printf("Warning: failed to save audio metadata: %v\n", err)
 	}
-
 	return result, nil
+}
+
+// ensureClip returns the duration of the clip at path, synthesizing it first
+// if it does not exist or cannot be read.
+func (g *SegmentTTSGenerator) ensureClip(ctx context.Context, path, spoken string, voice transcript.VoiceConfig) (int, error) {
+	if info, err := os.Stat(path); err == nil && info.Size() > 0 {
+		if d, err := media.GetAudioDurationMs(path); err == nil {
+			return d, nil
+		}
+		// Unreadable (for example a partial write): synthesize it again.
+	}
+	audioData, err := g.synthesize(ctx, spoken, voice)
+	if err != nil {
+		return 0, fmt.Errorf("TTS failed: %w", err)
+	}
+	// Write to a temporary name first so an interrupted run never leaves a
+	// truncated clip under its final name.
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, audioData, 0600); err != nil {
+		return 0, fmt.Errorf("failed to write audio file: %w", err)
+	}
+	if err := os.Rename(tmp, path); err != nil {
+		return 0, fmt.Errorf("failed to write audio file: %w", err)
+	}
+	d, err := media.GetAudioDurationMs(path)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get audio duration: %w", err)
+	}
+	return d, nil
 }
 
 // loadSegmentMetadata loads cached metadata from a JSON file
@@ -299,130 +340,10 @@ func (g *SegmentTTSGenerator) generateForSegmentWithProgress(
 	currentVoiceover *int,
 	totalVoiceovers int,
 ) (*SegmentAudioResult, error) {
-	voiceovers := seg.GetVoiceovers(language)
-	if len(voiceovers) == 0 {
-		return nil, fmt.Errorf("segment %s has no voiceovers for language %s", seg.GetID(), language)
-	}
-
-	// Ensure output directory exists
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return nil, fmt.Errorf("failed to create output directory: %w", err)
-	}
-
-	result := &SegmentAudioResult{
-		SegmentID:           seg.GetID(),
-		VoiceoverAudioFiles: make(map[int]string),
-		VoiceoverDurations:  make(map[int]int),
-	}
-
-	// Final combined audio path
-	combinedPath := filepath.Join(outputDir, seg.GetID()+".mp3")
-	metadataPath := filepath.Join(outputDir, seg.GetID()+".json")
-
-	// Check for cached metadata
-	if meta, err := loadSegmentMetadata(metadataPath); err == nil {
-		if info, err := os.Stat(combinedPath); err == nil && info.Size() > 0 {
-			result.AudioFile = combinedPath
-			result.Duration = meta.TotalDuration
-			result.VoiceoverDurations = meta.VoiceoverDurations
-			result.VoiceoverAudioFiles = meta.VoiceoverFiles
-			// Update progress for cached voiceovers
-			*currentVoiceover += len(voiceovers)
-			g.reportProgress(*currentVoiceover, totalVoiceovers, fmt.Sprintf("%s (cached)", seg.GetID()))
-			return result, nil
-		}
-	}
-
-	// For multiple voiceovers, use a subdirectory
-	segDir := outputDir
-	if len(voiceovers) > 1 {
-		segDir = filepath.Join(outputDir, seg.GetID())
-		if err := os.MkdirAll(segDir, 0755); err != nil {
-			return nil, fmt.Errorf("failed to create segment directory: %w", err)
-		}
-	}
-
-	// Generate audio for each voiceover
-	for _, vo := range voiceovers {
-		*currentVoiceover++
-		g.reportProgress(*currentVoiceover, totalVoiceovers, fmt.Sprintf("%s vo%d", seg.GetID(), vo.Index))
-
-		var audioPath string
-		if len(voiceovers) == 1 {
-			audioPath = combinedPath
-		} else {
-			audioPath = filepath.Join(segDir, fmt.Sprintf("voiceover_%03d.mp3", vo.Index))
-		}
-
-		var duration int
-		var needsGeneration bool
-
-		// Check if audio already exists
-		if info, err := os.Stat(audioPath); err == nil && info.Size() > 0 {
-			if d, err := media.GetAudioDurationMs(audioPath); err == nil {
-				duration = d
-			} else {
-				needsGeneration = true
-			}
-		} else {
-			needsGeneration = true
-		}
-
-		if needsGeneration {
-			voice := g.defaultVoice
-			if vo.Voice != nil {
-				voice = *vo.Voice
-			}
-
-			// Pronunciation substitutions affect only what's sent to TTS;
-			// vo.Text itself (used for subtitles/manifests) is untouched.
-			spokenText := g.pronouncer.Apply(vo.Text, language)
-			audioData, err := g.synthesize(ctx, spokenText, voice)
-			if err != nil {
-				return nil, fmt.Errorf("TTS failed for voiceover %d: %w", vo.Index, err)
-			}
-
-			if err := os.WriteFile(audioPath, audioData, 0600); err != nil {
-				return nil, fmt.Errorf("failed to write audio file: %w", err)
-			}
-
-			duration, err = media.GetAudioDurationMs(audioPath)
-			if err != nil {
-				return nil, fmt.Errorf("failed to get audio duration: %w", err)
-			}
-		}
-
-		result.VoiceoverAudioFiles[vo.Index] = audioPath
-		result.VoiceoverDurations[vo.Index] = duration
-		result.Duration += duration
-
-		if vo.Pause > 0 {
-			result.Duration += vo.Pause
-		}
-	}
-
-	// Set final audio path
-	if len(voiceovers) == 1 {
-		result.AudioFile = combinedPath
-	} else {
-		if err := g.combineAudioFiles(ctx, result.VoiceoverAudioFiles, voiceovers, combinedPath); err != nil {
-			return nil, fmt.Errorf("failed to combine audio files: %w", err)
-		}
-		result.AudioFile = combinedPath
-	}
-
-	// Save metadata
-	meta := segmentMetadata{
-		SegmentID:          seg.GetID(),
-		TotalDuration:      result.Duration,
-		VoiceoverDurations: result.VoiceoverDurations,
-		VoiceoverFiles:     result.VoiceoverAudioFiles,
-	}
-	if err := saveSegmentMetadata(metadataPath, meta); err != nil {
-		fmt.Printf("Warning: failed to save audio metadata: %v\n", err)
-	}
-
-	return result, nil
+	return g.generate(ctx, seg, language, outputDir, func(n int, desc string) {
+		*currentVoiceover += n
+		g.reportProgress(*currentVoiceover, totalVoiceovers, desc)
+	})
 }
 
 // CalculateMaxDurations finds the maximum duration per segment across all languages.
@@ -461,6 +382,9 @@ func CalculateMaxVoiceoverDurations(results map[string]map[string]*SegmentAudioR
 
 // synthesize calls the TTS provider.
 func (g *SegmentTTSGenerator) synthesize(ctx context.Context, text string, voice transcript.VoiceConfig) ([]byte, error) {
+	if g.synth != nil {
+		return g.synth(ctx, text, voice)
+	}
 	// Use the omnitts.Provider wrapper which handles config conversion
 	return g.provider.Synthesize(ctx, text, voice)
 }
