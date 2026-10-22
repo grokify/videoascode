@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -76,29 +77,7 @@ var (
 
 func init() {
 	browserVideoCmd.Flags().StringVarP(&bvConfigFile, "config", "c", "", "Configuration file (YAML/JSON) with browser segments (required)")
-	browserVideoCmd.Flags().StringVarP(&bvOutputFile, "output", "o", "output.mp4", "Output video file")
-	browserVideoCmd.Flags().StringVarP(&bvAudioDir, "audio-dir", "a", "", "Save audio tracks to this directory (per-language subdirs)")
-	browserVideoCmd.Flags().StringVar(&bvElevenLabsAPIKey, "elevenlabs-api-key", "", "ElevenLabs API key (or use ELEVENLABS_API_KEY env var)")
-	browserVideoCmd.Flags().StringVar(&bvDeepgramAPIKey, "deepgram-api-key", "", "Deepgram API key (or use DEEPGRAM_API_KEY env var)")
-	browserVideoCmd.Flags().StringVarP(&bvProvider, "provider", "p", "", "TTS provider: elevenlabs, deepgram, or f5tts-mlx (default: from config or auto-detect)")
-	browserVideoCmd.Flags().BoolVar(&bvLocal, "local", false, "Enable local TTS providers (F5-TTS MLX); requires a local gRPC server running on Apple Silicon")
-	browserVideoCmd.Flags().StringVar(&bvF5TTSEndpoint, "f5tts-endpoint", "", "F5-TTS MLX gRPC endpoint (default: unix:///tmp/omnivoice-f5tts.sock)")
-	browserVideoCmd.Flags().StringVarP(&bvVoiceID, "voice", "v", "", "TTS voice ID (default: from config or provider default)")
-	browserVideoCmd.Flags().StringSliceVarP(&bvLanguages, "lang", "l", []string{"en-US"}, "Languages to generate (comma-separated)")
-	browserVideoCmd.Flags().IntVar(&bvWidth, "width", 1920, "Video width")
-	browserVideoCmd.Flags().IntVar(&bvHeight, "height", 1080, "Video height")
-	browserVideoCmd.Flags().IntVar(&bvFPS, "fps", 30, "Video frame rate")
-	browserVideoCmd.Flags().StringVar(&bvWorkDir, "workdir", "", "Working directory for temp files")
-	browserVideoCmd.Flags().BoolVar(&bvHeadless, "headless", false, "Run browser in headless mode")
-	browserVideoCmd.Flags().Float64Var(&bvTransition, "transition", 0, "Transition duration between segments (seconds)")
-	browserVideoCmd.Flags().BoolVar(&bvSubtitles, "subtitles", false, "Generate subtitles from voiceover timing (no STT)")
-	browserVideoCmd.Flags().BoolVar(&bvSubtitlesSTT, "subtitles-stt", false, "Generate word-level subtitles using STT (requires API)")
-	browserVideoCmd.Flags().BoolVar(&bvSubtitlesBurn, "subtitles-burn", false, "Burn subtitles into video (permanent, no toggle)")
-	browserVideoCmd.Flags().BoolVar(&bvNoAudio, "no-audio", false, "Generate video without audio (TTS still used for timing/subtitles)")
-	browserVideoCmd.Flags().IntVar(&bvParallel, "parallel", 1, "Number of segments to record in parallel (default 1 = sequential)")
-	browserVideoCmd.Flags().BoolVar(&bvFast, "fast", false, "Use hardware-accelerated encoding (VideoToolbox/NVENC) for faster video generation")
-	browserVideoCmd.Flags().IntVar(&bvLimit, "limit", 0, "Limit to first N segments (0 = no limit, useful for testing)")
-	browserVideoCmd.Flags().IntVar(&bvLimitSteps, "limit-steps", 0, "Limit browser segments to first N steps (0 = no limit, useful for testing)")
+	addBrowserVideoFlags(browserVideoCmd)
 
 	if err := browserVideoCmd.MarkFlagRequired("config"); err != nil {
 		panic(err)
@@ -107,15 +86,46 @@ func init() {
 	browserParentCmd.AddCommand(browserVideoCmd)
 }
 
-func runBrowserVideo(cmd *cobra.Command, args []string) error {
-	ctx := newContext()
+// addBrowserVideoFlags registers the recording, TTS, and output flags shared
+// by 'vac browser video' and 'vac html video'.
+func addBrowserVideoFlags(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&bvOutputFile, "output", "o", "output.mp4", "Output video file")
+	cmd.Flags().StringVarP(&bvAudioDir, "audio-dir", "a", "", "Save audio tracks to this directory (per-language subdirs)")
+	cmd.Flags().StringVar(&bvElevenLabsAPIKey, "elevenlabs-api-key", "", "ElevenLabs API key (or use ELEVENLABS_API_KEY env var)")
+	cmd.Flags().StringVar(&bvDeepgramAPIKey, "deepgram-api-key", "", "Deepgram API key (or use DEEPGRAM_API_KEY env var)")
+	cmd.Flags().StringVarP(&bvProvider, "provider", "p", "", "TTS provider: elevenlabs, deepgram, or f5tts-mlx (default: from config or auto-detect)")
+	cmd.Flags().BoolVar(&bvLocal, "local", false, "Enable local TTS providers (F5-TTS MLX); requires a local gRPC server running on Apple Silicon")
+	cmd.Flags().StringVar(&bvF5TTSEndpoint, "f5tts-endpoint", "", "F5-TTS MLX gRPC endpoint (default: unix:///tmp/omnivoice-f5tts.sock)")
+	cmd.Flags().StringVarP(&bvVoiceID, "voice", "v", "", "TTS voice ID (default: from config or provider default)")
+	cmd.Flags().StringSliceVarP(&bvLanguages, "lang", "l", []string{"en-US"}, "Languages to generate (comma-separated)")
+	cmd.Flags().IntVar(&bvWidth, "width", 1920, "Video width")
+	cmd.Flags().IntVar(&bvHeight, "height", 1080, "Video height")
+	cmd.Flags().IntVar(&bvFPS, "fps", 30, "Video frame rate")
+	cmd.Flags().StringVar(&bvWorkDir, "workdir", "", "Working directory for temp files")
+	cmd.Flags().BoolVar(&bvHeadless, "headless", false, "Run browser in headless mode")
+	cmd.Flags().Float64Var(&bvTransition, "transition", 0, "Transition duration between segments (seconds)")
+	cmd.Flags().BoolVar(&bvSubtitles, "subtitles", false, "Generate subtitles from voiceover timing (no STT)")
+	cmd.Flags().BoolVar(&bvSubtitlesSTT, "subtitles-stt", false, "Generate word-level subtitles using STT (requires API)")
+	cmd.Flags().BoolVar(&bvSubtitlesBurn, "subtitles-burn", false, "Burn subtitles into video (permanent, no toggle)")
+	cmd.Flags().BoolVar(&bvNoAudio, "no-audio", false, "Generate video without audio (TTS still used for timing/subtitles)")
+	cmd.Flags().IntVar(&bvParallel, "parallel", 1, "Number of segments to record in parallel (default 1 = sequential)")
+	cmd.Flags().BoolVar(&bvFast, "fast", false, "Use hardware-accelerated encoding (VideoToolbox/NVENC) for faster video generation")
+	cmd.Flags().IntVar(&bvLimit, "limit", 0, "Limit to first N segments (0 = no limit, useful for testing)")
+	cmd.Flags().IntVar(&bvLimitSteps, "limit-steps", 0, "Limit browser segments to first N steps (0 = no limit, useful for testing)")
+}
 
+func runBrowserVideo(cmd *cobra.Command, args []string) error {
 	// Load config first (needed to determine default provider)
 	cfg, err := config.LoadFromFile(bvConfigFile)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
+	return recordBrowserVideo(newContext(), cfg, bvConfigFile)
+}
 
+// recordBrowserVideo records cfg's browser segments with TTS voiceover, using
+// the shared browser video flags. sourceLabel names the input in the summary.
+func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabel string) error {
 	// Get API keys from flags or environment
 	elevenLabsKey := bvElevenLabsAPIKey
 	if elevenLabsKey == "" {
@@ -262,7 +272,7 @@ func runBrowserVideo(cmd *cobra.Command, args []string) error {
 	// Print summary
 	fmt.Printf("Browser Video Recording\n")
 	fmt.Printf("=======================\n")
-	fmt.Printf("Config:     %s\n", bvConfigFile)
+	fmt.Printf("Input:      %s\n", sourceLabel)
 	fmt.Printf("Output:     %s\n", bvOutputFile)
 	if bvAudioDir != "" {
 		fmt.Printf("Audio Dir:  %s\n", bvAudioDir)
