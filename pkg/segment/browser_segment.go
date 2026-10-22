@@ -197,10 +197,37 @@ func (b *BrowserSegment) LimitSteps(n int) {
 	}
 }
 
+// hasStepAlignedTranscripts reports whether every language's transcript has
+// exactly one segment per step.
+func (b *BrowserSegment) hasStepAlignedTranscripts() bool {
+	if len(b.transcripts) == 0 {
+		return false
+	}
+	for _, content := range b.transcripts {
+		if len(content.Segments) != len(b.steps) {
+			return false
+		}
+	}
+	return true
+}
+
+// maxSegmentPause returns the longest pause after segment i across languages.
+func (b *BrowserSegment) maxSegmentPause(i int) int {
+	longest := 0
+	for _, content := range b.transcripts {
+		if i < len(content.Segments) {
+			longest = max(longest, content.Segments[i].Pause)
+		}
+	}
+	return longest
+}
+
 // UpdateStepMinDurations updates minDuration for steps based on TTS durations.
-// It handles two cases:
-// 1. Step-embedded voiceovers: each step with a voiceover gets the corresponding duration
-// 2. Transcript-based voiceovers: total duration is distributed across all steps
+// It handles three cases:
+//  1. Step-embedded voiceovers: each step with a voiceover gets the corresponding duration
+//  2. Transcript-based voiceovers with one segment per step: each step gets its
+//     own segment's duration plus pause
+//  3. Other transcript-based voiceovers: total duration is distributed across all steps
 func (b *BrowserSegment) UpdateStepMinDurations(durations map[int]int) {
 	// Count steps with embedded voiceovers
 	stepsWithVoiceover := 0
@@ -222,8 +249,17 @@ func (b *BrowserSegment) UpdateStepMinDurations(durations map[int]int) {
 				voiceoverIdx++
 			}
 		}
+	} else if len(durations) > 0 && len(durations) == len(b.steps) && b.hasStepAlignedTranscripts() {
+		// Case 2: Transcript-based voiceovers with one segment per step (a
+		// slide deck: one narration per slide). Each step lasts exactly its
+		// own narration plus that segment's pause, which is how the audio
+		// track is assembled, so slides stay in sync with the narration.
+		for i := range b.steps {
+			b.steps[i].MinDuration = durations[i] + b.maxSegmentPause(i)
+		}
 	} else if len(durations) > 0 && len(b.steps) > 0 {
-		// Case 2: Transcript-based voiceovers - distribute total duration across steps
+		// Case 3: Transcript-based voiceovers that don't line up with steps -
+		// distribute total duration across steps
 		// Calculate total duration from all voiceovers
 		totalDuration := 0
 		for _, dur := range durations {
