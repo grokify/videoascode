@@ -14,9 +14,26 @@
 //
 // Narration may contain [PAUSE:ms] directives, as in Marp voiceover comments;
 // they are removed from the spoken text and added as a pause after the slide.
+//
+// # Lessons
+//
+// A deck can be divided into lessons, each recorded as its own video. A
+// slide with a data-lesson attribute starts a lesson; the attribute's value,
+// if any, is the lesson's title. Slides before the first lesson start (a
+// title slide, say) belong to the first lesson, and a deck with no lesson
+// starts is one lesson. Typically one deck is a course section, and each
+// lesson is one video in it:
+//
+//	<section class="slide section" data-id="sec-design" data-lesson="Designing Endpoints">
+//
+// Options.LessonClass also marks lesson starts by class, for decks whose
+// divider slides already share one.
 package htmldeck
 
 import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"regexp"
@@ -34,6 +51,7 @@ const (
 	DefaultIDAttr         = "data-id"
 	DefaultTitleAttr      = "data-title"
 	DefaultNotesClass     = "notes"
+	DefaultLessonAttr     = "data-lesson"
 	DefaultNextKey        = "ArrowRight"
 	DefaultInitialWaitMs  = 800
 	DefaultLanguage       = "en-US"
@@ -53,6 +71,13 @@ type Slide struct {
 	// Pause is the total of the slide's [PAUSE:ms] directives, in
 	// milliseconds, spoken as silence after the narration.
 	Pause int
+	// StartsLesson reports whether a lesson starts at this slide.
+	StartsLesson bool
+	// LessonTitle is the value of the slide's lesson attribute, if any.
+	LessonTitle string
+	// ContentHash is a hash of the slide's HTML, used to tell when a
+	// recorded lesson is out of date.
+	ContentHash string
 }
 
 // Deck is a parsed HTML deck.
@@ -70,6 +95,8 @@ type Options struct {
 	IDAttr        string // attribute holding the slide ID; default "data-id"
 	TitleAttr     string // attribute holding the slide title; default "data-title"
 	NotesClass    string // class of the fallback notes element; default "notes"
+	LessonAttr    string // attribute marking a lesson start; default "data-lesson"
+	LessonClass   string // class also marking a lesson start; default none
 }
 
 func (o Options) withDefaults() Options {
@@ -87,6 +114,9 @@ func (o Options) withDefaults() Options {
 	}
 	if o.NotesClass == "" {
 		o.NotesClass = DefaultNotesClass
+	}
+	if o.LessonAttr == "" {
+		o.LessonAttr = DefaultLessonAttr
 	}
 	return o
 }
@@ -159,6 +189,19 @@ func readSlide(n *html.Node, index int, opts Options) (Slide, error) {
 		s.Pause += ms
 	}
 	s.Narration = normalizeSpace(pauseRe.ReplaceAllString(raw, " "))
+
+	s.LessonTitle, s.StartsLesson = attrOK(n, opts.LessonAttr)
+	s.LessonTitle = normalizeSpace(s.LessonTitle)
+	if opts.LessonClass != "" && hasClass(n, opts.LessonClass) {
+		s.StartsLesson = true
+	}
+
+	var buf bytes.Buffer
+	if err := html.Render(&buf, n); err != nil {
+		return Slide{}, fmt.Errorf("slide %d: render: %w", index+1, err)
+	}
+	sum := sha256.Sum256(buf.Bytes())
+	s.ContentHash = hex.EncodeToString(sum[:8])
 	return s, nil
 }
 
