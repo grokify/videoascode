@@ -1,0 +1,74 @@
+{
+  "version": "1.0",
+  "title": "Recording HTML Decks with vac",
+  "defaultLanguage": "en-US",
+  "defaultVoice": {
+    "provider": "deepgram",
+    "voiceId": "aura-asteria-en",
+    "voiceName": "Asteria"
+  },
+  "resolution": {
+    "width": 1920,
+    "height": 1080
+  },
+  "frameRate": 30,
+  "segments": [
+    {
+      "type": "browser",
+      "name": "recording-html-decks-with-vac",
+      "url": "http://localhost:8000/index.html?capture=1",
+      "steps": [
+        {
+          "action": "wait",
+          "duration": 800,
+          "description": "title"
+        },
+        {
+          "action": "keypress",
+          "key": "ArrowRight",
+          "description": "narration"
+        },
+        {
+          "action": "keypress",
+          "key": "ArrowRight",
+          "description": "notes"
+        },
+        {
+          "action": "keypress",
+          "key": "ArrowRight",
+          "description": "record"
+        }
+      ],
+      "transcripts": {
+        "en-US": {
+          "segments": [
+            {
+              "text": "This is a native HTML slide deck, recorded by vac. Each slide carries its own narration, so the deck is the single source for both the slides and the voiceover."
+            },
+            {
+              "text": "Narration lives in a data-vo attribute on each slide. A pause directive adds a beat of silence after the slide.",
+              "pause": 600
+            },
+            {
+              "text": "This slide's narration comes from an aside element with the notes class, the same convention reveal.js uses for speaker notes."
+            },
+            {
+              "text": "To record, run vac html video with the deck as input. It serves this folder on a local port, presses the right arrow once per slide, and times each slide to its own narration."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "languages": [
+    "en-US"
+  ],
+  "pronunciations": {
+    "data-vo": {
+      "en-US": "data V O"
+    },
+    "vac": {
+      "en-US": "V A C"
+    }
+  }
+}
