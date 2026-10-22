@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/grokify/videoascode/pkg/config"
 	omnitts "github.com/grokify/videoascode/pkg/omnivoice/tts"
@@ -120,12 +121,13 @@ func runBrowserVideo(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
-	return recordBrowserVideo(newContext(), cfg, bvConfigFile)
+	return recordBrowserVideo(newContext(), cfg, bvConfigFile, bvOutputFile)
 }
 
-// recordBrowserVideo records cfg's browser segments with TTS voiceover, using
-// the shared browser video flags. sourceLabel names the input in the summary.
-func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabel string) error {
+// recordBrowserVideo records cfg's browser segments with TTS voiceover to
+// outputFile, using the shared browser video flags. sourceLabel names the
+// input in the summary.
+func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabel, outputFile string) error {
 	// Get API keys from flags or environment
 	elevenLabsKey := bvElevenLabsAPIKey
 	if elevenLabsKey == "" {
@@ -247,7 +249,7 @@ func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabe
 	// Create orchestrator config
 	orchConfig := orchestrator.SegmentConfig{
 		Source:             contentSource,
-		OutputFile:         bvOutputFile,
+		OutputFile:         outputFile,
 		WorkDir:            workDir,
 		AudioOutputDir:     bvAudioDir,
 		Languages:          bvLanguages,
@@ -273,7 +275,7 @@ func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabe
 	fmt.Printf("Browser Video Recording\n")
 	fmt.Printf("=======================\n")
 	fmt.Printf("Input:      %s\n", sourceLabel)
-	fmt.Printf("Output:     %s\n", bvOutputFile)
+	fmt.Printf("Output:     %s\n", outputFile)
 	if bvAudioDir != "" {
 		fmt.Printf("Audio Dir:  %s\n", bvAudioDir)
 	}
@@ -297,16 +299,13 @@ func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabe
 		return fmt.Errorf("processing failed: %w", err)
 	}
 
-	fmt.Printf("\n✓ Success! Video saved to: %s\n", bvOutputFile)
+	fmt.Printf("\n✓ Success! Video saved to: %s\n", outputFile)
 
 	// List additional language versions if generated
 	if len(bvLanguages) > 1 {
 		fmt.Println("\nLanguage versions:")
-		ext := filepath.Ext(bvOutputFile)
-		base := bvOutputFile[:len(bvOutputFile)-len(ext)]
 		for _, lang := range bvLanguages[1:] {
-			langFile := fmt.Sprintf("%s_%s%s", base, lang, ext)
-			fmt.Printf("  - %s\n", langFile)
+			fmt.Printf("  - %s\n", languageVideoPath(outputFile, lang))
 		}
 	}
 
@@ -319,4 +318,11 @@ func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabe
 	}
 
 	return nil
+}
+
+// languageVideoPath returns where the orchestrator writes the video for an
+// additional language: the output path with "_<lang>" before the extension.
+func languageVideoPath(outputFile, lang string) string {
+	ext := filepath.Ext(outputFile)
+	return fmt.Sprintf("%s_%s%s", strings.TrimSuffix(outputFile, ext), lang, ext)
 }
