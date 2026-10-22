@@ -26,7 +26,13 @@ vac/
 │   ├── parser/         # Marp markdown parsing
 │   │   ├── marp_parser.go
 │   │   └── marp_parser_test.go
+│   ├── htmldeck/       # HTML slide deck parsing → transcript + browser config
+│   │   ├── htmldeck.go
+│   │   ├── generate.go
+│   │   ├── lesson.go     # Lessons: runs of slides recorded as one video
+│   │   └── manifest.go   # lessons.json and lesson fingerprints
 │   ├── tts/            # Text-to-speech generation
+│   │   ├── segment_generator.go  # Per-segment TTS with a content-addressed clip cache
 │   │   └── elevenlabs.go
 │   ├── avatar/         # Optional avatar presenter generation (OmniAvatar)
 │   │   ├── generate.go
@@ -83,6 +89,51 @@ Voiceover extraction priority:
 
 1. HTML comments: `<!-- Voiceover text -->`
 2. Speaker notes: Content after `---` separator
+
+### HTML Deck Parser
+
+The `htmldeck` package (`pkg/htmldeck`) reads native HTML slide decks. It parses the
+page with `golang.org/x/net/html`, treats each element with a `slide` class as a slide
+(without descending into it), and reads narration from `data-vo` or a child
+`<aside class="notes">`:
+
+```go
+deck, err := htmldeck.Parse(r, htmldeck.Options{})
+t := deck.Transcript(htmldeck.TranscriptOptions{Existing: previous})
+cfg, err := deck.VideoConfig(t, htmldeck.ConfigOptions{URL: deckURL})
+```
+
+`Transcript` keeps other languages from an existing transcript, so regenerating never
+discards translations. `VideoConfig` produces one browser segment with one step per slide
+and a segment-level transcript with one segment per step, which the browser segment times
+step by step. `vac html video` serves the deck directory on a loopback port and passes
+the config straight to the browser recording pipeline.
+
+A slide with a `data-lesson` attribute starts a lesson. `Deck.Lessons` divides the deck
+into lessons, and `LessonVideoConfig` builds a config for one of them: the deck URL plus a
+fragment (`#{id}` by default) that opens the deck at the lesson's first slide, and one
+step per slide of the lesson. `LessonFingerprint` hashes the lesson's slide HTML and its
+config (minus the URL), and `Manifest` (`lessons.json`) records each lesson's videos,
+duration, and fingerprint, so `vac html video --lessons changed` re-records only lessons
+whose content changed.
+
+```go
+for _, l := range deck.Lessons() {
+    cfg, err := deck.LessonVideoConfig(t, l, htmldeck.ConfigOptions{URL: deckURL})
+    fp := htmldeck.LessonFingerprint(l, cfg)
+    // record cfg to l.Name()+".mp4", store fp in the manifest
+}
+```
+
+### Voiceover Clip Cache
+
+`tts.SegmentTTSGenerator` synthesizes each voiceover into
+`{audio-dir}/{language}/clips/{key}.mp3`, where `tts.ClipKey` hashes the spoken text
+(after pronunciations), the language, and the voice settings. A segment's clips and
+pauses are assembled into `{segment}.mp3`, whose metadata stores a fingerprint of the
+clip keys and pauses; the assembled file is reused only while the fingerprint matches.
+Unchanged voiceovers are therefore never synthesized twice, across segments, lessons, and
+runs, and edited narration or a changed voice can never reuse stale audio.
 
 ### TTS Client
 

@@ -236,12 +236,16 @@ Cache structure:
 ```
 audio/
 ├── en-US/
-│   ├── segment_000.mp3
-│   └── segment_000.json  # Timing metadata
+│   ├── clips/
+│   │   ├── 3f9a1c0e5b7d2a64.mp3   # One clip per voiceover, named by text + voice
+│   │   └── 81c2d9e04a6f7b13.mp3
+│   ├── segment_000.mp3            # The segment's clips and pauses, assembled
+│   └── segment_000.json           # Timing metadata
 ├── fr-FR/
-│   ├── segment_000.mp3
-│   └── segment_000.json
+│   └── …
 └── zh-Hans/
-    ├── segment_000.mp3
-    └── segment_000.json
+    └── …
 ```
+
+A clip is reused only while its spoken text, language, and voice are unchanged, so
+editing one voiceover regenerates just that clip.

@@ -338,6 +338,9 @@ For a 10-word sentence:
 !!! tip "Let TTS Drive Timing"
     In most cases, you don't need to set `minDuration` manually. The tool automatically calculates timing from TTS audio duration and uses the longest language when generating multi-language videos.
 
+!!! note "Slide decks: one narration per step"
+    If a segment's `transcripts` have exactly one segment per step, each step lasts its own segment's duration plus its `pause`, so slides stay in sync with the narration. This is the shape `vac html init` writes for [HTML slide decks](html-decks.md). Transcripts that don't line up with the steps are spread across the steps proportionally.
+
 ## Troubleshooting
 
 ### Browser not opening
@@ -371,6 +374,9 @@ vac browser video --config demo.yaml --output demo.mp4 \
 vac browser video --config demo.yaml --output demo.mp4 \
   --audio-dir ./audio
 ```
+
+Audio is cached per voiceover, keyed by its text and voice, so after editing one step's
+voiceover only that step is sent to the TTS provider.
 
 ### Subtitle burning fails
 

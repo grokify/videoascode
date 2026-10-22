@@ -7,6 +7,7 @@ Example presentations demonstrating vac features.
 | Example | Description | Features |
 |---------|-------------|----------|
 | [Intro](intro.md) | Self-documenting introduction | Multi-language (en-US, en-GB, es-ES) |
+| [HTML Deck](html-deck.md) | Native HTML deck narrated from `data-vo` and speaker notes | `vac html video`, lessons, pauses, pronunciations |
 
 ## Example Structure
 

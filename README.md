@@ -27,9 +27,9 @@
  [license-svg]: https://img.shields.io/badge/license-MIT-blue.svg
  [license-url]: https://github.com/grokify/videoascode/blob/main/LICENSE
 
-Convert Marp presentations with voiceovers to video files.
+Convert Marp presentations and HTML slide decks with voiceovers to video files.
 
-This tool takes a Marp markdown presentation with voiceover text (inline comments or JSON transcript), generates speech using text-to-speech (TTS), and creates a synchronized video recording of the presentation with optional subtitles.
+This tool takes a Marp markdown presentation or an HTML slide deck with voiceover text (inline comments, `data-vo` attributes, or a JSON transcript), generates speech using text-to-speech (TTS), and creates a synchronized video recording of the presentation with optional subtitles.
 
 **Powered by [OmniVoice](https://github.com/plexusone/omnivoice)** - a unified interface for TTS/STT providers. Additional providers beyond those listed below are available via OmniVoice. Tested with:
 
@@ -41,6 +41,8 @@ Both providers offer TTS and STT capabilities. You can use either one for both f
 ## Features
 
 - 📝 **Parse Marp presentations** with voiceover in HTML comments
+- 🖥️ **Record HTML slide decks** with narration in `data-vo` attributes or reveal.js speaker notes, served and recorded in one command (see [HTML Slide Decks](docs/guide/html-decks.md))
+- 🎓 **Record course lessons** — one video per lesson with a `lessons.json` manifest, re-recording only lessons whose content changed (see [Lessons and Courses](docs/guide/lessons.md))
 - 🌐 **JSON transcript support** for multi-language voiceovers
 - 🎙️ **Text-to-speech** via OmniVoice (ElevenLabs, Deepgram, or local F5-TTS)
 - 🗣️ **Multi-language** support with per-slide voice configuration
@@ -365,6 +367,32 @@ Flags:
       --limit-steps int         Limit browser segments to first N steps (for testing)
       --workdir string          Working directory for temp files
 ```
+
+### Command: `vac html video`, `vac html init`, and `vac html lessons`
+
+Record a native HTML slide deck. Slides are elements with a `slide` class; narration comes from each slide's `data-vo` attribute or a child `<aside class="notes">`. `vac html video` serves the deck's directory on a loopback port and records it one slide per step, timing each slide to its own narration. It takes the same recording, TTS, and subtitle flags as `vac browser video`.
+
+```bash
+# Record a deck directly
+vac html video --input deck/index.html --output deck.mp4 --provider deepgram
+
+# Write voiceover/transcript.json and deck.video.json next to the deck,
+# keeping translations and pronunciations from earlier runs
+vac html init --input deck/index.html --provider deepgram --voice aura-asteria-en
+
+# List lessons (slides with a data-lesson attribute start one) and their status
+vac html lessons --input deck/index.html
+
+# Record one video per lesson into lessons/ with a lessons.json manifest
+vac html video --input deck/index.html --lessons all
+
+# Later, re-record only lessons whose slides, narration, or voice changed
+vac html video --input deck/index.html --lessons changed
+```
+
+Voiceover clips are cached by their text and voice, so unchanged narration is never sent to the TTS provider twice.
+
+See [HTML Slide Decks](docs/guide/html-decks.md) for the deck conventions, translations, and timing, and [Lessons and Courses](docs/guide/lessons.md) for lessons, the manifest, and course terminology.
 
 ### Command: `vac browser record`
 
@@ -981,7 +1009,27 @@ examples/
 │       └── es-ES/
 │           ├── manifest.json
 │           └── slide_*.mp3
+├── html-deck/                # Native HTML deck in two lessons, narrated from data-vo
+│   ├── index.html
+│   ├── pronunciations.json
+│   ├── voiceover/transcript.json
+│   └── deck.video.json
 └── README.md
+```
+
+### Running the HTML Deck Example
+
+```bash
+vac html video \
+  --input examples/html-deck/index.html \
+  --pronunciations examples/html-deck/pronunciations.json \
+  --output examples/html-deck/output.mp4
+
+# Or one video per lesson, in examples/html-deck/lessons/
+vac html video \
+  --input examples/html-deck/index.html \
+  --pronunciations examples/html-deck/pronunciations.json \
+  --lessons all
 ```
 
 ### Running the Intro Example
