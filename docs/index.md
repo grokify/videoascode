@@ -84,35 +84,35 @@ flowchart LR
 
 <div class="grid cards" markdown>
 
-- :material-download: **[Installation](getting-started/installation.md)**
+- :material-download: **[Installation](guides/getting-started/installation.md)**
 
     Install vac and its dependencies
 
-- :material-rocket-launch: **[Quick Start](getting-started/quick-start.md)**
+- :material-rocket-launch: **[Quick Start](guides/getting-started/quick-start.md)**
 
     Create your first video in minutes
 
-- :material-book-open-variant: **[User Guide](guide/pipeline.md)**
+- :material-book-open-variant: **[User Guide](guides/pipeline.md)**
 
     Learn about the Marp slides pipeline
 
-- :material-presentation: **[HTML Slide Decks](guide/html-decks.md)**
+- :material-presentation: **[HTML Slide Decks](guides/html-decks.md)**
 
     Narrate and record native HTML decks
 
-- :material-school: **[Lessons and Courses](guide/lessons.md)**
+- :material-school: **[Lessons and Courses](guides/lessons.md)**
 
     One video per lesson, Udemy- and Coursera-style
 
-- :material-web: **[Browser Video](guide/browser-video.md)**
+- :material-web: **[Browser Video](guides/browser-video.md)**
 
     Record browser demos with voiceover
 
-- :material-code-json: **[Transcript Schema](reference/transcript-schema.md)**
+- :material-code-json: **[Transcript Schema](guides/reference/transcript-schema.md)**
 
     Multi-language JSON format reference
 
-- :material-subtitles: **[Subtitles](guide/subtitles.md)**
+- :material-subtitles: **[Subtitles](guides/subtitles.md)**
 
     Generate SRT/VTT subtitles
 

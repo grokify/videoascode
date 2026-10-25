@@ -15,7 +15,7 @@ This guide walks through the entire process of creating a narrated video with su
 
 ## Prerequisites
 
-- [vac installed](../getting-started/installation.md)
+- [vac installed](getting-started/installation.md)
 - [Marp CLI](https://github.com/marp-team/marp-cli) installed
 - [ffmpeg](https://ffmpeg.org/) installed
 - ElevenLabs API key (for TTS)
@@ -390,7 +390,7 @@ iconv -f ISO-8859-1 -t UTF-8 subtitles/en-US.srt > subtitles/en-US-utf8.srt
 
 ## Next Steps
 
-- [Customize voice settings](../reference/voice-settings.md)
+- [Customize voice settings](reference/voice-settings.md)
 - [Add custom dictionaries for subtitle capitalization](subtitles.md)
 - [Output options for different platforms](output-options.md)
 - [Pipeline architecture details](pipeline.md)

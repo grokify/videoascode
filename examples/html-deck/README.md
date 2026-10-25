@@ -44,7 +44,7 @@ Slides 2 and 4 carry `data-lesson`, so the deck has two lessons; the title slide
 the first. vac opens `index.html?capture=1#record` to record the second lesson. Videos
 and `lessons.json` go to `examples/html-deck/lessons/`; after an edit,
 `--lessons changed` re-records only the affected lesson. See the
-[Lessons and Courses guide](../../docs/guide/lessons.md).
+[Lessons and Courses guide](../../docs/guides/lessons.md).
 
 ## Regenerate the Transcript and Config
 
@@ -69,4 +69,4 @@ cd examples/html-deck && python3 -m http.server 8000 &
 vac browser video --config examples/html-deck/deck.video.json --output output.mp4
 ```
 
-See the [HTML Slide Decks guide](../../docs/guide/html-decks.md) for the conventions.
+See the [HTML Slide Decks guide](../../docs/guides/html-decks.md) for the conventions.

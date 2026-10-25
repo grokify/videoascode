@@ -60,37 +60,38 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started:
-    - Installation: getting-started/installation.md
-    - Quick Start: getting-started/quick-start.md
-    - Requirements: getting-started/requirements.md
+    - Installation: guides/getting-started/installation.md
+    - Quick Start: guides/getting-started/quick-start.md
+    - Requirements: guides/getting-started/requirements.md
   - User Guide:
-    - Complete Workflow: guide/complete-workflow.md
-    - Pipeline Overview: guide/pipeline.md
-    - Voiceover Formats: guide/voiceover-formats.md
-    - Browser Video Recording: guide/browser-video.md
-    - HTML Slide Decks: guide/html-decks.md
-    - Lessons and Courses: guide/lessons.md
-    - Avatar Presenter Overlay: guide/avatar-presenter.md
-    - Subtitle Generation: guide/subtitles.md
-    - Pronunciation: guide/pronunciation.md
-    - Local Providers (Offline TTS/STT): guide/local-providers.md
-    - Multi-Language Support: guide/multi-language.md
-    - Output Options: guide/output-options.md
-    - Customization: guide/customization.md
+    - Complete Workflow: guides/complete-workflow.md
+    - Pipeline Overview: guides/pipeline.md
+    - Voiceover Formats: guides/voiceover-formats.md
+    - Browser Video Recording: guides/browser-video.md
+    - HTML Slide Decks: guides/html-decks.md
+    - Lessons and Courses: guides/lessons.md
+    - Avatar Presenter Overlay: guides/avatar-presenter.md
+    - Subtitle Generation: guides/subtitles.md
+    - Pronunciation: guides/pronunciation.md
+    - Local Providers (Offline TTS/STT): guides/local-providers.md
+    - Multi-Language Support: guides/multi-language.md
+    - Output Options: guides/output-options.md
+    - Customization: guides/customization.md
+    - Troubleshooting: guides/troubleshooting.md
+    - Contributing: guides/contributing.md
   - Reference:
-    - CLI Reference: reference/cli.md
-    - Transcript Schema: reference/transcript-schema.md
-    - Voice Settings: reference/voice-settings.md
+    - CLI Reference: guides/reference/cli.md
+    - Transcript Schema: guides/reference/transcript-schema.md
+    - Voice Settings: guides/reference/voice-settings.md
   - Examples:
-    - Overview: examples/index.md
-    - Intro Presentation: examples/intro.md
-    - HTML Deck: examples/html-deck.md
-    - Local Avatar (Offline): examples/local-avatar.md
+    - Overview: guides/examples/index.md
+    - Intro Presentation: guides/examples/intro.md
+    - HTML Deck: guides/examples/html-deck.md
+    - Local Avatar (Offline): guides/examples/local-avatar.md
   - Comparisons:
-    - vs marptalk: comparisons/marptalk.md
+    - vs marptalk: guides/comparisons/marptalk.md
   - Development:
     - Architecture: development/architecture.md
-    - Contributing: development/contributing.md
   - Releases:
     - v0.10.0: releases/v0.10.0.md
     - v0.9.0: releases/v0.9.0.md
