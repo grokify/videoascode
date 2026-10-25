@@ -8,7 +8,7 @@
   "releases": [
     {
       "version": "v0.10.0",
-      "date": "2026-10-22",
+      "date": "2026-10-25",
       "highlights": [
         { "description": "Native **HTML slide decks**: `vac html video` serves and records a deck with TTS voiceover in one command" },
         { "description": "`vac html init` generates a transcript and browser video config from a deck, keeping translations and pronunciations" },
@@ -51,7 +51,8 @@
         { "description": "`golang.org/x/net` promoted to a direct dependency (HTML parsing)" },
         { "description": "Upgrade `mogo` to v0.75.0", "commit": "d7b1069" },
         { "description": "Upgrade `omnivoice-core` to v0.16.1", "commit": "99bc65f" },
-        { "description": "Update indirect Go module dependencies", "commit": "4af6618" }
+        { "description": "Update indirect Go module dependencies", "commit": "4af6618" },
+        { "description": "Upgrade `golang.org/x/net` to v0.61.0 and update indirect Go module dependencies", "commit": "d8c921c" }
       ]
     },
     {
