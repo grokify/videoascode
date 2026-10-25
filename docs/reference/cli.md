@@ -14,6 +14,10 @@ vac
 ├── browser            # Browser automation recordings
 │   ├── video          # Record with TTS voiceover
 │   └── record         # Silent recording (no audio)
+├── html               # Native HTML slide decks
+│   ├── init           # Write transcript + video config from a deck
+│   ├── lessons        # List lessons and whether their videos are up to date
+│   └── video          # Serve and record a deck, or its lessons, with TTS voiceover
 ├── avatar             # Talking-head presenter overlay (optional)
 │   ├── list-avatars   # List provider avatar IDs (for --avatar-id)
 │   ├── generate       # Narration audio -> presenter video
@@ -219,11 +223,16 @@ vac browser video --config demo.yaml --output demo.mp4 --limit-steps 3
 
 ### Audio Caching
 
-When using `--audio-dir`, vac caches generated TTS audio:
+vac caches generated TTS audio in `--audio-dir`, or in `audio/` under `--workdir` when
+it isn't set:
 
-- Audio files stored as `{audio-dir}/{language}/segment_XXX.mp3`
-- Metadata JSON files store per-voiceover timing information
-- Subsequent runs skip TTS generation if cached audio exists
+- Each voiceover is a clip, `{audio-dir}/{language}/clips/{hash}.mp3`, named by a hash
+  of its spoken text (after pronunciations), language, and voice settings
+- Each segment's clips and pauses are assembled into `{audio-dir}/{language}/{segment}.mp3`,
+  with a JSON file holding per-voiceover timing
+- Later runs reuse every clip whose text and voice are unchanged, and reassemble a
+  segment only when one of its clips or pauses changed; edited narration, a new
+  pronunciation, or a different voice produces a new clip
 
 ### Multi-Language Timing
 
@@ -233,6 +242,87 @@ When generating multiple languages, the video is paced to the longest audio:
 2. Per-voiceover durations are compared across languages
 3. Each browser step uses the maximum duration
 4. All language versions sync with the same video
+
+When the segment's `transcripts` have one segment per step — as configs from
+`vac html init` do, one narration per slide — each step lasts exactly its own
+segment's duration plus its `pause`. Transcripts that don't line up with the steps
+are spread across the steps proportionally.
+
+---
+
+## html init
+
+Write a transcript and browser video config for an HTML slide deck. See
+[HTML Slide Decks](../guide/html-decks.md).
+
+```bash
+vac html init --input deck/index.html [flags]
+```
+
+### Flags
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--input`, `-i` | string | *required* | HTML deck file |
+| `--transcript` | string | `voiceover/transcript.json` next to the deck | Transcript to write; translations already in it are kept |
+| `--config`, `-c` | string | `deck.video.json` next to the deck | Video config to write |
+| `--url` | string | `http://localhost:8000/<deck file>` + `--query` | URL the config records |
+| `--title` | string | transcript's, else the page `<title>` | Title |
+| `--provider`, `-p` | string | transcript's | TTS provider recorded in the transcript |
+| `--voice`, `-v` | string | transcript's | TTS voice ID recorded in the transcript |
+| `--voice-name` | string | | Human-readable voice name |
+| `--voice-model` | string | | Provider-specific TTS model |
+| `--narration-lang` | string | `en-US` | Language of the narration in the HTML |
+| `--pronunciations` | string | config's | JSON file of term → language → spoken form |
+| `--query` | string | `capture=1` | Query added to the deck URL; empty for none |
+| `--next-key` | string | `ArrowRight` | Key that advances one slide |
+| `--initial-wait` | int | `800` | Milliseconds on the first slide before recording |
+| `--slide-class` | string | `slide` | Class that marks a slide element |
+| `--narration-attr` | string | `data-vo` | Attribute holding a slide's narration |
+| `--lesson-attr` | string | `data-lesson` | Attribute marking a slide that starts a lesson |
+| `--lesson-class` | string | | Class that also marks a slide starting a lesson, e.g. `section` |
+| `--start-fragment` | string | `#{id}` | URL fragment opening the deck at a lesson's first slide: `{id}`, `{n}` (1-based), `{i}` (0-based) |
+
+---
+
+## html lessons
+
+List a deck's lessons with their slides, estimated length, and status against the
+`lessons.json` manifest: `not recorded`, `changed`, or `recorded` (with the video's
+length). See [Lessons and Courses](../guide/lessons.md).
+
+```bash
+vac html lessons --input deck/index.html [--output-dir lessons/]
+```
+
+Takes the deck flags of `html init` (except `--config` and `--url`) and `--output-dir`.
+
+---
+
+## html video
+
+Serve an HTML deck's directory on a loopback port and record it with TTS voiceover, one
+slide per step, timing each slide to its own narration.
+
+```bash
+vac html video --input deck/index.html --output deck.mp4 [flags]
+vac html video --input deck/index.html --lessons all [flags]
+```
+
+Takes the deck flags of `html init` (except `--config` and `--url`) and the recording,
+TTS, and subtitle flags of [browser video](#browser-video), plus:
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--lessons` | strings | | Record lessons as separate videos: lesson IDs or numbers, `all`, or `changed` |
+| `--output-dir` | string | `lessons/` next to the deck | Directory for lesson videos and `lessons.json` |
+
+With `--lessons`, `--output` is not used: each lesson is written to `--output-dir` as
+`NN-<title>.mp4`, and `lessons.json` is updated after each one. `changed` selects lessons
+not yet recorded or whose slides, narration, voice, or pronunciations changed since.
+
+Voiceover clips are cached by their spoken text, language, and voice, so narration that
+hasn't changed is never synthesized again (this applies to `browser video` too).
 
 ---
 

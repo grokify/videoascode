@@ -7,6 +7,54 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.10.0",
+      "date": "2026-10-22",
+      "highlights": [
+        { "description": "Native **HTML slide decks**: `vac html video` serves and records a deck with TTS voiceover in one command" },
+        { "description": "`vac html init` generates a transcript and browser video config from a deck, keeping translations and pronunciations" },
+        { "description": "Per-slide timing for browser segments whose transcript has one segment per step" },
+        { "description": "**Course lessons**: `vac html video --lessons` records one video per lesson with a `lessons.json` manifest, and `--lessons changed` re-records only lessons whose content changed" },
+        { "description": "Voiceover audio cached per clip by spoken text and voice, so unchanged narration is never synthesized twice" }
+      ],
+      "added": [
+        { "description": "`pkg/htmldeck` — parse HTML decks (`.slide` elements) with narration from `data-vo` or `<aside class=\"notes\">`, and `[PAUSE:ms]` directives", "commit": "a76a3d3" },
+        { "description": "`htmldeck.Deck.Transcript` and `htmldeck.Deck.VideoConfig` — transcript (keeping existing translations) and validated browser video config, one step per slide", "commit": "a76a3d3" },
+        { "description": "`vac html init` — write `voiceover/transcript.json` and `deck.video.json` next to a deck", "commit": "3a89e4d" },
+        { "description": "`vac html video` — serve a deck on a loopback port and record it, with all `vac browser video` flags", "commit": "3a89e4d" },
+        { "description": "`examples/html-deck/` — four-slide deck in two lessons with `data-vo`, speaker notes, a pause, a pronunciation file, and `#<slide id>` deep links", "commit": "11d6890" },
+        { "description": "Lessons: a slide with `data-lesson` (or `--lesson-class`) starts a lesson; `htmldeck.Deck.Lessons`, `Deck.Lesson`, and `Lesson.Name`", "commit": "d0c86da" },
+        { "description": "`htmldeck.Deck.LessonVideoConfig` — config for one lesson, opening the deck at its first slide via a URL fragment (`#{id}` by default, `--start-fragment`)", "commit": "d0c86da" },
+        { "description": "`htmldeck.Manifest` (`lessons.json`) and `htmldeck.LessonFingerprint` — lesson videos, durations, and a fingerprint of slide HTML, narration, voice, and pronunciations", "commit": "d0c86da" },
+        { "description": "`vac html video --lessons <ids|numbers|all|changed>` and `--output-dir` — record lessons as separate videos and update the manifest after each", "commit": "3c2f3ab" },
+        { "description": "`vac html lessons` — list lessons with slides, estimated length, and status: not recorded, changed, or recorded", "commit": "3c2f3ab" },
+        { "description": "`tts.ClipKey` — content hash naming each voiceover clip", "commit": "dc394d8" }
+      ],
+      "changed": [
+        { "description": "`vac browser video` flags and recording pipeline shared with `vac html video`; run summary shows `Input:` instead of `Config:`", "commit": "3a89e4d" },
+        { "description": "Browser video TTS audio stored as clips in `{audio-dir}/{language}/clips/`, assembled per segment; audio cached in the old layout is generated again once", "commit": "dc394d8" },
+        { "description": "`vac html video` reads pronunciations from `deck.video.json` when `--pronunciations` is not given, as `vac html init` does", "commit": "3c2f3ab" }
+      ],
+      "fixed": [
+        { "description": "Browser segments with one transcript segment per step now time each step to its own narration plus pause, instead of an equal share of the total, keeping slides in sync with the voiceover", "commit": "5c76a04" },
+        { "description": "Browser video reused cached audio by segment name and position, so edited narration, pronunciations, or voice settings could play stale audio; clips are now keyed by their content", "commit": "dc394d8" }
+      ],
+      "documentation": [
+        { "description": "New HTML Slide Decks guide and HTML Deck example page; CLI reference, browser video guide, architecture, README, and home page updated", "commit": "a1041e6" },
+        { "description": "New Lessons and Courses guide with course terminology (course, section, lesson, deck, slide, clip, line, chapter); audio caching docs updated for clips", "commit": "a1041e6" },
+        { "description": "v0.10.0 release notes" }
+      ],
+      "tests": [
+        { "description": "`htmldeck` parsing and generation tests, step-aligned and unaligned transcript timing tests, and `vac html` server and URL tests" },
+        { "description": "Lesson division, lookup, per-lesson config, fingerprint, and manifest tests; lesson status and selection tests; clip cache reuse tests with a counting TTS provider" }
+      ],
+      "dependencies": [
+        { "description": "`golang.org/x/net` promoted to a direct dependency (HTML parsing)" },
+        { "description": "Upgrade `mogo` to v0.75.0", "commit": "d7b1069" },
+        { "description": "Upgrade `omnivoice-core` to v0.16.1", "commit": "99bc65f" },
+        { "description": "Update indirect Go module dependencies", "commit": "4af6618" }
+      ]
+    },
+    {
       "version": "v0.9.0",
       "date": "2026-07-27",
       "highlights": [

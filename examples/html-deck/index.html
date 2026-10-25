@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Recording HTML Decks with vac</title>
+<style>
+  /* A fixed 1280x720 stage, scaled to fit, so every frame has the same geometry. */
+  :root { --bg: #0f172a; --fg: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); overflow: hidden;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px;
+    transform: translate(-50%, -50%) scale(var(--scale, 1)); }
+  .slide { display: none; position: absolute; inset: 0; padding: 80px 96px; box-sizing: border-box; }
+  .slide.active { display: flex; flex-direction: column; justify-content: center; }
+  h1 { font-size: 64px; margin: 0 0 24px; }
+  h2 { font-size: 44px; margin: 0 0 28px; color: var(--accent); }
+  p, li { font-size: 28px; line-height: 1.5; color: var(--muted); }
+  code { color: var(--accent); }
+  #pagenum { position: fixed; right: 24px; bottom: 16px; color: var(--muted); font-size: 14px; }
+  /* Capture mode (?capture=1): hide on-screen controls while recording. */
+  body.capture #pagenum { display: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <section class="slide active" data-id="title" data-title="Title"
+    data-vo="This is a native HTML slide deck, recorded by vac. Each slide carries its own narration, so the deck is the single source for both the slides and the voiceover.">
+    <h1>Recording HTML Decks</h1>
+    <p>Slides and narration in one file, recorded with <code>vac html video</code>.</p>
+  </section>
+
+  <section class="slide" data-id="narration" data-title="Where Narration Lives" data-lesson="Writing Narration"
+    data-vo="Narration lives in a data-vo attribute on each slide. A pause directive adds a beat of silence after the slide. [PAUSE:600]">
+    <h2>Where Narration Lives</h2>
+    <ul>
+      <li>A <code>data-vo</code> attribute on each <code>.slide</code></li>
+      <li>Or a child <code>&lt;aside class="notes"&gt;</code></li>
+      <li><code>[PAUSE:ms]</code> adds silence after the slide</li>
+    </ul>
+  </section>
+
+  <section class="slide" data-id="notes" data-title="Speaker Notes">
+    <h2>Speaker Notes Work Too</h2>
+    <p>This slide has no <code>data-vo</code>. Its narration comes from the notes element below, as in reveal.js.</p>
+    <aside class="notes" hidden>
+      This slide's narration comes from an aside element with the notes class,
+      the same convention reveal.js uses for speaker notes.
+    </aside>
+  </section>
+
+  <section class="slide" data-id="record" data-title="Record It" data-lesson="Recording"
+    data-vo="To record, run vac html video with the deck as input. It serves this folder on a local port, presses the right arrow once per slide, and times each slide to its own narration.">
+    <h2>Record It</h2>
+    <p><code>vac html video --input examples/html-deck/index.html --output deck.mp4</code></p>
+  </section>
+
+</div>
+<div id="pagenum"></div>
+<script>
+  // Minimal deck controller: ArrowRight / ArrowLeft, instant advance, capture
+  // mode, and #<slide id> to open at a slide (how vac records one lesson).
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var stage = document.getElementById('stage');
+    var pagenum = document.getElementById('pagenum');
+    var idx = 0;
+    if (new URLSearchParams(location.search).get('capture') === '1') {
+      document.body.classList.add('capture');
+    }
+    function fit() {
+      stage.style.setProperty('--scale', Math.min(innerWidth / 1280, innerHeight / 720));
+    }
+    function show(i) {
+      idx = Math.max(0, Math.min(slides.length - 1, i));
+      slides.forEach(function (s, n) { s.classList.toggle('active', n === idx); });
+      pagenum.textContent = (idx + 1) + ' / ' + slides.length;
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === ' ') show(idx + 1);
+      if (e.key === 'ArrowLeft') show(idx - 1);
+    });
+    function fromHash() {
+      var id = decodeURIComponent(location.hash.slice(1));
+      var i = slides.findIndex(function (s) { return s.getAttribute('data-id') === id; });
+      return i < 0 ? 0 : i;
+    }
+    addEventListener('resize', fit);
+    addEventListener('hashchange', function () { show(fromHash()); });
+    fit();
+    show(fromHash());
+  })();
+</script>
+</body>
+</html>

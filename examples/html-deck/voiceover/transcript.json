@@ -1,0 +1,76 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "title": "Recording HTML Decks with vac",
+    "defaultLanguage": "en-US",
+    "defaultVoice": {
+      "provider": "deepgram",
+      "voiceId": "aura-asteria-en",
+      "voiceName": "Asteria"
+    }
+  },
+  "slides": [
+    {
+      "index": 0,
+      "title": "Title",
+      "transcripts": {
+        "en-US": {
+          "segments": [
+            {
+              "text": "This is a native HTML slide deck, recorded by vac."
+            },
+            {
+              "text": "Each slide carries its own narration, so the deck is the single source for both the slides and the voiceover."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "index": 1,
+      "title": "Where Narration Lives",
+      "transcripts": {
+        "en-US": {
+          "segments": [
+            {
+              "text": "Narration lives in a data-vo attribute on each slide."
+            },
+            {
+              "text": "A pause directive adds a beat of silence after the slide.",
+              "pause": 600
+            }
+          ]
+        }
+      }
+    },
+    {
+      "index": 2,
+      "title": "Speaker Notes",
+      "transcripts": {
+        "en-US": {
+          "segments": [
+            {
+              "text": "This slide's narration comes from an aside element with the notes class, the same convention reveal.js uses for speaker notes."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "index": 3,
+      "title": "Record It",
+      "transcripts": {
+        "en-US": {
+          "segments": [
+            {
+              "text": "To record, run vac html video with the deck as input."
+            },
+            {
+              "text": "It serves this folder on a local port, presses the right arrow once per slide, and times each slide to its own narration."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

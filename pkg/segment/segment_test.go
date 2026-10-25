@@ -307,6 +307,51 @@ func TestBrowserSegment_UpdateStepMinDurations(t *testing.T) {
 	}
 }
 
+func TestBrowserSegment_UpdateStepMinDurations_StepAlignedTranscripts(t *testing.T) {
+	// A slide deck: one transcript segment per step. Each step must last its
+	// own narration plus pause, not an equal share of the total.
+	steps := []browser.Step{
+		{Action: browser.ActionWait, Duration: 800},
+		{Action: browser.ActionKeypress, Key: "ArrowRight"},
+		{Action: browser.ActionKeypress, Key: "ArrowRight"},
+	}
+	seg := NewBrowserSegment(0, "Deck", "http://localhost/index.html", steps)
+	seg.SetTranscripts(map[string]transcript.LanguageContent{
+		"en-US": {Segments: []transcript.Segment{{Text: "One."}, {Text: "Two.", Pause: 400}, {Text: "Three."}}},
+		"fr-FR": {Segments: []transcript.Segment{{Text: "Un."}, {Text: "Deux.", Pause: 700}, {Text: "Trois."}}},
+	})
+
+	seg.UpdateStepMinDurations(map[int]int{0: 9000, 1: 2000, 2: 4000})
+
+	want := []int{9000, 2700, 4000} // step 1 gets the longest pause across languages
+	for i, s := range seg.GetSteps() {
+		if s.MinDuration != want[i] {
+			t.Errorf("step %d MinDuration = %d, want %d", i, s.MinDuration, want[i])
+		}
+	}
+}
+
+func TestBrowserSegment_UpdateStepMinDurations_UnalignedTranscripts(t *testing.T) {
+	// Transcript segments that don't line up with steps keep the proportional
+	// distribution: 6000ms over two equal steps.
+	steps := []browser.Step{
+		{Action: browser.ActionClick, Selector: "#a"},
+		{Action: browser.ActionClick, Selector: "#b"},
+	}
+	seg := NewBrowserSegment(0, "Demo", "https://example.com", steps)
+	seg.SetTranscripts(map[string]transcript.LanguageContent{
+		"en-US": {Segments: []transcript.Segment{{Text: "The whole demo in one narration."}}},
+	})
+
+	seg.UpdateStepMinDurations(map[int]int{0: 6000})
+
+	for i, s := range seg.GetSteps() {
+		if s.MinDuration != 3000 {
+			t.Errorf("step %d MinDuration = %d, want 3000", i, s.MinDuration)
+		}
+	}
+}
+
 func TestSourceTypeConstants(t *testing.T) {
 	if SourceTypeSlide != "slide" {
 		t.Errorf("SourceTypeSlide = %s, want 'slide'", SourceTypeSlide)

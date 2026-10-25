@@ -4,8 +4,8 @@ Agent guidelines for videoascode.
 
 ## Project Overview
 
-CLI tool for generating videos from Marp presentations with AI voiceovers,
-avatar presenters, and subtitles. Supports both cloud APIs (ElevenLabs, HeyGen)
+CLI tool for generating videos from Marp presentations and native HTML slide
+decks with AI voiceovers, avatar presenters, and subtitles. Supports both cloud APIs (ElevenLabs, HeyGen)
 and fully local providers (F5-TTS, Whisper, LivePortrait+JoyVASA).
 
 ## Pipeline
@@ -43,7 +43,8 @@ presentation.md (Marp)
 |------|---------|
 | `cmd/vac/` | CLI commands |
 | `pkg/orchestrator/` | Pipeline orchestration |
-| `pkg/tts/` | TTS abstraction |
+| `pkg/htmldeck/` | HTML deck parsing → transcript, browser video config, lessons, lesson manifest |
+| `pkg/tts/` | TTS abstraction; per-voiceover clip cache keyed by text and voice |
 | `pkg/avatar/` | Avatar generation + caching |
 | `pkg/video/` | FFmpeg operations, overlays |
 | `pkg/omnivoice/` | Local TTS/STT factory |

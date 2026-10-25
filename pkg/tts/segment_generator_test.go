@@ -1,9 +1,14 @@
 package tts
 
 import (
+	"context"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
+
+	"github.com/grokify/videoascode/pkg/segment"
+	"github.com/grokify/videoascode/pkg/transcript"
 )
 
 func TestSegmentMetadataSaveLoad(t *testing.T) {
@@ -164,5 +169,152 @@ func TestCalculateMaxVoiceoverDurationsNoVoiceovers(t *testing.T) {
 
 	if len(maxDurations) != 0 {
 		t.Errorf("expected empty map when no voiceover durations, got %d entries", len(maxDurations))
+	}
+}
+
+// fakeSegment is a minimal segment.Segment with fixed voiceovers.
+type fakeSegment struct {
+	id  string
+	vos []segment.Voiceover
+}
+
+func (f *fakeSegment) GetID() string                     { return f.id }
+func (f *fakeSegment) GetIndex() int                     { return 0 }
+func (f *fakeSegment) GetSourceType() segment.SourceType { return segment.SourceTypeBrowser }
+func (f *fakeSegment) GetTitle() string                  { return f.id }
+func (f *fakeSegment) GetVoiceovers(string) []segment.Voiceover {
+	return f.vos
+}
+func (f *fakeSegment) GetLanguages() []string { return []string{"en-US"} }
+func (f *fakeSegment) GetTranscripts() map[string]transcript.LanguageContent {
+	return nil
+}
+
+// countingGenerator returns a generator whose provider writes a short silent
+// MP3 per call, and the number of calls made so far.
+func countingGenerator(t *testing.T) (*SegmentTTSGenerator, *[]string) {
+	t.Helper()
+	if _, err := exec.LookPath("ffmpeg"); err != nil {
+		t.Skip("ffmpeg not installed")
+	}
+	silence := filepath.Join(t.TempDir(), "silence.mp3")
+	if err := generateSilence(context.Background(), 300, silence); err != nil {
+		t.Fatal(err)
+	}
+	audio, err := os.ReadFile(silence)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var calls []string
+	g := NewSegmentTTSGenerator(nil, transcript.VoiceConfig{Provider: "fake", VoiceID: "v1"})
+	g.synth = func(_ context.Context, text string, _ transcript.VoiceConfig) ([]byte, error) {
+		calls = append(calls, text)
+		return audio, nil
+	}
+	return g, &calls
+}
+
+func TestGenerateForSegment_ReusesClips(t *testing.T) {
+	g, calls := countingGenerator(t)
+	dir := t.TempDir()
+	ctx := context.Background()
+	seg := &fakeSegment{id: "lesson", vos: []segment.Voiceover{
+		{Index: 0, Text: "First slide."},
+		{Index: 1, Text: "Second slide.", Pause: 200},
+	}}
+
+	res, err := g.GenerateForSegment(ctx, seg, "en-US", dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(*calls) != 2 {
+		t.Fatalf("first run: %d TTS calls, want 2", len(*calls))
+	}
+	if res.AudioFile != filepath.Join(dir, "lesson.mp3") {
+		t.Errorf("AudioFile = %s", res.AudioFile)
+	}
+
+	// Unchanged: no new TTS calls.
+	if _, err := g.GenerateForSegment(ctx, seg, "en-US", dir); err != nil {
+		t.Fatal(err)
+	}
+	if len(*calls) != 2 {
+		t.Fatalf("unchanged run: %d TTS calls, want 2", len(*calls))
+	}
+
+	// One slide edited: only that clip is synthesized.
+	seg.vos[1].Text = "Second slide, revised."
+	res, err = g.GenerateForSegment(ctx, seg, "en-US", dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(*calls) != 3 || (*calls)[2] != "Second slide, revised." {
+		t.Fatalf("edited run: calls = %q", *calls)
+	}
+	if res.VoiceoverAudioFiles[0] == res.VoiceoverAudioFiles[1] {
+		t.Error("distinct voiceovers share a clip")
+	}
+
+	// A pause change reassembles the segment without new TTS calls.
+	seg.vos[1].Pause = 900
+	res2, err := g.GenerateForSegment(ctx, seg, "en-US", dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(*calls) != 3 {
+		t.Fatalf("pause change: %d TTS calls, want 3", len(*calls))
+	}
+	if res2.Duration-res.Duration != 700 {
+		t.Errorf("pause change: duration %d -> %d, want +700", res.Duration, res2.Duration)
+	}
+}
+
+func TestGenerateForSegment_VoiceAndPronunciationChangeClip(t *testing.T) {
+	g, calls := countingGenerator(t)
+	dir := t.TempDir()
+	ctx := context.Background()
+	seg := &fakeSegment{id: "s", vos: []segment.Voiceover{{Index: 0, Text: "Run vac."}}}
+
+	if _, err := g.GenerateForSegment(ctx, seg, "en-US", dir); err != nil {
+		t.Fatal(err)
+	}
+	g.SetPronunciations(&PronunciationDictionary{Terms: map[string]map[string]string{"vac": {"en-US": "V A C"}}})
+	if _, err := g.GenerateForSegment(ctx, seg, "en-US", dir); err != nil {
+		t.Fatal(err)
+	}
+	g.defaultVoice.VoiceID = "v2"
+	if _, err := g.GenerateForSegment(ctx, seg, "en-US", dir); err != nil {
+		t.Fatal(err)
+	}
+	want := []string{"Run vac.", "Run V A C.", "Run V A C."}
+	if len(*calls) != len(want) {
+		t.Fatalf("calls = %q, want %q", *calls, want)
+	}
+	for i := range want {
+		if (*calls)[i] != want[i] {
+			t.Errorf("call %d = %q, want %q", i, (*calls)[i], want[i])
+		}
+	}
+}
+
+func TestClipKey(t *testing.T) {
+	v := transcript.VoiceConfig{Provider: "deepgram", VoiceID: "aura"}
+	k := ClipKey("Hello.", "en-US", v)
+	if len(k) != 16 {
+		t.Errorf("key %q: want 16 hex chars", k)
+	}
+	if k != ClipKey("Hello.", "en-US", v) {
+		t.Error("key is not stable")
+	}
+	v2 := v
+	v2.Speed = 1.1
+	for _, other := range []string{
+		ClipKey("Hello!", "en-US", v),
+		ClipKey("Hello.", "fr-FR", v),
+		ClipKey("Hello.", "en-US", v2),
+	} {
+		if other == k {
+			t.Error("different inputs share a key")
+		}
 	}
 }
