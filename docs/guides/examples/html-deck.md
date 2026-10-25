@@ -55,7 +55,7 @@ vac html video \
 The title slide joins the first lesson, so this writes `01-writing-narration.mp4`
 (slides 1–3), `02-recording.mp4` (slide 4), and `lessons.json` to
 `examples/html-deck/lessons/`. After editing a slide, `--lessons changed` re-records only
-its lesson. See [Lessons and Courses](../guide/lessons.md).
+its lesson. See [Lessons and Courses](../lessons.md).
 
 ## Regenerate the Transcript and Config
 
@@ -66,4 +66,4 @@ vac html init \
 ```
 
 This rewrites `voiceover/transcript.json` and `deck.video.json`, keeping translations
-already in the transcript. See [HTML Slide Decks](../guide/html-decks.md).
+already in the transcript. See [HTML Slide Decks](../html-decks.md).

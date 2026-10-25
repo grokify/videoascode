@@ -41,8 +41,8 @@ Both providers offer TTS and STT capabilities. You can use either one for both f
 ## Features
 
 - 📝 **Parse Marp presentations** with voiceover in HTML comments
-- 🖥️ **Record HTML slide decks** with narration in `data-vo` attributes or reveal.js speaker notes, served and recorded in one command (see [HTML Slide Decks](docs/guide/html-decks.md))
-- 🎓 **Record course lessons** — one video per lesson with a `lessons.json` manifest, re-recording only lessons whose content changed (see [Lessons and Courses](docs/guide/lessons.md))
+- 🖥️ **Record HTML slide decks** with narration in `data-vo` attributes or reveal.js speaker notes, served and recorded in one command (see [HTML Slide Decks](docs/guides/html-decks.md))
+- 🎓 **Record course lessons** — one video per lesson with a `lessons.json` manifest, re-recording only lessons whose content changed (see [Lessons and Courses](docs/guides/lessons.md))
 - 🌐 **JSON transcript support** for multi-language voiceovers
 - 🎙️ **Text-to-speech** via OmniVoice (ElevenLabs, Deepgram, or local F5-TTS)
 - 🗣️ **Multi-language** support with per-slide voice configuration
@@ -55,7 +55,7 @@ Both providers offer TTS and STT capabilities. You can use either one for both f
 - 🎓 **Udemy-ready** individual slide videos for course lectures
 - 🔄 **Decoupled workflow** - generate audio and video separately
 - 📜 **Subtitle generation** - SRT/VTT from audio via OmniVoice (Deepgram or local Whisper STT)
-- 🗣️ **Pronunciation dictionary** - rewrite brand names/acronyms to a spoken form before TTS, leaving displayed text (subtitles/manifests) unchanged (see [Pronunciation](docs/guide/pronunciation.md))
+- 🗣️ **Pronunciation dictionary** - rewrite brand names/acronyms to a spoken form before TTS, leaving displayed text (subtitles/manifests) unchanged (see [Pronunciation](docs/guides/pronunciation.md))
 - 🌐 **Browser demo recording** - automated browser interactions with voiceover
 - 🎯 **TTS audio caching** - reuse generated audio across runs
 - 🧑‍💼 **Avatar presenter overlay** (optional) - talking-head circle via [OmniAvatar](https://github.com/plexusone/omniavatar) (HeyGen, Tavus, bitHuman)
@@ -392,7 +392,7 @@ vac html video --input deck/index.html --lessons changed
 
 Voiceover clips are cached by their text and voice, so unchanged narration is never sent to the TTS provider twice.
 
-See [HTML Slide Decks](docs/guide/html-decks.md) for the deck conventions, translations, and timing, and [Lessons and Courses](docs/guide/lessons.md) for lessons, the manifest, and course terminology.
+See [HTML Slide Decks](docs/guides/html-decks.md) for the deck conventions, translations, and timing, and [Lessons and Courses](docs/guides/lessons.md) for lessons, the manifest, and course terminology.
 
 ### Command: `vac browser record`
 

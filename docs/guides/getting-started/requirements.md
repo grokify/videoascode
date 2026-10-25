@@ -28,7 +28,7 @@
 | **HeyGen** / **bitHuman** / **Tavus** | Optional | AI avatar presenter overlay (`vac avatar`, `--avatar-id`) |
 
 \* Not required when using the local F5-TTS provider for TTS (and Whisper for
-STT) — see [Local Providers](../guide/local-providers.md). Local providers run
+STT) — see [Local Providers](../local-providers.md). Local providers run
 entirely on-device with no API keys.
 
 ## Local Providers (optional, Apple Silicon)
@@ -43,7 +43,7 @@ providers requires:
 | **Disk** | ~4 GB free | F5-TTS (~2 GB) and Whisper `large-v3-turbo` (~1.6 GB) model weights |
 
 The `scripts/localvoice.sh` helper sets these up automatically. See
-[Local Providers](../guide/local-providers.md).
+[Local Providers](../local-providers.md).
 
 ## Platform-Specific Notes
 

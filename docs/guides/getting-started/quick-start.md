@@ -62,6 +62,6 @@ vac --input slides.md --output my_video.mp4
 
 ## Next Steps
 
-- Add [pause directives](../guide/voiceover-formats.md#pause-directives) for timing control
-- Use [transcript.json](../guide/voiceover-formats.md#json-transcripts) for multi-language
-- Configure [output options](../guide/output-options.md) for different platforms
+- Add [pause directives](../voiceover-formats.md#pause-directives) for timing control
+- Use [transcript.json](../voiceover-formats.md#json-transcripts) for multi-language
+- Configure [output options](../output-options.md) for different platforms

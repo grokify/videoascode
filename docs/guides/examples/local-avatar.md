@@ -117,5 +117,5 @@ On Apple Silicon (M-series), for a 6-slide presentation:
 
 ## See Also
 
-- [Local Providers Guide](../guide/local-providers.md) — F5-TTS and Whisper setup
-- [Avatar Presenter Overlay](../guide/avatar-presenter.md) — Avatar integration options
+- [Local Providers Guide](../local-providers.md) — F5-TTS and Whisper setup
+- [Avatar Presenter Overlay](../avatar-presenter.md) — Avatar integration options

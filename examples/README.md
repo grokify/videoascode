@@ -71,9 +71,9 @@ See `pkg/transcript/transcript.schema.json` for the full schema.
 
 | Example | Description | Slides | Languages |
 |---------|-------------|--------|-----------|
-| [intro](./intro/) | Self-documenting introduction to vac | 13 | en-US, en-GB, es-ES |
-| [local-avatar](./local-avatar/) | Fully offline pipeline with local TTS and avatar | 6 | en-US |
-| [html-deck](./html-deck/) | Native HTML deck in two lessons, narrated from `data-vo` and speaker notes | 4 | en-US |
+| [intro](intro/) | Self-documenting introduction to vac | 13 | en-US, en-GB, es-ES |
+| [local-avatar](local-avatar/) | Fully offline pipeline with local TTS and avatar | 6 | en-US |
+| [html-deck](html-deck/) | Native HTML deck in two lessons, narrated from `data-vo` and speaker notes | 4 | en-US |
 
 ## Running an Example
 

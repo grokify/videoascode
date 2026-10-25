@@ -147,7 +147,7 @@ vac slides tts --transcript transcript.json --output audio/en-US/ \
 vac slides tts --transcript transcript.json --output audio/ --force
 ```
 
-See [Local Providers](../guide/local-providers.md) for the `--local` server setup.
+See [Local Providers](../local-providers.md) for the `--local` server setup.
 
 ---
 
@@ -253,7 +253,7 @@ are spread across the steps proportionally.
 ## html init
 
 Write a transcript and browser video config for an HTML slide deck. See
-[HTML Slide Decks](../guide/html-decks.md).
+[HTML Slide Decks](../html-decks.md).
 
 ```bash
 vac html init --input deck/index.html [flags]
@@ -289,7 +289,7 @@ vac html init --input deck/index.html [flags]
 
 List a deck's lessons with their slides, estimated length, and status against the
 `lessons.json` manifest: `not recorded`, `changed`, or `recorded` (with the video's
-length). See [Lessons and Courses](../guide/lessons.md).
+length). See [Lessons and Courses](../lessons.md).
 
 ```bash
 vac html lessons --input deck/index.html [--output-dir lessons/]
@@ -407,7 +407,7 @@ vac subtitle --audio audio/en-US/ --lang en-US --provider whisper-mlx --local
 vac subtitle --audio audio/en-US/ --individual
 ```
 
-See [Local Providers](../guide/local-providers.md) for the `--local` server setup.
+See [Local Providers](../local-providers.md) for the `--local` server setup.
 
 ---
 

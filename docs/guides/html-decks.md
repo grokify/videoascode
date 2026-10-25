@@ -61,7 +61,7 @@ This writes two files next to the deck:
 
 | File | Contents |
 | --- | --- |
-| `voiceover/transcript.json` | The narration in the [transcript format](../reference/transcript-schema.md), one entry per slide, split into sentences |
+| `voiceover/transcript.json` | The narration in the [transcript format](reference/transcript-schema.md), one entry per slide, split into sentences |
 | `deck.video.json` | A config for `vac browser video`, one browser step per slide |
 
 Re-run `vac html init` whenever the narration changes. It keeps what you added since:
