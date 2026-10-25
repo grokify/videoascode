@@ -2,142 +2,178 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://grokify.github.io/videoascode/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/TRD_DUAL_SUBS/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/design/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/comparisons/marptalk/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/design/architecture/overview/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/development/architecture/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/avatar-presenter/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/development/contributing/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/browser-video/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/examples/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/complete-workflow/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/examples/intro/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/contributing/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/examples/local-avatar/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/customization/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/getting-started/installation/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/html-decks/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/getting-started/quick-start/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/lessons/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/getting-started/requirements/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/local-providers/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/avatar-presenter/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/multi-language/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/browser-video/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/output-options/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/complete-workflow/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/pipeline/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/customization/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/pronunciation/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/local-providers/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/subtitles/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/multi-language/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/troubleshooting/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/output-options/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/voiceover-formats/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/pipeline/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/comparisons/marptalk/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/pronunciation/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/examples/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/subtitles/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/examples/html-deck/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/troubleshooting/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/examples/intro/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/guide/voiceover-formats/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/examples/local-avatar/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/reference/cli/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/getting-started/installation/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/reference/transcript-schema/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/getting-started/quick-start/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
-         <loc>https://grokify.github.io/videoascode/reference/voice-settings/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <loc>https://grokify.github.io/videoascode/guides/getting-started/requirements/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://grokify.github.io/videoascode/guides/reference/cli/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://grokify.github.io/videoascode/guides/reference/transcript-schema/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://grokify.github.io/videoascode/guides/reference/voice-settings/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://grokify.github.io/videoascode/releases/v0.1.0/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://grokify.github.io/videoascode/releases/v0.10.0/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://grokify.github.io/videoascode/releases/v0.2.0/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://grokify.github.io/videoascode/releases/v0.3.0/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://grokify.github.io/videoascode/releases/v0.4.0/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://grokify.github.io/videoascode/releases/v0.5.0/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://grokify.github.io/videoascode/releases/v0.6.0/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://grokify.github.io/videoascode/releases/v0.7.0/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://grokify.github.io/videoascode/releases/v0.8.0/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://grokify.github.io/videoascode/releases/v0.9.0/</loc>
-         <lastmod>2026-07-27</lastmod>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://grokify.github.io/videoascode/specs/dual-language-subtitles/TRD/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://grokify.github.io/videoascode/specs/initiatives/INIT-VAC-001/PLAN/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://grokify.github.io/videoascode/specs/initiatives/INIT-VAC-001/PRD/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://grokify.github.io/videoascode/specs/initiatives/INIT-VAC-001/ROADMAP/</loc>
+         <lastmod>2026-10-25</lastmod>
+    </url>
+    <url>
+         <loc>https://grokify.github.io/videoascode/specs/initiatives/INIT-VAC-001/TRD/</loc>
+         <lastmod>2026-10-25</lastmod>
     </url>
 </urlset>
