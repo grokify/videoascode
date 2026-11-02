@@ -9,10 +9,10 @@ require (
 	github.com/grokify/mogo v0.75.0
 	github.com/plexusone/omniavatar v0.3.0
 	github.com/plexusone/omniavatar-core v0.4.0
-	github.com/plexusone/omnivoice v0.13.0
-	github.com/plexusone/omnivoice-core v0.16.1
+	github.com/plexusone/omnivoice v0.14.0
+	github.com/plexusone/omnivoice-core v0.18.1
 	github.com/spf13/cobra v1.10.2
-	golang.org/x/net v0.61.0
+	golang.org/x/net v0.62.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -84,14 +84,14 @@ require (
 	github.com/pion/webrtc/v4 v4.2.25 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plexusone/bithuman-go v0.2.0 // indirect
-	github.com/plexusone/elevenlabs-go v0.13.0 // indirect
+	github.com/plexusone/elevenlabs-go v0.14.0 // indirect
 	github.com/plexusone/heygen-go v0.2.0 // indirect
 	github.com/plexusone/ogen-tools v0.3.0 // indirect
 	github.com/plexusone/omni-deepgram v0.7.0 // indirect
 	github.com/plexusone/omni-google v0.7.0 // indirect
-	github.com/plexusone/omni-openai v0.7.1 // indirect
-	github.com/plexusone/omni-telnyx v0.4.0 // indirect
-	github.com/plexusone/omni-twilio v0.9.0 // indirect
+	github.com/plexusone/omni-openai v0.8.0 // indirect
+	github.com/plexusone/omni-telnyx v0.7.0 // indirect
+	github.com/plexusone/omni-twilio v0.12.0 // indirect
 	github.com/plexusone/omnillm-core v0.18.1 // indirect
 	github.com/plexusone/tavus-go v0.3.0 // indirect
 	github.com/plexusone/terminology-spec v0.1.0 // indirect
@@ -103,7 +103,7 @@ require (
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/shopspring/decimal v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
-	github.com/team-telnyx/telnyx-go/v4 v4.104.0 // indirect
+	github.com/team-telnyx/telnyx-go/v4 v4.106.0 // indirect
 	github.com/tidwall/gjson v1.20.0 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.2 // indirect
@@ -134,8 +134,8 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261019180522-ce908d29299b // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
-	google.golang.org/grpc v1.84.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261026165753-2ffab32bce7e // indirect
+	google.golang.org/grpc v1.85.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
