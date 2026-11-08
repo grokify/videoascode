@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>{{CSS}}</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-title">
+    <h1 id="title">Transcript review</h1>
+    <span id="meta" class="muted"></span>
+  </div>
+  <div class="bar-controls">
+    <span id="deck-pick" hidden><a href="../../" title="All decks">All decks</a> <select id="decks" aria-label="Deck"></select></span>
+    <label>Language <select id="lang"></select></label>
+    <label>Compare <select id="compare"><option value="">None</option></select></label>
+    <label>Show <select id="filter">
+      <option value="all">All slides</option>
+      <option value="todo">Needs review</option>
+      <option value="changes">Changes requested</option>
+      <option value="flagged">With warnings</option>
+    </select></label>
+    <button id="reload" type="button" title="Reload deck and transcript (R)">Reload</button>
+  </div>
+</header>
+
+<div id="banner" class="banner" hidden></div>
+
+<main class="layout">
+  <nav class="outline" aria-label="Slides">
+    <div id="progress" class="progress"></div>
+    <ol id="outline"></ol>
+  </nav>
+
+  <section class="stage-col">
+    <div id="stage" class="stage">
+      <iframe id="deck" title="Deck" tabindex="-1"></iframe>
+      <div class="stage-shield" title="Use the arrow keys or the buttons to move"></div>
+    </div>
+    <div class="stage-nav">
+      <button id="prev" type="button" title="Previous slide (←)">← Prev</button>
+      <span id="position" class="muted"></span>
+      <button id="next" type="button" title="Next slide (→)">Next →</button>
+      <button id="next-todo" type="button" title="Next slide needing review (N)">Next to review</button>
+    </div>
+    <div id="preview" class="preview" hidden>
+      <span class="label muted" title="A quick listen with the browser's own voice. The recording uses the TTS voice, which sounds different.">Browser preview</span>
+      <button id="play" type="button" title="Listen to this slide (P)">▶ This slide</button>
+      <button id="play-on" type="button" title="Listen from this slide on, moving through the slides (Shift+P)">▶ From here</button>
+      <select id="voice" aria-label="Preview voice"></select>
+      <select id="rate" aria-label="Preview speed">
+        <option value="0.8">0.8×</option>
+        <option value="0.9">0.9×</option>
+        <option value="1">1×</option>
+        <option value="1.1">1.1×</option>
+        <option value="1.25">1.25×</option>
+        <option value="1.5">1.5×</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="panel" aria-live="polite">
+    <div id="panel"></div>
+  </section>
+</main>
+
+<footer class="keys muted">
+  <span><kbd>←</kbd><kbd>→</kbd> move</span>
+  <span><kbd>N</kbd> next to review</span>
+  <span><kbd>A</kbd> approve</span>
+  <span><kbd>C</kbd> request changes</span>
+  <span><kbd>R</kbd> reload</span>
+  <span class="speech-keys" hidden><kbd>P</kbd> listen · <kbd>Shift</kbd><kbd>P</kbd> from here · <kbd>Esc</kbd> stop</span>
+</footer>
+
+<script type="application/json" id="model">{{MODEL}}</script>
+<script>{{SPEECH}}</script>
+<script>{{JS}}</script>
+</body>
+</html>

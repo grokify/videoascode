@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transcript review</title>
+<style>{{.CSS}}
+body { display: block; }
+.decks { max-width: 980px; margin: 0 auto; padding: 20px 16px 40px; }
+.decks h1 { font-size: 20px; margin: 0 0 4px; }
+.decks table { width: 100%; border-collapse: collapse; margin-top: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.decks th, .decks td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.decks th { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; font-weight: 600; }
+.decks tr:last-child td { border-bottom: 0; }
+.decks a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.decks a:hover { text-decoration: underline; }
+.decks .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.decks .bar { width: 120px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.decks .bar span { display: block; height: 100%; background: var(--ok); }
+.decks .err { color: var(--err); }
+.decks .wrn { color: var(--warn); }
+@media (max-width: 700px) { .decks .hide-sm { display: none; } }
+</style>
+</head>
+<body>
+<main class="decks">
+  <h1>Transcript review</h1>
+  <p class="muted">Open a deck to read and approve its narration. Progress is per language.</p>
+  <table>
+    <thead><tr><th>Deck</th><th>Language</th><th>Approved</th><th class="hide-sm"></th><th>Errors</th><th>Warnings</th></tr></thead>
+    <tbody>
+    {{- range .Decks}}
+      {{- $d := .}}
+      {{- if .Err}}
+      <tr><td><a href="{{.URL}}">{{.Name}}</a></td><td colspan="5" class="err">{{.Err}}</td></tr>
+      {{- else}}
+      {{- range $i, $lang := .Model.Languages}}
+      {{- $c := index $d.Model.Summary $lang}}
+      <tr>
+        <td>{{if eq $i 0}}<a href="{{$d.URL}}">{{$d.Name}}</a><div class="muted">{{len $d.Model.Slides}} slides · {{len $d.Model.Lessons}} lessons</div>{{end}}</td>
+        <td>{{$lang}}</td>
+        <td class="num">{{$c.Approved}} / {{$c.Slides}}{{if $c.Changes}} · {{$c.Changes}} changes{{end}}{{if $c.Stale}} · {{$c.Stale}} stale{{end}}</td>
+        <td class="hide-sm"><div class="bar"><span style="width: {{pct $c.Approved $c.Slides}}%"></span></div></td>
+        <td class="num{{if $c.Errors}} err{{end}}">{{$c.Errors}}</td>
+        <td class="num{{if $c.Warnings}} wrn{{end}}">{{$c.Warnings}}</td>
+      </tr>
+      {{- end}}
+      {{- end}}
+    {{- end}}
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

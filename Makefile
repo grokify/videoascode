@@ -1,4 +1,4 @@
-.PHONY: build install test clean check run
+.PHONY: build install test clean check run vendor-speech
 
 # Build the binary
 build:
@@ -52,3 +52,10 @@ help:
 	@echo "  make check    - Check system dependencies"
 	@echo "  make run      - Build and run example"
 	@echo "  make help     - Show this help message"
+	@echo "  make vendor-speech - Copy the browser speech library (SPEECH_VERSION)"
+
+# Copy the browser speech library used by the review page's preview.
+# SPEECH_DIST=<dir> copies from a local build instead of the npm registry.
+SPEECH_VERSION ?= 0.2.1
+vendor-speech:
+	@scripts/vendor-speech.sh $(SPEECH_VERSION)
