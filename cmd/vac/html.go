@@ -38,11 +38,18 @@ and each lesson is one video in it.
 Subcommands:
   init     Write a transcript and video config for a deck
   lessons  List a deck's lessons and whether their videos are up to date
+  review   Review the narration slide by slide before sending it to TTS
   video    Serve a deck locally and record it, or its lessons, with TTS voiceover
 
 Examples:
   # Generate voiceover/transcript.json and deck.video.json next to the deck
   vac html init --input deck/index.html
+
+  # Read and approve each slide's narration next to the slide
+  vac html review --input deck/index.html --open
+
+  # Record only once every slide is approved
+  vac html video --input deck/index.html --lessons all --require-review
 
   # Record the deck directly; no separate web server needed
   vac html video --input deck/index.html --output deck.mp4 --provider deepgram
@@ -146,7 +153,7 @@ against the lessons.json manifest in --output-dir:
 }
 
 func init() {
-	for _, c := range []*cobra.Command{htmlInitCmd, htmlLessonsCmd, htmlVideoCmd} {
+	for _, c := range []*cobra.Command{htmlInitCmd, htmlLessonsCmd, htmlReviewCmd, htmlVideoCmd} {
 		c.Flags().StringVarP(&hdInput, "input", "i", "", "HTML deck file (required)")
 		c.Flags().StringVar(&hdTitle, "title", "", "Title (default: the transcript's, else the page <title>)")
 		c.Flags().StringVar(&hdLanguage, "narration-lang", htmldeck.DefaultLanguage, "Language of the narration in the HTML")
@@ -162,6 +169,9 @@ func init() {
 		c.Flags().StringVar(&hdLessonAttr, "lesson-attr", htmldeck.DefaultLessonAttr, "Attribute that marks a slide starting a lesson")
 		c.Flags().StringVar(&hdLessonClass, "lesson-class", "", `Class that also marks a slide starting a lesson (e.g. "section")`)
 		c.Flags().StringVar(&hdStartFragment, "start-fragment", htmldeck.DefaultStartFragment, "URL fragment that opens the deck at a lesson's first slide; {id}, {n} (1-based), {i} (0-based)")
+		if c == htmlReviewCmd {
+			continue // review also takes decks as arguments
+		}
 		if err := c.MarkFlagRequired("input"); err != nil {
 			panic(err)
 		}
@@ -178,7 +188,7 @@ func init() {
 		c.Flags().StringVar(&hdOutputDir, "output-dir", "", "Directory for lesson videos and lessons.json (default: lessons/ next to the deck)")
 	}
 
-	htmlCmd.AddCommand(htmlInitCmd, htmlLessonsCmd, htmlVideoCmd)
+	htmlCmd.AddCommand(htmlInitCmd, htmlLessonsCmd, htmlReviewCmd, htmlVideoCmd)
 	rootCmd.AddCommand(htmlCmd)
 }
 
@@ -193,7 +203,12 @@ type htmlDeckInputs struct {
 // loadHTMLDeck parses the deck and builds its transcript, keeping the
 // translations and voice of any existing transcript.
 func loadHTMLDeck() (*htmlDeckInputs, error) {
-	f, err := os.Open(hdInput)
+	return loadHTMLDeckFile(hdInput)
+}
+
+// loadHTMLDeckFile is loadHTMLDeck for the deck at input.
+func loadHTMLDeckFile(input string) (*htmlDeckInputs, error) {
+	f, err := os.Open(input)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +220,7 @@ func loadHTMLDeck() (*htmlDeckInputs, error) {
 	})
 	closeErr := f.Close()
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", hdInput, err)
+		return nil, fmt.Errorf("%s: %w", input, err)
 	}
 	if closeErr != nil {
 		return nil, closeErr
@@ -213,7 +228,7 @@ func loadHTMLDeck() (*htmlDeckInputs, error) {
 
 	tPath := hdTranscriptPath
 	if tPath == "" {
-		tPath = filepath.Join(filepath.Dir(hdInput), "voiceover", "transcript.json")
+		tPath = filepath.Join(filepath.Dir(input), "voiceover", "transcript.json")
 	}
 	existing, err := loadTranscriptIfExists(tPath)
 	if err != nil {
@@ -231,7 +246,7 @@ func loadHTMLDeck() (*htmlDeckInputs, error) {
 		Existing: existing,
 	})
 
-	pron, err := loadPronunciations(htmlConfigPath())
+	pron, err := loadPronunciations(htmlConfigPathFor(input))
 	if err != nil {
 		return nil, err
 	}
@@ -240,10 +255,15 @@ func loadHTMLDeck() (*htmlDeckInputs, error) {
 
 // htmlConfigPath is the video config 'vac html init' writes.
 func htmlConfigPath() string {
+	return htmlConfigPathFor(hdInput)
+}
+
+// htmlConfigPathFor is htmlConfigPath for the deck at input.
+func htmlConfigPathFor(input string) string {
 	if hiConfigPath != "" {
 		return hiConfigPath
 	}
-	return filepath.Join(filepath.Dir(hdInput), "deck.video.json")
+	return filepath.Join(filepath.Dir(input), "deck.video.json")
 }
 
 // loadPronunciations reads --pronunciations, or else keeps the
@@ -366,6 +386,11 @@ func runHTMLVideo(cmd *cobra.Command, args []string) error {
 	deckURL := withQuery(baseURL + "/" + url.PathEscape(filepath.Base(hdInput)))
 	if len(hvLessons) > 0 {
 		return recordLessons(ctx, in, deckURL)
+	}
+	if hvRequireReview {
+		if err := requireReviewed(nil, bvLanguages); err != nil {
+			return err
+		}
 	}
 	cfg, err := in.deck.VideoConfig(in.transcript, deckConfigOptions(deckURL, in.pronunciations))
 	if err != nil {
@@ -498,6 +523,17 @@ func recordLessons(ctx context.Context, in *htmlDeckInputs, deckURL string) erro
 	if len(selected) == 0 {
 		fmt.Println("All lessons are up to date.")
 		return nil
+	}
+	if hvRequireReview {
+		var slides []int
+		for _, i := range selected {
+			for _, s := range plans[i].lesson.Slides {
+				slides = append(slides, s.Index)
+			}
+		}
+		if err := requireReviewed(slides, bvLanguages); err != nil {
+			return err
+		}
 	}
 	if err := os.MkdirAll(lessonsDir(), 0o755); err != nil {
 		return err
