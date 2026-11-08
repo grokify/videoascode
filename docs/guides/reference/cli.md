@@ -17,6 +17,7 @@ vac
 ├── html               # Native HTML slide decks
 │   ├── init           # Write transcript + video config from a deck
 │   ├── lessons        # List lessons and whether their videos are up to date
+│   ├── review         # Review narration slide by slide before TTS
 │   └── video          # Serve and record a deck, or its lessons, with TTS voiceover
 ├── avatar             # Talking-head presenter overlay (optional)
 │   ├── list-avatars   # List provider avatar IDs (for --avatar-id)
@@ -299,6 +300,39 @@ Takes the deck flags of `html init` (except `--config` and `--url`) and `--outpu
 
 ---
 
+## html review
+
+Serve a page that shows each slide next to its narration, for approving the transcript
+before it is sent to TTS. The page can read the narration aloud with the browser's own
+voice. See [Transcript Review](../transcript-review.md).
+
+```bash
+vac html review --input deck/index.html [--open] [flags]
+vac html review --input deck/index.html --export deck/transcript.html
+vac html review --input deck/index.html --summary
+vac html review course/sections/*/index.html --open
+```
+
+Decks can be named with `--input` and as arguments. With more than one, the page lists
+every deck with its progress and each deck's page can switch to the others;
+`--transcript`, `--review-file`, and `--export` then cannot be used.
+
+Takes the deck flags of `html init` (except `--config` and `--url`), plus:
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--port` | int | `8765` | Port to serve on; `0` for any free port |
+| `--open` | bool | false | Open the page in the default browser |
+| `--review-file` | string | `review.json` next to the transcript | Where decisions are saved |
+| `--reviewer` | string | | Name recorded with each decision |
+| `--lang`, `-l` | strings | every language in the transcript | Languages to review |
+| `--export` | string | | Write a read-only snapshot page instead of serving |
+| `--summary` | bool | false | Print review progress per language and exit |
+| `--nav` | string | `hash` | Move the deck by fragment (`hash`) or reload it at each slide (`reload`) |
+| `--width`, `--height` | int | `1920`, `1080` | Size the deck is laid out at before scaling |
+
+---
+
 ## html video
 
 Serve an HTML deck's directory on a loopback port and record it with TTS voiceover, one
@@ -316,6 +350,7 @@ TTS, and subtitle flags of [browser video](#browser-video), plus:
 |------|------|---------|-------------|
 | `--lessons` | strings | | Record lessons as separate videos: lesson IDs or numbers, `all`, or `changed` |
 | `--output-dir` | string | `lessons/` next to the deck | Directory for lesson videos and `lessons.json` |
+| `--require-review` | bool | false | Refuse to record unless every slide being recorded is approved in `html review` for every `--lang` |
 
 With `--lessons`, `--output` is not used: each lesson is written to `--output-dir` as
 `NN-<title>.mp4`, and `lessons.json` is updated after each one. `changed` selects lessons

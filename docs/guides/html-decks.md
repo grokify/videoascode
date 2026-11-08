@@ -99,6 +99,16 @@ vac html lessons --input deck/index.html
 vac html video --input deck/index.html --lessons all
 ```
 
+## Review the Narration
+
+Before recording, read each slide's narration next to the slide and approve it, so
+nothing reaches the TTS provider unread. See [Transcript Review](transcript-review.md).
+
+```bash
+vac html review --input deck/index.html --open
+vac html video --input deck/index.html --lessons all --require-review
+```
+
 ## Timing
 
 Each slide stays on screen for exactly its own narration plus its pause, which is how the

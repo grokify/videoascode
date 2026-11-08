@@ -43,6 +43,7 @@ Both providers offer TTS and STT capabilities. You can use either one for both f
 - 📝 **Parse Marp presentations** with voiceover in HTML comments
 - 🖥️ **Record HTML slide decks** with narration in `data-vo` attributes or reveal.js speaker notes, served and recorded in one command (see [HTML Slide Decks](docs/guides/html-decks.md))
 - 🎓 **Record course lessons** — one video per lesson with a `lessons.json` manifest, re-recording only lessons whose content changed (see [Lessons and Courses](docs/guides/lessons.md))
+- ✅ **Review narration before TTS** — read each slide's transcript next to the slide, listen to it with the browser's own voice, approve it per language, and refuse to record until it is approved (see [Transcript Review](docs/guides/transcript-review.md))
 - 🌐 **JSON transcript support** for multi-language voiceovers
 - 🎙️ **Text-to-speech** via OmniVoice (ElevenLabs, Deepgram, or local F5-TTS)
 - 🗣️ **Multi-language** support with per-slide voice configuration
@@ -368,7 +369,7 @@ Flags:
       --workdir string          Working directory for temp files
 ```
 
-### Command: `vac html video`, `vac html init`, and `vac html lessons`
+### Command: `vac html video`, `vac html init`, `vac html lessons`, and `vac html review`
 
 Record a native HTML slide deck. Slides are elements with a `slide` class; narration comes from each slide's `data-vo` attribute or a child `<aside class="notes">`. `vac html video` serves the deck's directory on a loopback port and records it one slide per step, timing each slide to its own narration. It takes the same recording, TTS, and subtitle flags as `vac browser video`.
 
@@ -388,11 +389,17 @@ vac html video --input deck/index.html --lessons all
 
 # Later, re-record only lessons whose slides, narration, or voice changed
 vac html video --input deck/index.html --lessons changed
+
+# Read and approve each slide's narration next to the slide, before any TTS call
+vac html review --input deck/index.html --open
+
+# Record only once every slide being recorded is approved
+vac html video --input deck/index.html --lessons all --require-review
 ```
 
 Voiceover clips are cached by their text and voice, so unchanged narration is never sent to the TTS provider twice.
 
-See [HTML Slide Decks](docs/guides/html-decks.md) for the deck conventions, translations, and timing, and [Lessons and Courses](docs/guides/lessons.md) for lessons, the manifest, and course terminology.
+See [HTML Slide Decks](docs/guides/html-decks.md) for the deck conventions, translations, and timing, [Lessons and Courses](docs/guides/lessons.md) for lessons, the manifest, and course terminology, and [Transcript Review](docs/guides/transcript-review.md) for reviewing narration before TTS.
 
 ### Command: `vac browser record`
 
