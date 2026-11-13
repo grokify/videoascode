@@ -7,6 +7,38 @@
   "maintainers": ["grokify", "johncwang@gmail.com"],
   "releases": [
     {
+      "version": "v0.11.0",
+      "date": "2026-11-13",
+      "highlights": [
+        { "description": "**Transcript review**: `vac html review` shows each slide's narration next to the slide, with checks and a browser-voice preview, and records approvals tied to the exact text" },
+        { "description": "`vac html video --require-review` refuses to record until every slide being recorded is approved" },
+        { "description": "**Recordings for course platforms**: `vac html video --lessons … --recordings` writes each lesson's audio, captions and slide timings in the course-spec format, and `--audio-only` writes them without video" },
+        { "description": "**YouTube chapters** beside each lesson video, a chapter per slide" }
+      ],
+      "added": [
+        { "description": "`vac html review` — a review page for one deck or many: narration by sentence, the text TTS receives, checks for text TTS reads badly, a browser-voice preview, and approve or request changes per slide and language, saved to `voiceover/review.json`; `--lang`, `--reviewer`, `--review-file`, `--summary` and `--export`", "commit": "4a83684" },
+        { "description": "`pkg/review` — review model, checks, decisions file that goes stale when the reviewed text changes, and page server", "commit": "2779f64" },
+        { "description": "`vac html video --require-review` — stop before any TTS call unless every slide being recorded is approved for every `--lang`", "commit": "4a83684" },
+        { "description": "`make vendor-speech` — copy the browser speech library used by the review page", "commit": "2779f64" },
+        { "description": "`pkg/recording` — slide timings from clip lengths and pauses, WebVTT captions with a cue per sentence, YouTube chapters, and writing a lesson into a deck's `recordings/recordings.json` with course-spec narration fingerprints", "commit": "2be2dfd" },
+        { "description": "`vac html video --lessons … --recordings` and `--audio-only` — write each lesson's audio, captions and slide timings into the deck's `recordings/`, with or without video; with `--audio-only`, `changed` selects lessons whose recording is missing or out of date", "commit": "95595aa" },
+        { "description": "YouTube chapters beside each lesson video (`NN-<title>.chapters.txt`), a chapter per slide of at least ten seconds, listed in `lessons.json` under `chapters`", "commit": "95595aa" }
+      ],
+      "changed": [
+        { "description": "`vac browser video` and `vac html video` share one TTS provider and voice setup, so recordings reuse the clips a video run synthesized", "commit": "f5946b0" }
+      ],
+      "documentation": [
+        { "description": "New Transcript Review guide, and the transcript review technical requirements", "commit": "128ab32" },
+        { "description": "Lessons and Courses guide and CLI reference describe recordings for course platforms and YouTube chapters", "commit": "9a75b52" }
+      ],
+      "tests": [
+        { "description": "Recording timings, captions, chapters, and writing and checking recordings against a deck", "commit": "97ff564" }
+      ],
+      "dependencies": [
+        { "description": "Added `github.com/academyosio/course-spec` as a direct dependency for the recordings format; requires v0.2.0", "commit": "2be2dfd" }
+      ]
+    },
+    {
       "version": "v0.10.0",
       "date": "2026-10-25",
       "highlights": [
