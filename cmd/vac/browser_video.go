@@ -11,6 +11,7 @@ import (
 	omnitts "github.com/grokify/videoascode/pkg/omnivoice/tts"
 	"github.com/grokify/videoascode/pkg/orchestrator"
 	"github.com/grokify/videoascode/pkg/source"
+	"github.com/grokify/videoascode/pkg/transcript"
 	"github.com/grokify/videoascode/pkg/tts"
 	"github.com/grokify/videoascode/pkg/video"
 	"github.com/spf13/cobra"
@@ -127,7 +128,22 @@ func runBrowserVideo(cmd *cobra.Command, args []string) error {
 // recordBrowserVideo records cfg's browser segments with TTS voiceover to
 // outputFile, using the shared browser video flags. sourceLabel names the
 // input in the summary.
-func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabel, outputFile string) error {
+// ttsSetup is the TTS generator for a config and where its audio is cached.
+type ttsSetup struct {
+	gen         *tts.SegmentTTSGenerator
+	provider    string
+	voiceID     string
+	voice       transcript.VoiceConfig
+	deepgramKey string
+	workDir     string
+	// audioDir is where segment audio and clips are cached: --audio-dir,
+	// else audio/ in the work directory, as the orchestrator uses.
+	audioDir string
+}
+
+// newTTSSetup chooses the provider and voice for cfg from the flags, the
+// config and the environment, as 'vac browser video' does.
+func newTTSSetup(cfg *config.VideoConfig) (*ttsSetup, error) {
 	// Get API keys from flags or environment
 	elevenLabsKey := bvElevenLabsAPIKey
 	if elevenLabsKey == "" {
@@ -141,7 +157,7 @@ func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabe
 
 	// Require at least one API key, unless using a local provider
 	if elevenLabsKey == "" && deepgramKey == "" && !bvLocal {
-		return fmt.Errorf("TTS API key required: use --elevenlabs-api-key or --deepgram-api-key flag, set ELEVENLABS_API_KEY or DEEPGRAM_API_KEY env var, or use --local for F5-TTS MLX")
+		return nil, fmt.Errorf("TTS API key required: use --elevenlabs-api-key or --deepgram-api-key flag, set ELEVENLABS_API_KEY or DEEPGRAM_API_KEY env var, or use --local for F5-TTS MLX")
 	}
 
 	// Determine provider
@@ -166,18 +182,18 @@ func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabe
 	switch provider {
 	case "deepgram":
 		if deepgramKey == "" {
-			return fmt.Errorf("Deepgram provider selected but no API key: use --deepgram-api-key or set DEEPGRAM_API_KEY env var")
+			return nil, fmt.Errorf("Deepgram provider selected but no API key: use --deepgram-api-key or set DEEPGRAM_API_KEY env var")
 		}
 	case "elevenlabs":
 		if elevenLabsKey == "" {
-			return fmt.Errorf("ElevenLabs provider selected but no API key: use --elevenlabs-api-key or set ELEVENLABS_API_KEY env var")
+			return nil, fmt.Errorf("ElevenLabs provider selected but no API key: use --elevenlabs-api-key or set ELEVENLABS_API_KEY env var")
 		}
 	case "f5tts-mlx":
 		if !bvLocal {
-			return fmt.Errorf("F5-TTS MLX provider selected but local providers not enabled: use --local")
+			return nil, fmt.Errorf("F5-TTS MLX provider selected but local providers not enabled: use --local")
 		}
 	default:
-		return fmt.Errorf("unknown TTS provider: %s (supported: elevenlabs, deepgram, f5tts-mlx)", provider)
+		return nil, fmt.Errorf("unknown TTS provider: %s (supported: elevenlabs, deepgram, f5tts-mlx)", provider)
 	}
 
 	// Validate config has browser segments
@@ -189,7 +205,7 @@ func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabe
 		}
 	}
 	if !hasBrowser {
-		return fmt.Errorf("config has no browser segments")
+		return nil, fmt.Errorf("config has no browser segments")
 	}
 
 	// Set up working directory
@@ -208,7 +224,7 @@ func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabe
 	factory := omnitts.NewFactory(providerCfg)
 	ttsProvider, err := factory.Get(provider)
 	if err != nil {
-		return fmt.Errorf("failed to create TTS provider: %w", err)
+		return nil, fmt.Errorf("failed to create TTS provider: %w", err)
 	}
 
 	// Determine voice ID
@@ -242,6 +258,20 @@ func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabe
 	if len(cfg.Pronunciations) > 0 {
 		ttsGen.SetPronunciations(&tts.PronunciationDictionary{Terms: cfg.Pronunciations})
 	}
+
+	audioDir := bvAudioDir
+	if audioDir == "" {
+		audioDir = filepath.Join(workDir, "audio")
+	}
+	return &ttsSetup{gen: ttsGen, provider: provider, voiceID: voiceID, voice: defaultVoice, deepgramKey: deepgramKey, workDir: workDir, audioDir: audioDir}, nil
+}
+
+func recordBrowserVideo(ctx context.Context, cfg *config.VideoConfig, sourceLabel, outputFile string) error {
+	ts, err := newTTSSetup(cfg)
+	if err != nil {
+		return err
+	}
+	ttsGen, provider, voiceID, deepgramKey, workDir := ts.gen, ts.provider, ts.voiceID, ts.deepgramKey, ts.workDir
 
 	// Create content source
 	contentSource := source.NewConfigSource(cfg)
