@@ -351,10 +351,15 @@ TTS, and subtitle flags of [browser video](#browser-video), plus:
 | `--lessons` | strings | | Record lessons as separate videos: lesson IDs or numbers, `all`, or `changed` |
 | `--output-dir` | string | `lessons/` next to the deck | Directory for lesson videos and `lessons.json` |
 | `--require-review` | bool | false | Refuse to record unless every slide being recorded is approved in `html review` for every `--lang` |
+| `--recordings` | bool | false | With `--lessons`: also write each lesson's audio, captions and slide timings into the deck's `recordings/` |
+| `--audio-only` | bool | false | With `--lessons`: write the recordings without recording video; implies `--recordings` |
 
 With `--lessons`, `--output` is not used: each lesson is written to `--output-dir` as
-`NN-<title>.mp4`, and `lessons.json` is updated after each one. `changed` selects lessons
-not yet recorded or whose slides, narration, voice, or pronunciations changed since.
+`NN-<title>.mp4`, with YouTube chapters in `NN-<title>.chapters.txt` when it has three or
+more, and `lessons.json` is updated after each one. `changed` selects lessons not yet
+recorded or whose slides, narration, voice, or pronunciations changed since; with
+`--audio-only`, lessons whose recording is missing or out of date. See
+[Recordings for Course Platforms](../lessons.md#recordings-for-course-platforms).
 
 Voiceover clips are cached by their spoken text, language, and voice, so narration that
 hasn't changed is never synthesized again (this applies to `browser video` too).

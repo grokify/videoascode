@@ -142,6 +142,49 @@ slide's narration to the TTS provider. Clips live in the audio directory, shared
 lesson and deck: `--audio-dir` if given, else `audio/` in `--workdir` (by default a
 `vac-browser-video` folder in the system temp directory).
 
+## YouTube Chapters
+
+Beside each lesson video, `NN-<title>.chapters.txt` lists a chapter per slide, such as
+`0:00 Welcome`, for pasting into the video's description, where YouTube turns it into
+chapters on the seek bar. YouTube needs at least three chapters, the first at `0:00`,
+each at least ten seconds long, so a slide shorter than ten seconds joins the chapter
+before it, and a lesson that can't have three gets no file. `lessons.json` names each
+language's file under `chapters`.
+
+## Recordings for Course Platforms
+
+A course platform can play a lesson's slides with its recorded narration instead of a
+video: the slides stay sharp and searchable, and the learner hears the same voice as in
+the video. `--recordings` writes each recorded lesson's audio into the deck's
+`recordings/` directory in the [course-spec](https://github.com/academyosio/course-spec)
+format, and `--audio-only` writes it without recording video, which takes seconds a
+lesson instead of the lesson's length:
+
+```bash
+vac html video --input deck/index.html --lessons all --audio-only
+```
+
+```text
+deck/
+  index.html
+  recordings/
+    recordings.json
+    en-US/tractors.mp3
+    en-US/tractors.vtt
+```
+
+For each lesson and `--lang`, it writes:
+
+- the lesson's audio, the same clips the video uses, joined with each slide's pauses;
+- WebVTT captions with a cue per sentence, timed by each sentence's share of its slide;
+- the lesson's entry in `recordings.json`: each slide's start time in the audio, and a
+  fingerprint of the narration it was recorded from.
+
+AcademyOS plays a lesson's recording while every slide's narration matches its
+fingerprint, and falls back to the browser's voice when the narration changed. With
+`--audio-only`, `--lessons changed` re-records exactly those lessons. Commit the
+recordings with the course, and push it with `academyos course push`.
+
 ## Writing Lessons That Stand Alone
 
 Learners jump straight to a lesson, rewatch one, or come back days later, so:
