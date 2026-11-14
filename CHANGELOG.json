@@ -5,6 +5,18 @@
   "versioning": "semver",
   "commitConvention": "conventional",
   "maintainers": ["grokify", "johncwang@gmail.com"],
+  "unreleased": {
+    "added": [
+      { "description": "`vac html video --lessons … --retake <slide IDs>` — synthesize chosen slides' narration again after listening to it: their cached clips are deleted in every `--lang`, and each lesson's audio is rebuilt from the new clips and its other slides' cached clips; every slide must be in a selected lesson", "commit": "2330365" },
+      { "description": "`tts.SegmentTTSGenerator.RemoveClips` — delete the cached clips of chosen voiceovers and the segment's audio metadata, so only they are synthesized again", "commit": "e926b00" }
+    ],
+    "documentation": [
+      { "description": "Lessons and Courses guide, CLI reference and README describe re-taking slides with `--retake`", "commit": "373c1d2" }
+    ],
+    "tests": [
+      { "description": "Clip re-takes and `--retake` validation", "commit": "5fd4d5b" }
+    ]
+  },
   "releases": [
     {
       "version": "v0.11.0",
