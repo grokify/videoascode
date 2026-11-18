@@ -403,9 +403,12 @@ vac html video --input deck/index.html --lessons changed --recordings
 
 # Or write only the audio and timings, without video
 vac html video --input deck/index.html --lessons all --audio-only
+
+# Synthesize chosen slides' narration again after listening to it
+vac html video --input deck/index.html --lessons tractors --audio-only --retake tractors,tractors-engines
 ```
 
-Voiceover clips are cached by their text and voice, so unchanged narration is never sent to the TTS provider twice.
+Voiceover clips are cached by their text and voice, so unchanged narration is never sent to the TTS provider twice; `--retake` synthesizes only the named slides again.
 
 See [HTML Slide Decks](docs/guides/html-decks.md) for the deck conventions, translations, and timing, [Lessons and Courses](docs/guides/lessons.md) for lessons, the manifest, course terminology, YouTube chapters, and course recordings, and [Transcript Review](docs/guides/transcript-review.md) for reviewing narration before TTS.
 
