@@ -44,6 +44,7 @@ presentation.md (Marp)
 | `cmd/vac/` | CLI commands |
 | `pkg/orchestrator/` | Pipeline orchestration |
 | `pkg/htmldeck/` | HTML deck parsing → transcript, browser video config, lessons, lesson manifest |
+| `pkg/review/` | Transcript review before TTS: checks, review file, review page handler and snapshot |
 | `pkg/tts/` | TTS abstraction; per-voiceover clip cache keyed by text and voice |
 | `pkg/avatar/` | Avatar generation + caching |
 | `pkg/video/` | FFmpeg operations, overlays |
