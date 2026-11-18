@@ -353,6 +353,7 @@ TTS, and subtitle flags of [browser video](#browser-video), plus:
 | `--require-review` | bool | false | Refuse to record unless every slide being recorded is approved in `html review` for every `--lang` |
 | `--recordings` | bool | false | With `--lessons`: also write each lesson's audio, captions and slide timings into the deck's `recordings/` |
 | `--audio-only` | bool | false | With `--lessons`: write the recordings without recording video; implies `--recordings` |
+| `--retake` | strings | | With `--lessons`: slide IDs (`data-id`) whose cached narration clips are synthesized again, in every `--lang` |
 
 With `--lessons`, `--output` is not used: each lesson is written to `--output-dir` as
 `NN-<title>.mp4`, with YouTube chapters in `NN-<title>.chapters.txt` when it has three or
@@ -363,6 +364,10 @@ recorded or whose slides, narration, voice, or pronunciations changed since; wit
 
 Voiceover clips are cached by their spoken text, language, and voice, so narration that
 hasn't changed is never synthesized again (this applies to `browser video` too).
+`--retake` deletes the cached clips of the named slides, which must be in lessons that
+`--lessons` selects, so only they are synthesized again and each lesson's audio is
+rebuilt with its other slides' cached clips. See
+[Re-taking Slides](../lessons.md#re-taking-slides).
 
 ---
 

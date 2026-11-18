@@ -318,3 +318,81 @@ func TestClipKey(t *testing.T) {
 		}
 	}
 }
+
+func TestRemoveClips(t *testing.T) {
+	g := NewSegmentTTSGenerator(nil, transcript.VoiceConfig{Provider: "fake", VoiceID: "v1"})
+	g.SetPronunciations(&PronunciationDictionary{Terms: map[string]map[string]string{"vac": {"en-US": "V A C"}}})
+	dir := t.TempDir()
+	seg := &fakeSegment{id: "lesson", vos: []segment.Voiceover{
+		{Index: 0, Text: "Run vac."},
+		{Index: 1, Text: "Second slide."},
+		{Index: 2, Text: "Third slide.", Voice: &transcript.VoiceConfig{Provider: "fake", VoiceID: "v2"}},
+	}}
+	clipDir := filepath.Join(dir, ClipDir)
+	if err := os.MkdirAll(clipDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	clip := func(text string, voice transcript.VoiceConfig) string {
+		return filepath.Join(clipDir, ClipKey(text, "en-US", voice)+".mp3")
+	}
+	v1 := transcript.VoiceConfig{Provider: "fake", VoiceID: "v1"}
+	clips := []string{clip("Run V A C.", v1), clip("Second slide.", v1), clip("Third slide.", *seg.vos[2].Voice)}
+	meta := filepath.Join(dir, "lesson.json")
+	for _, p := range append(append([]string{}, clips...), meta) {
+		if err := os.WriteFile(p, []byte("x"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	got, err := g.RemoveClips(seg, "en-US", dir, []int{0, 2})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 2 || got[0] != clips[0] || got[1] != clips[2] {
+		t.Errorf("RemoveClips = %q, want %q", got, []string{clips[0], clips[2]})
+	}
+	for i, p := range clips {
+		_, err := os.Stat(p)
+		if kept := err == nil; kept != (i == 1) {
+			t.Errorf("clip %d kept = %v (stat: %v)", i, kept, err)
+		}
+	}
+	if _, err := os.Stat(meta); !os.IsNotExist(err) {
+		t.Errorf("metadata not removed: %v", err)
+	}
+
+	// Already removed: not an error.
+	if _, err := g.RemoveClips(seg, "en-US", dir, []int{0}); err != nil {
+		t.Errorf("second removal: %v", err)
+	}
+	// An unknown voiceover removes nothing.
+	if _, err := g.RemoveClips(seg, "en-US", dir, []int{1, 7}); err == nil {
+		t.Error("unknown voiceover: no error")
+	}
+	if _, err := os.Stat(clips[1]); err != nil {
+		t.Errorf("clip 1 removed despite the error: %v", err)
+	}
+}
+
+func TestRemoveClips_Resynthesizes(t *testing.T) {
+	g, calls := countingGenerator(t)
+	dir := t.TempDir()
+	ctx := context.Background()
+	seg := &fakeSegment{id: "lesson", vos: []segment.Voiceover{
+		{Index: 0, Text: "First slide."},
+		{Index: 1, Text: "Second slide."},
+		{Index: 2, Text: "Third slide."},
+	}}
+	if _, err := g.GenerateForSegment(ctx, seg, "en-US", dir); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := g.RemoveClips(seg, "en-US", dir, []int{1}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := g.GenerateForSegment(ctx, seg, "en-US", dir); err != nil {
+		t.Fatal(err)
+	}
+	if len(*calls) != 4 || (*calls)[3] != "Second slide." {
+		t.Fatalf("calls = %q, want the second slide synthesized again only", *calls)
+	}
+}

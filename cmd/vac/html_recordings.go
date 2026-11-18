@@ -10,7 +10,7 @@ import (
 	"github.com/academyosio/course-spec/deck"
 
 	"github.com/grokify/videoascode/pkg/recording"
-	"github.com/grokify/videoascode/pkg/source"
+	"github.com/grokify/videoascode/pkg/segment"
 )
 
 // planRecordingStatus sets each plan's status from its course recording,
@@ -51,15 +51,11 @@ func writeLessonAudio(ctx context.Context, in *htmlDeckInputs, p lessonPlan, vid
 	if err != nil {
 		return nil, err
 	}
-	segments, err := source.NewConfigSource(p.cfg).Load()
+	seg, err := lessonSegment(p.cfg)
 	if err != nil {
 		return nil, err
 	}
-	if len(segments) != 1 {
-		return nil, fmt.Errorf("a lesson config has %d segments, not one", len(segments))
-	}
-	seg := segments[0]
-	results, err := ts.gen.GenerateMultiLanguage(ctx, segments, bvLanguages, ts.audioDir)
+	results, err := ts.gen.GenerateMultiLanguage(ctx, []segment.Segment{seg}, bvLanguages, ts.audioDir)
 	if err != nil {
 		return nil, fmt.Errorf("synthesize the narration: %w", err)
 	}

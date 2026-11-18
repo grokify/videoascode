@@ -89,6 +89,7 @@ var (
 	hvLessons    []string
 	hvRecordings bool
 	hvAudioOnly  bool
+	hvRetake     []string
 )
 
 // Flags for 'vac html init' only.
@@ -145,7 +146,12 @@ much faster; with it, "changed" selects lessons whose recording is missing
 or out of date for the narration.
 
 Voiceover clips are cached by their text and voice, so unchanged narration is
-never sent to the TTS provider twice.`,
+never sent to the TTS provider twice. TTS output varies between runs, so to
+re-take slides whose narration did not sound right, name them with --retake
+(slide IDs, the deck's data-id values): their cached clips are deleted in
+every --lang and synthesized again, and their lessons' audio is rebuilt from
+the new clips and the other slides' cached clips. Each slide must be in a
+lesson that --lessons selects.`,
 	Example: `  vac html video --input deck/index.html --output deck.mp4
   vac html video --input deck/index.html --output deck.mp4 \
     --provider deepgram --subtitles --lang en-US,fr-FR
@@ -153,7 +159,9 @@ never sent to the TTS provider twice.`,
   vac html video --input deck/index.html --lessons sec-design,3
   vac html video --input deck/index.html --lessons changed
   vac html video --input deck/index.html --lessons changed --recordings
-  vac html video --input deck/index.html --lessons all --audio-only`,
+  vac html video --input deck/index.html --lessons all --audio-only
+  vac html video --input deck/index.html --lessons sec-design --audio-only \
+    --retake sec-design,sec-design-goals`,
 	RunE: runHTMLVideo,
 }
 
@@ -205,6 +213,7 @@ func init() {
 	htmlVideoCmd.Flags().StringSliceVar(&hvLessons, "lessons", nil, `Record lessons as separate videos: lesson IDs or numbers, "all", or "changed"`)
 	htmlVideoCmd.Flags().BoolVar(&hvRecordings, "recordings", false, "With --lessons: also write each lesson's audio, captions and slide timings into the deck's recordings/, for course platforms")
 	htmlVideoCmd.Flags().BoolVar(&hvAudioOnly, "audio-only", false, "With --lessons: write the recordings without recording video; implies --recordings")
+	htmlVideoCmd.Flags().StringSliceVar(&hvRetake, "retake", nil, "With --lessons: slide IDs whose cached narration clips are synthesized again, in every --lang")
 	for _, c := range []*cobra.Command{htmlLessonsCmd, htmlVideoCmd} {
 		c.Flags().StringVar(&hdOutputDir, "output-dir", "", "Directory for lesson videos and lessons.json (default: lessons/ next to the deck)")
 	}
@@ -396,6 +405,9 @@ func runHTMLVideo(cmd *cobra.Command, args []string) error {
 	if (hvRecordings || hvAudioOnly) && len(hvLessons) == 0 {
 		return fmt.Errorf("--recordings and --audio-only record lessons; add --lessons, such as --lessons all")
 	}
+	if len(hvRetake) > 0 && len(hvLessons) == 0 {
+		return fmt.Errorf("--retake re-takes slides of the lessons being recorded; add --lessons with the lessons that hold them")
+	}
 	in, err := loadHTMLDeck()
 	if err != nil {
 		return err
@@ -550,6 +562,10 @@ func recordLessons(ctx context.Context, in *htmlDeckInputs, deckURL string) erro
 	if err != nil {
 		return err
 	}
+	retakes, err := planRetakes(plans, selected, hvRetake)
+	if err != nil {
+		return err
+	}
 	if len(selected) == 0 {
 		fmt.Println("All lessons are up to date.")
 		return nil
@@ -581,6 +597,15 @@ func recordLessons(ctx context.Context, in *htmlDeckInputs, deckURL string) erro
 	for n, i := range selected {
 		p := plans[i]
 		fmt.Printf("\n[%d/%d] Lesson %d: %s (%d slides)\n", n+1, len(selected), p.lesson.Number, p.lesson.Title, len(p.lesson.Slides))
+		if pos := retakes[i]; len(pos) > 0 {
+			ts, err := newTTSSetup(p.cfg)
+			if err != nil {
+				return err
+			}
+			if err := retakeLessonClips(os.Stdout, ts.gen, ts.audioDir, p, pos, bvLanguages); err != nil {
+				return fmt.Errorf("lesson %d (%s): re-take: %w", p.lesson.Number, p.lesson.ID, err)
+			}
+		}
 		if hvAudioOnly {
 			if _, err := writeLessonAudio(ctx, in, p, "", true); err != nil {
 				return fmt.Errorf("lesson %d (%s): %w", p.lesson.Number, p.lesson.ID, err)

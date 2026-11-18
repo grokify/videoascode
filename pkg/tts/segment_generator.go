@@ -5,7 +5,9 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -152,14 +154,7 @@ func (g *SegmentTTSGenerator) generate(
 	clips := make([]clip, len(voiceovers))
 	fp := sha256.New()
 	for i, vo := range voiceovers {
-		voice := g.defaultVoice
-		if vo.Voice != nil {
-			voice = *vo.Voice
-		}
-		// Pronunciation substitutions affect only what's sent to TTS;
-		// vo.Text itself (used for subtitles/manifests) is untouched.
-		spoken := g.pronouncer.Apply(vo.Text, language)
-		key := ClipKey(spoken, language, voice)
+		spoken, voice, key := g.clipFor(vo, language)
 		clips[i] = clip{vo: vo, spoken: spoken, voice: voice, path: filepath.Join(clipDir, key+".mp3")}
 		fmt.Fprintf(fp, "%d:%s:%d\n", vo.Index, key, vo.Pause)
 	}
@@ -223,6 +218,49 @@ func (g *SegmentTTSGenerator) generate(
 		fmt.Printf("Warning: failed to save audio metadata: %v\n", err)
 	}
 	return result, nil
+}
+
+// clipFor returns the text sent to the TTS provider for vo in language,
+// the voice it is spoken in, and its ClipKey.
+func (g *SegmentTTSGenerator) clipFor(vo segment.Voiceover, language string) (spoken string, voice transcript.VoiceConfig, key string) {
+	voice = g.defaultVoice
+	if vo.Voice != nil {
+		voice = *vo.Voice
+	}
+	// Pronunciation substitutions affect only what's sent to TTS;
+	// vo.Text itself (used for subtitles/manifests) is untouched.
+	spoken = g.pronouncer.Apply(vo.Text, language)
+	return spoken, voice, ClipKey(spoken, language, voice)
+}
+
+// RemoveClips deletes the cached clips of the segment's voiceovers with the
+// given indexes in language, so the next GenerateForSegment with the same
+// outputDir synthesizes them again: a re-take, since TTS output varies
+// between runs. It also deletes the segment's assembled audio metadata, so
+// the segment is reassembled from the new clips and the other voiceovers'
+// cached clips, which are kept. It returns the paths of the clips, whether
+// or not they existed; a clip or metadata file that does not exist is not
+// an error. An index the segment has no voiceover for is an error.
+func (g *SegmentTTSGenerator) RemoveClips(seg segment.Segment, language, outputDir string, indexes []int) ([]string, error) {
+	byIndex := map[int]segment.Voiceover{}
+	for _, vo := range seg.GetVoiceovers(language) {
+		byIndex[vo.Index] = vo
+	}
+	var paths []string
+	for _, i := range indexes {
+		vo, ok := byIndex[i]
+		if !ok {
+			return nil, fmt.Errorf("segment %s has no voiceover %d in %s", seg.GetID(), i, language)
+		}
+		_, _, key := g.clipFor(vo, language)
+		paths = append(paths, filepath.Join(outputDir, ClipDir, key+".mp3"))
+	}
+	for _, path := range append(append([]string{}, paths...), filepath.Join(outputDir, seg.GetID()+".json")) {
+		if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			return nil, err
+		}
+	}
+	return paths, nil
 }
 
 // ensureClip returns the duration of the clip at path, synthesizing it first

@@ -185,6 +185,24 @@ fingerprint, and falls back to the browser's voice when the narration changed. W
 `--audio-only`, `--lessons changed` re-records exactly those lessons. Commit the
 recordings with the course, and push it with `academyos course push`.
 
+### Re-taking Slides
+
+TTS output varies between runs, so after listening to a recording you may want a
+slide's narration synthesized again with the same text. Name those slides by their
+`data-id` with `--retake`, along with the lessons that hold them:
+
+```bash
+vac html video --input deck/index.html --lessons tractors --audio-only \
+  --retake tractors,tractors-engines
+```
+
+For each slide and `--lang`, vac deletes the slide's cached clip and its lesson's
+assembled audio, prints the clip being re-taken, and then records the lesson as usual:
+only the re-taken slides are sent to the TTS provider, and the lesson's audio is
+rebuilt from their new clips and the other slides' cached clips. Every slide must be
+in a lesson that `--lessons` selects; an unknown slide, or one in a lesson not being
+recorded, is an error. `--retake` works with or without `--audio-only`.
+
 ## Writing Lessons That Stand Alone
 
 Learners jump straight to a lesson, rewatch one, or come back days later, so:
