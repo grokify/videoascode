@@ -10,32 +10,32 @@ require (
 	github.com/grokify/mogo v0.75.0
 	github.com/plexusone/omniavatar v0.3.0
 	github.com/plexusone/omniavatar-core v0.4.0
-	github.com/plexusone/omnivoice v0.15.0
-	github.com/plexusone/omnivoice-core v0.19.0
+	github.com/plexusone/omnivoice v0.16.0
+	github.com/plexusone/omnivoice-core v0.20.0
 	github.com/spf13/cobra v1.10.2
-	golang.org/x/net v0.62.0
+	golang.org/x/net v0.63.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2 // indirect
 	buf.build/go/protovalidate v1.4.0 // indirect
-	buf.build/go/protoyaml v0.7.0 // indirect
-	cel.dev/cel-go v0.32.0 // indirect
-	cel.dev/expr v0.25.3 // indirect
+	buf.build/go/protoyaml v0.8.0 // indirect
+	cel.dev/cel-go v0.33.4 // indirect
+	cel.dev/expr v0.26.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/deepgram/deepgram-go-sdk/v3 v3.11.0 // indirect
+	github.com/deepgram/deepgram-go-sdk/v3 v3.11.1 // indirect
 	github.com/dennwc/iters v1.2.2 // indirect
 	github.com/dlclark/regexp2 v1.12.0 // indirect
 	github.com/dvonthenen/websocket v1.5.1-dyv.2 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/frostbyte73/core v0.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
-	github.com/gammazero/deque v1.2.2 // indirect
+	github.com/gammazero/deque v1.2.3 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/errors v0.8.0 // indirect
 	github.com/go-faster/jx v1.2.0 // indirect
@@ -51,12 +51,12 @@ require (
 	github.com/huandu/xstrings v1.6.3 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jxskiss/base62 v1.1.0 // indirect
-	github.com/klauspost/compress v1.20.3 // indirect
-	github.com/klauspost/cpuid/v2 v2.4.1 // indirect
+	github.com/klauspost/compress v1.20.4 // indirect
+	github.com/klauspost/cpuid/v2 v2.4.2 // indirect
 	github.com/lithammer/shortuuid/v4 v4.3.0 // indirect
 	github.com/livekit/mageutil v0.0.0-20250511045019-0f1ff63f7731 // indirect
-	github.com/livekit/mediatransportutil v0.0.0-20261020100523-e0b22b120fb1 // indirect
-	github.com/livekit/protocol v1.53.0 // indirect
+	github.com/livekit/mediatransportutil v0.0.0-20261116220501-6af81419a977 // indirect
+	github.com/livekit/protocol v1.54.1 // indirect
 	github.com/livekit/psrpc v0.8.2 // indirect
 	github.com/livekit/server-sdk-go/v2 v2.19.0 // indirect
 	github.com/magefile/mage v1.17.2 // indirect
@@ -66,31 +66,32 @@ require (
 	github.com/nats-io/nats.go v1.55.0 // indirect
 	github.com/ogen-go/ogen v1.25.0 // indirect
 	github.com/openai/openai-go v1.12.0 // indirect
-	github.com/petermattis/goid v0.0.0-20260918085751-abfca077860b // indirect
-	github.com/pion/datachannel v1.6.3 // indirect
-	github.com/pion/dtls/v3 v3.1.15 // indirect
-	github.com/pion/ice/v4 v4.4.8 // indirect
+	github.com/pandatix/go-abnf v0.5.5 // indirect
+	github.com/petermattis/goid v0.0.0-20261109124353-7cfa343ad0ab // indirect
+	github.com/pion/datachannel v1.6.4 // indirect
+	github.com/pion/dtls/v3 v3.1.16 // indirect
+	github.com/pion/ice/v4 v4.4.9 // indirect
 	github.com/pion/interceptor v0.1.51 // indirect
 	github.com/pion/logging v0.2.4 // indirect
 	github.com/pion/mdns/v2 v2.2.2 // indirect
 	github.com/pion/randutil v0.1.0 // indirect
 	github.com/pion/rtcp v1.2.20 // indirect
 	github.com/pion/rtp v1.10.6 // indirect
-	github.com/pion/sctp v1.12.0 // indirect
+	github.com/pion/sctp v1.12.1 // indirect
 	github.com/pion/sdp/v3 v3.0.20 // indirect
 	github.com/pion/srtp/v3 v3.1.3 // indirect
 	github.com/pion/stun/v4 v4.0.1 // indirect
-	github.com/pion/transport/v5 v5.1.1 // indirect
+	github.com/pion/transport/v5 v5.1.5 // indirect
 	github.com/pion/turn/v5 v5.1.3 // indirect
-	github.com/pion/webrtc/v4 v4.2.25 // indirect
+	github.com/pion/webrtc/v4 v4.2.26 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/plexusone/bithuman-go v0.2.0 // indirect
-	github.com/plexusone/elevenlabs-go v0.15.0 // indirect
+	github.com/plexusone/elevenlabs-go v0.15.1 // indirect
 	github.com/plexusone/heygen-go v0.2.0 // indirect
 	github.com/plexusone/ogen-tools v0.3.0 // indirect
 	github.com/plexusone/omni-deepgram v0.7.0 // indirect
 	github.com/plexusone/omni-google v0.7.0 // indirect
-	github.com/plexusone/omni-openai v0.8.0 // indirect
+	github.com/plexusone/omni-openai v0.8.1 // indirect
 	github.com/plexusone/omni-telnyx v0.7.0 // indirect
 	github.com/plexusone/omni-twilio v0.12.0 // indirect
 	github.com/plexusone/omnillm-core v0.18.1 // indirect
@@ -98,18 +99,18 @@ require (
 	github.com/plexusone/terminology-spec v0.2.0 // indirect
 	github.com/prometheus/client_golang v1.25.0 // indirect
 	github.com/prometheus/client_model v0.6.3 // indirect
-	github.com/prometheus/common v0.72.1 // indirect
+	github.com/prometheus/common v0.74.0 // indirect
 	github.com/prometheus/procfs v0.23.0 // indirect
 	github.com/puzpuzpuz/xsync/v4 v4.5.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/shopspring/decimal v1.6.0 // indirect
 	github.com/spf13/pflag v1.1.0 // indirect
 	github.com/team-telnyx/telnyx-go/v4 v4.107.0 // indirect
-	github.com/tidwall/gjson v1.20.2 // indirect
+	github.com/tidwall/gjson v1.20.4 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.3.0 // indirect
-	github.com/tidwall/sjson v1.2.9 // indirect
-	github.com/twilio/twilio-go v1.33.0 // indirect
+	github.com/tidwall/sjson v1.2.10 // indirect
+	github.com/twilio/twilio-go v1.33.1 // indirect
 	github.com/twitchtv/twirp v8.1.3+incompatible // indirect
 	github.com/wlynxg/anet v0.0.5 // indirect
 	github.com/ysmood/fetchup v0.5.3 // indirect
@@ -127,15 +128,15 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.28.0 // indirect
 	go.uber.org/zap/exp v0.3.0 // indirect
-	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/crypto v0.58.0 // indirect
-	golang.org/x/exp v0.0.0-20261113113407-e3970619a1a4 // indirect
+	go.yaml.in/yaml/v3 v3.0.6 // indirect
+	golang.org/x/crypto v0.59.0 // indirect
+	golang.org/x/exp v0.0.0-20261117202309-7a49493bfd90 // indirect
 	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/text v0.44.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20261019180522-ce908d29299b // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261026165753-2ffab32bce7e // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20261116203732-fd2c7689a808 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261116203732-fd2c7689a808 // indirect
 	google.golang.org/grpc v1.85.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -147,3 +148,8 @@ require (
 // Remove this replace directive when upgrading rod to a version that
 // supports newer fetchup releases.
 replace github.com/ysmood/fetchup => github.com/ysmood/fetchup v0.2.3
+
+// v2.20.0 builds only with its replace of pion/webrtc by livekit's fork,
+// which Go ignores in a dependency, so it fails to compile here. Remove this
+// once a later release builds without it.
+exclude github.com/livekit/server-sdk-go/v2 v2.20.0
