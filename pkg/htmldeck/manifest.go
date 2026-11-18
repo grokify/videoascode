@@ -37,6 +37,9 @@ type ManifestLesson struct {
 	// Videos maps a language to the lesson's video file, relative to the
 	// manifest. Empty until the lesson is recorded.
 	Videos map[string]string `json:"videos,omitempty"`
+	// Chapters maps a language to the lesson video's YouTube chapters
+	// file, relative to the manifest, when the lesson has three or more.
+	Chapters map[string]string `json:"chapters,omitempty"`
 	// DurationMs is the length of the primary video.
 	DurationMs int `json:"durationMs,omitempty"`
 	// Fingerprint identifies the lesson content the videos were recorded

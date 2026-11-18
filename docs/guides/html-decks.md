@@ -92,11 +92,14 @@ vac browser video --config deck/deck.video.json --output deck.mp4
 
 A slide with a `data-lesson` attribute starts a lesson, and `vac html video --lessons`
 records each lesson as its own video with a `lessons.json` manifest, re-recording only
-the lessons that change. See [Lessons and Courses](lessons.md).
+the lessons that change. Each video gets YouTube chapters beside it, and `--recordings`
+or `--audio-only` also writes each lesson's audio and slide timings into the deck's
+`recordings/` for course platforms. See [Lessons and Courses](lessons.md).
 
 ```bash
 vac html lessons --input deck/index.html
 vac html video --input deck/index.html --lessons all
+vac html video --input deck/index.html --lessons all --audio-only
 ```
 
 ## Review the Narration

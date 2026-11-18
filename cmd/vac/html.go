@@ -58,7 +58,10 @@ Examples:
   vac html video --input deck/index.html --lessons all
 
   # Later: re-record only the lessons whose slides or narration changed
-  vac html video --input deck/index.html --lessons changed`,
+  vac html video --input deck/index.html --lessons changed
+
+  # Write each lesson's audio and slide timings for AcademyOS, without video
+  vac html video --input deck/index.html --lessons all --audio-only`,
 }
 
 // Flags shared by 'vac html init' and 'vac html video'.
@@ -82,7 +85,11 @@ var (
 )
 
 // Flags for 'vac html video' only.
-var hvLessons []string
+var (
+	hvLessons    []string
+	hvRecordings bool
+	hvAudioOnly  bool
+)
 
 // Flags for 'vac html init' only.
 var (
@@ -125,7 +132,17 @@ every lesson with its videos, duration, and a fingerprint of the content it
 was recorded from. --lessons takes lesson IDs or numbers, "all", or
 "changed" (lessons not yet recorded or whose slides, narration, voice, or
 pronunciations changed since). The deck is opened at each lesson's first
-slide with --start-fragment (default "#{id}").
+slide with --start-fragment (default "#{id}"). Beside each video,
+<name>.chapters.txt lists YouTube chapters, one per slide of at least ten
+seconds, for the video's description.
+
+With --recordings, each recorded lesson's audio is also written into the
+deck's recordings/ directory in the course-spec format: the lesson's MP3 and
+WebVTT captions per language, and its entry in recordings.json with each
+slide's start time. Course platforms such as AcademyOS play it with the
+slides. --audio-only writes the recordings without recording video, which is
+much faster; with it, "changed" selects lessons whose recording is missing
+or out of date for the narration.
 
 Voiceover clips are cached by their text and voice, so unchanged narration is
 never sent to the TTS provider twice.`,
@@ -134,7 +151,9 @@ never sent to the TTS provider twice.`,
     --provider deepgram --subtitles --lang en-US,fr-FR
   vac html video --input deck/index.html --lessons all --output-dir video/
   vac html video --input deck/index.html --lessons sec-design,3
-  vac html video --input deck/index.html --lessons changed`,
+  vac html video --input deck/index.html --lessons changed
+  vac html video --input deck/index.html --lessons changed --recordings
+  vac html video --input deck/index.html --lessons all --audio-only`,
 	RunE: runHTMLVideo,
 }
 
@@ -184,6 +203,8 @@ func init() {
 
 	addBrowserVideoFlags(htmlVideoCmd)
 	htmlVideoCmd.Flags().StringSliceVar(&hvLessons, "lessons", nil, `Record lessons as separate videos: lesson IDs or numbers, "all", or "changed"`)
+	htmlVideoCmd.Flags().BoolVar(&hvRecordings, "recordings", false, "With --lessons: also write each lesson's audio, captions and slide timings into the deck's recordings/, for course platforms")
+	htmlVideoCmd.Flags().BoolVar(&hvAudioOnly, "audio-only", false, "With --lessons: write the recordings without recording video; implies --recordings")
 	for _, c := range []*cobra.Command{htmlLessonsCmd, htmlVideoCmd} {
 		c.Flags().StringVar(&hdOutputDir, "output-dir", "", "Directory for lesson videos and lessons.json (default: lessons/ next to the deck)")
 	}
@@ -372,6 +393,9 @@ func runHTMLVideo(cmd *cobra.Command, args []string) error {
 	if len(hvLessons) > 0 && cmd.Flags().Changed("output") {
 		return fmt.Errorf("--output names a single video; with --lessons, use --output-dir")
 	}
+	if (hvRecordings || hvAudioOnly) && len(hvLessons) == 0 {
+		return fmt.Errorf("--recordings and --audio-only record lessons; add --lessons, such as --lessons all")
+	}
 	in, err := loadHTMLDeck()
 	if err != nil {
 		return err
@@ -516,6 +540,12 @@ func recordLessons(ctx context.Context, in *htmlDeckInputs, deckURL string) erro
 	if err != nil {
 		return err
 	}
+	if hvAudioOnly {
+		// Without video, a lesson is up to date when its recording is.
+		if err := planRecordingStatus(plans); err != nil {
+			return err
+		}
+	}
 	selected, err := selectLessons(in.deck, plans, hvLessons)
 	if err != nil {
 		return err
@@ -551,14 +581,26 @@ func recordLessons(ctx context.Context, in *htmlDeckInputs, deckURL string) erro
 	for n, i := range selected {
 		p := plans[i]
 		fmt.Printf("\n[%d/%d] Lesson %d: %s (%d slides)\n", n+1, len(selected), p.lesson.Number, p.lesson.Title, len(p.lesson.Slides))
+		if hvAudioOnly {
+			if _, err := writeLessonAudio(ctx, in, p, "", true); err != nil {
+				return fmt.Errorf("lesson %d (%s): %w", p.lesson.Number, p.lesson.ID, err)
+			}
+			continue
+		}
 		file := p.lesson.Name() + ".mp4"
 		out := filepath.Join(lessonsDir(), file)
 		label := fmt.Sprintf("%s, lesson %d", hdInput, p.lesson.Number)
 		if err := recordBrowserVideo(ctx, p.cfg, label, out); err != nil {
 			return fmt.Errorf("lesson %d (%s): %w", p.lesson.Number, p.lesson.ID, err)
 		}
+		// The audio was just synthesized, so this reads the cached clips.
+		chapters, err := writeLessonAudio(ctx, in, p, strings.TrimSuffix(out, ".mp4"), hvRecordings)
+		if err != nil {
+			return fmt.Errorf("lesson %d (%s): %w", p.lesson.Number, p.lesson.ID, err)
+		}
 
 		e := &m.Lessons[i]
+		e.Chapters = chapters
 		e.Videos = map[string]string{bvLanguages[0]: file}
 		for _, lang := range bvLanguages[1:] {
 			e.Videos[lang] = filepath.Base(languageVideoPath(out, lang))
@@ -570,6 +612,10 @@ func recordLessons(ctx context.Context, in *htmlDeckInputs, deckURL string) erro
 		if err := m.Save(manifestPath); err != nil {
 			return err
 		}
+	}
+	if hvAudioOnly {
+		fmt.Printf("\nRecorded the audio of %d of %d lessons into %s\n", len(selected), len(plans), filepath.Join(filepath.Dir(hdInput), "recordings"))
+		return nil
 	}
 	fmt.Printf("\nRecorded %d of %d lessons; manifest: %s\n", len(selected), len(plans), manifestPath)
 	return nil

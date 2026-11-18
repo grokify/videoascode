@@ -44,6 +44,8 @@ Both providers offer TTS and STT capabilities. You can use either one for both f
 - 🖥️ **Record HTML slide decks** with narration in `data-vo` attributes or reveal.js speaker notes, served and recorded in one command (see [HTML Slide Decks](docs/guides/html-decks.md))
 - 🎓 **Record course lessons** — one video per lesson with a `lessons.json` manifest, re-recording only lessons whose content changed (see [Lessons and Courses](docs/guides/lessons.md))
 - ✅ **Review narration before TTS** — read each slide's transcript next to the slide, listen to it with the browser's own voice, approve it per language, and refuse to record until it is approved (see [Transcript Review](docs/guides/transcript-review.md))
+- 🎧 **Recordings for course platforms** — `--recordings` writes each lesson's audio, captions, and slide timings in the [course-spec](https://github.com/academyosio/course-spec) format, which AcademyOS plays with the slides; `--audio-only` writes them without video (see [Lessons and Courses](docs/guides/lessons.md#recordings-for-course-platforms))
+- 📑 **YouTube chapters** — a chapter per slide beside each lesson video, ready for the video's description
 - 🌐 **JSON transcript support** for multi-language voiceovers
 - 🎙️ **Text-to-speech** via OmniVoice (ElevenLabs, Deepgram, or local F5-TTS)
 - 🗣️ **Multi-language** support with per-slide voice configuration
@@ -395,11 +397,17 @@ vac html review --input deck/index.html --open
 
 # Record only once every slide being recorded is approved
 vac html video --input deck/index.html --lessons all --require-review
+
+# Also write each lesson's audio and slide timings for a course platform
+vac html video --input deck/index.html --lessons changed --recordings
+
+# Or write only the audio and timings, without video
+vac html video --input deck/index.html --lessons all --audio-only
 ```
 
 Voiceover clips are cached by their text and voice, so unchanged narration is never sent to the TTS provider twice.
 
-See [HTML Slide Decks](docs/guides/html-decks.md) for the deck conventions, translations, and timing, [Lessons and Courses](docs/guides/lessons.md) for lessons, the manifest, and course terminology, and [Transcript Review](docs/guides/transcript-review.md) for reviewing narration before TTS.
+See [HTML Slide Decks](docs/guides/html-decks.md) for the deck conventions, translations, and timing, [Lessons and Courses](docs/guides/lessons.md) for lessons, the manifest, course terminology, YouTube chapters, and course recordings, and [Transcript Review](docs/guides/transcript-review.md) for reviewing narration before TTS.
 
 ### Command: `vac browser record`
 

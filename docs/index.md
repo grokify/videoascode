@@ -16,6 +16,8 @@ vac is a command-line tool that automates the conversion of [Marp](https://marp.
 - :material-transition: **Crossfade transitions** between slides
 - :material-subtitles: **Subtitle generation** from voiceover timing or speech-to-text (Deepgram or local Whisper)
 - :material-school: **Course lessons** — record a deck as one video per lesson, with a manifest for your course platform, re-recording only the lessons that changed
+- :material-check-decagram: **Transcript review** — read and approve each slide's narration next to the slide before any TTS call, and refuse to record until it is approved
+- :material-headphones: **Course recordings** — each lesson's audio, captions, and slide timings for course platforms such as AcademyOS, with or without video, plus YouTube chapters per lesson video
 - :material-cached: **Audio caching** per voiceover, keyed by text and voice, so only edited narration is sent to TTS again
 - :material-account-circle: **Avatar presenter overlay** (optional) via [OmniAvatar](https://github.com/plexusone/omniavatar) — HeyGen, Tavus, bitHuman
 - :material-shield-lock: **Local, offline TTS & STT** (optional) — F5-TTS + Whisper on Apple Silicon via OmniVoice MLX providers, no API keys or cloud calls
@@ -124,6 +126,7 @@ flowchart LR
 |----------|----------|---------|----------|
 | **YouTube** | Tutorials, demos | `slides video` | Combined video with transitions |
 | **Udemy** | Course lectures | `slides video`, `html video --lessons` | One video per lesson, re-record only what changed |
+| **AcademyOS** | Course lessons | `html video --lessons --audio-only` | Each lesson's audio and slide timings, played with the slides |
 | **Coursera** | Academic content | `slides video` | Professional voice settings |
 | **Product Demos** | SaaS walkthroughs | `browser video` | Automated browser recording |
 | **Talks & Briefings** | HTML decks, reveal.js | `html video` | Per-slide narration timing, no build step |
