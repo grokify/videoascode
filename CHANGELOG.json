@@ -8,7 +8,7 @@
   "releases": [
     {
       "version": "v0.12.0",
-      "date": "2026-11-16",
+      "date": "2026-11-18",
       "highlights": [
         { "description": "`--retake` synthesizes only the slides that sounded wrong again, reusing every other slide's cached clip, so a correction costs only those slides' characters", "commit": "2330365" }
       ],
@@ -21,6 +21,10 @@
       ],
       "tests": [
         { "description": "Clip re-takes and `--retake` validation", "commit": "5fd4d5b" }
+      ],
+      "dependencies": [
+        { "description": "Upgrade `github.com/plexusone/omnivoice` to v0.16.0, `github.com/plexusone/omnivoice-core` to v0.20.0 and `golang.org/x/net` to v0.63.0, and update indirect Go module dependencies", "commit": "777b19a" },
+        { "description": "Exclude `github.com/livekit/server-sdk-go/v2` v2.20.0, which builds only with its own replace of `pion/webrtc` and fails to compile as a dependency; v2.19.0 is used", "commit": "777b19a" }
       ]
     },
     {
