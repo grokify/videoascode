@@ -10,8 +10,8 @@ require (
 	github.com/grokify/mogo v0.75.0
 	github.com/plexusone/omniavatar v0.3.0
 	github.com/plexusone/omniavatar-core v0.4.0
-	github.com/plexusone/omnivoice v0.16.0
-	github.com/plexusone/omnivoice-core v0.20.0
+	github.com/plexusone/omnivoice v0.16.1
+	github.com/plexusone/omnivoice-core v0.20.1
 	github.com/spf13/cobra v1.10.2
 	golang.org/x/net v0.63.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -28,7 +28,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/deepgram/deepgram-go-sdk/v3 v3.11.1 // indirect
+	github.com/deepgram/deepgram-go-sdk/v3 v3.12.0 // indirect
 	github.com/dennwc/iters v1.2.2 // indirect
 	github.com/dlclark/regexp2 v1.12.0 // indirect
 	github.com/dvonthenen/websocket v1.5.1-dyv.2 // indirect
@@ -106,10 +106,10 @@ require (
 	github.com/shopspring/decimal v1.6.0 // indirect
 	github.com/spf13/pflag v1.1.0 // indirect
 	github.com/team-telnyx/telnyx-go/v4 v4.107.0 // indirect
-	github.com/tidwall/gjson v1.20.4 // indirect
+	github.com/tidwall/gjson v1.20.6 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.3.0 // indirect
-	github.com/tidwall/sjson v1.2.10 // indirect
+	github.com/tidwall/sjson v1.2.11 // indirect
 	github.com/twilio/twilio-go v1.33.1 // indirect
 	github.com/twitchtv/twirp v8.1.3+incompatible // indirect
 	github.com/wlynxg/anet v0.0.5 // indirect
@@ -119,7 +119,7 @@ require (
 	github.com/ysmood/gson v0.7.3 // indirect
 	github.com/ysmood/leakless v0.9.0 // indirect
 	github.com/zeebo/xxh3 v1.1.0 // indirect
-	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
+	go.opentelemetry.io/auto/sdk v1.2.2 // indirect
 	go.opentelemetry.io/otel v1.47.0 // indirect
 	go.opentelemetry.io/otel/log v1.47.0 // indirect
 	go.opentelemetry.io/otel/metric v1.47.0 // indirect
@@ -130,13 +130,13 @@ require (
 	go.uber.org/zap/exp v0.3.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/crypto v0.59.0 // indirect
-	golang.org/x/exp v0.0.0-20261117202309-7a49493bfd90 // indirect
+	golang.org/x/exp v0.0.0-20261121134650-e1094eeca1b5 // indirect
 	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/text v0.44.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261116203732-fd2c7689a808 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261116203732-fd2c7689a808 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261118221215-c8830f628b3f // indirect
 	google.golang.org/grpc v1.85.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
